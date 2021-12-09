@@ -3,19 +3,17 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.leyuna</groupId>
-    <artifactId>disk-start</artifactId>
+    <artifactId>disk-client</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>disk-start</name>
+    <name>disk-client</name>
     <description>Demo project for Spring Boot</description>
+
     <parent>
         <groupId>com.leyuna</groupId>
         <artifactId>disk</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-        </dependency>
     </dependencies>
 </project>
