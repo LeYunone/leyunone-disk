@@ -3,16 +3,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.leyuna</groupId>
-    <artifactId>disk-client</artifactId>
+    <artifactId>disk-domain</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>disk-client</name>
+    <name>disk-domain</name>
     <description>Demo project for Spring Boot</description>
     <parent>
         <groupId>com.leyuna</groupId>
         <artifactId>disk</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-
     <dependencies>
     </dependencies>
+
 </project>

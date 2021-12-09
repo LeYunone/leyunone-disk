@@ -16,6 +16,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.leyuna</groupId>
+            <artifactId>disk-client</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>

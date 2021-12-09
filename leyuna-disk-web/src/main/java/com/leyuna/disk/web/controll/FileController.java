@@ -1,5 +1,7 @@
 package com.leyuna.disk.web.controll;
 
+import com.leyuna.disk.client.DataResponse;
+import com.leyuna.disk.client.dto.file.FileDTO;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,5 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/file")
 public class FileController {
 
-
+    /**
+     * 查询服务器内文件[条件-分页]
+     * @return
+     */
+    @RequestMapping("/selectFile")
+    public DataResponse selectFileList(FileDTO fileDTO){
+        
+    }
 }

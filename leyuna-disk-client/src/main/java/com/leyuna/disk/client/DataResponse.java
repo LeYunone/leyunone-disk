@@ -1,4 +1,4 @@
-package com.leyuna.disk.client.dto;
+package com.leyuna.disk.client;
 
 /**
  * @author pengli
