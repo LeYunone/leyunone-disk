@@ -14,5 +14,10 @@
     </parent>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-beans</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 </project>
