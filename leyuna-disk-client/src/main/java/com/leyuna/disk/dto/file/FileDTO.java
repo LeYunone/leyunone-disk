@@ -1,4 +1,4 @@
-package com.leyuna.disk.client.dto.file;
+package com.leyuna.disk.dto.file;
 
 import lombok.Getter;
 import lombok.Setter;

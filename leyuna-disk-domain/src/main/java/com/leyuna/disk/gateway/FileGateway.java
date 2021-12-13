@@ -1,6 +1,6 @@
-package com.leyuna.disk.domain.gateway;
+package com.leyuna.disk.gateway;
 
-import com.leyuna.disk.client.co.FileCO;
+import com.leyuna.disk.co.FileCO;
 
 /**
  * @author pengli

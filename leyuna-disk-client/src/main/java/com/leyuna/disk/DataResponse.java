@@ -1,4 +1,4 @@
-package com.leyuna.disk.client;
+package com.leyuna.disk;
 
 import lombok.Getter;
 import lombok.Setter;

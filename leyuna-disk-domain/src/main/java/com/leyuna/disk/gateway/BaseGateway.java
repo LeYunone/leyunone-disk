@@ -1,4 +1,4 @@
-package com.leyuna.disk.domain.gateway;
+package com.leyuna.disk.gateway;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 

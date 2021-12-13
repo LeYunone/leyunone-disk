@@ -1,7 +1,6 @@
-package com.leyuna.disk.web.controll;
+package com.leyuna.disk.controll;
 
-import com.leyuna.disk.client.DataResponse;
-import com.leyuna.disk.client.dto.file.FileDTO;
+import com.leyuna.disk.DataResponse;
 import com.leyuna.disk.service.file.FileQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

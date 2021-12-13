@@ -1,4 +1,4 @@
-package com.leyuna.disk.dao.repository.entry;
+package com.leyuna.disk.repository.entry;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,11 +1,11 @@
-package com.leyuna.disk.dao.repository;
+package com.leyuna.disk.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.leyuna.disk.client.util.TransformationUtil;
-import com.leyuna.disk.domain.gateway.BaseGateway;
+import com.leyuna.disk.util.TransformationUtil;
+import com.leyuna.disk.gateway.BaseGateway;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;

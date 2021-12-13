@@ -1,7 +1,7 @@
-package com.leyuna.disk.dao.repository.mapper;
+package com.leyuna.disk.repository.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.leyuna.disk.dao.repository.entry.FileDO;
+import com.leyuna.disk.repository.entry.FileDO;
 
 /**
  * @author pengli

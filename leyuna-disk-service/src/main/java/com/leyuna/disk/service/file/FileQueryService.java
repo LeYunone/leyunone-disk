@@ -1,10 +1,8 @@
 package com.leyuna.disk.service.file;
 
-import com.leyuna.disk.client.DataResponse;
-import com.leyuna.disk.client.co.FileCO;
-import com.leyuna.disk.client.dto.file.FileDTO;
-import com.leyuna.disk.domain.gateway.FileGateway;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.leyuna.disk.DataResponse;
+import com.leyuna.disk.co.FileCO;
+import com.leyuna.disk.dto.file.FileDTO;
 import org.springframework.stereotype.Service;
 
 
@@ -15,9 +13,6 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class FileQueryService {
-
-    @Autowired
-    private FileGateway fileGateway;
 
     public DataResponse<FileCO> selectFile(FileDTO fileDTO){
         return null;
