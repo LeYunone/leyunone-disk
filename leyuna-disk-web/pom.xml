@@ -17,7 +17,8 @@
     <dependencies>
         <dependency>
             <groupId>com.leyuna</groupId>
-            <artifactId>disk-client</artifactId>
+            <artifactId>disk-service</artifactId>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

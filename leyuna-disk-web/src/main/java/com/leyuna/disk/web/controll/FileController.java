@@ -2,7 +2,11 @@ package com.leyuna.disk.web.controll;
 
 import com.leyuna.disk.client.DataResponse;
 import com.leyuna.disk.client.dto.file.FileDTO;
+import com.leyuna.disk.service.file.FileQueryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -14,12 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/file")
 public class FileController {
 
+    @Autowired
+    private FileQueryService fileQueryService;
+
     /**
      * 查询服务器内文件[条件-分页]
      * @return
      */
-    @RequestMapping("/selectFile")
-    public DataResponse selectFileList(FileDTO fileDTO){
-        
+    @GetMapping("/selectFile/{id}")
+    public DataResponse selectFileList(@RequestParam("id") String id){
     }
 }

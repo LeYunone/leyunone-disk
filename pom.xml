@@ -10,6 +10,7 @@
     <modules>
         <module>leyuna-disk-start</module>
         <module>leyuna-disk-service</module>
+        <module>leyuna-disk-domain</module>
         <module>leyuna-disk-web</module>
         <module>leyuna-disk-start</module>
     </modules>
@@ -26,12 +27,17 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <spring-boot.version>2.3.7.RELEASE</spring-boot.version>
         <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
+        <mybatis-plus.version>3.1.0</mybatis-plus.version>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.20</version>
+        </dependency>
+        <dependency>
+            <groupId>com.leyuna</groupId>
+            <artifactId>disk-client</artifactId>
         </dependency>
     </dependencies>
     <dependencyManagement>
@@ -49,6 +55,16 @@
             <dependency>
                 <groupId>com.leyuna</groupId>
                 <artifactId>disk-web</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.leyuna</groupId>
+                <artifactId>disk-domain</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.leyuna</groupId>
+                <artifactId>disk-dao</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
