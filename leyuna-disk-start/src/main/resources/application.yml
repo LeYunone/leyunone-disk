@@ -1,11 +1,23 @@
 server:
-  port: 8111
+  port: 9999
 
+  ## 数据库配置
 spring:
-  application:
-    name: file-service
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/blog?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: root
+    filters: stat
+    maxActive: 20
+    initialSize: 1
+    maxWait: 60000
+    minIdle: 1
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: select 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    maxOpenPreparedStatements: 20
+    driver-class-name: com.mysql.jdbc.Driver

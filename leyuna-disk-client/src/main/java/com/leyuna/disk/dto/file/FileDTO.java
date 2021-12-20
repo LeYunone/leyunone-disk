@@ -1,8 +1,10 @@
 package com.leyuna.disk.dto.file;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.experimental.Accessors;
 
 /**
  * @author pengli
@@ -11,6 +13,9 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+@Accessors(chain = true)
+@EqualsAndHashCode(callSuper = false)
 public class FileDTO {
 
+    private String id;
 }

@@ -16,13 +16,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.leyuna</groupId>
-            <artifactId>disk-service</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.leyuna</groupId>
+            <artifactId>disk-service</artifactId>
         </dependency>
     </dependencies>
 </project>
