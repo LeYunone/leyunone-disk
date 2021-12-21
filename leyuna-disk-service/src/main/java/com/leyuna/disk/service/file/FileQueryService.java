@@ -2,7 +2,8 @@ package com.leyuna.disk.service.file;
 
 import com.leyuna.disk.DataResponse;
 import com.leyuna.disk.co.FileCO;
-import com.leyuna.disk.domain.FileE;
+import com.leyuna.disk.co.FileInfoCO;
+import com.leyuna.disk.domain.FileInfoE;
 import com.leyuna.disk.dto.file.FileDTO;
 import org.springframework.stereotype.Service;
 
@@ -17,9 +18,9 @@ import java.util.List;
 @Service
 public class FileQueryService {
 
-    public DataResponse<List<FileCO>> selectFile(FileDTO fileDTO){
-        List<FileCO> fileCOS =
-                FileE.of(fileDTO).selectByCon();
+    public DataResponse<List<FileInfoCO>> selectFile(FileDTO fileDTO){
+        List<FileInfoCO> fileCOS =
+                FileInfoE.of(fileDTO).selectByCon();
         return DataResponse.of(fileCOS);
     }
 }
