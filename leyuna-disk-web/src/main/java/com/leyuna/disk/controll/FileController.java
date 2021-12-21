@@ -18,12 +18,11 @@ import java.util.List;
  * 文件方接口
  */
 @RestController
-@RequestMapping("/file")
+@RequestMapping("file")
 public class FileController {
 
     @Autowired
     private FileQueryService fileQueryService;
-
     /**
      * 查询服务器内文件[条件-分页]
      * @return

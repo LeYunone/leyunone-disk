@@ -4,8 +4,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 
-@SpringBootApplication(scanBasePackages={"com.leyuna"})
-@ComponentScan("com.leyuna.disk.controll")
+@SpringBootApplication
+@ComponentScan({"com.leyuna.*"})
 public class DiskStartApplication {
 
     public static void main (String[] args) {
