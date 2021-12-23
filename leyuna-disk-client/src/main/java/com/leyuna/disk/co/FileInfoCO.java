@@ -11,16 +11,20 @@ import java.io.Serializable;
  * (FileInfo)出参
  *
  * @author pengli
- * @since 2021-12-21 14:50:05
+ * @since 2021-12-21 16:08:13
  */
 @Getter
 @Setter
 public class FileInfoCO implements Serializable {
-    private static final long serialVersionUID = 551152105629043876L;
+    private static final long serialVersionUID = -57826925195323495L;
 
-    private Integer id;
+    private String id;
 
     private String name;
 
     private LocalDateTime createDt;
+
+    private LocalDateTime updateDt;
+
+    private Integer deleted;
 }

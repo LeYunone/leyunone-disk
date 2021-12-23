@@ -1,4 +1,4 @@
-package com.leyuna.disk.repository.entry;
+package com.leyuna.disk.entry;
 
 import java.time.LocalDateTime;
 import java.io.Serializable;
@@ -13,17 +13,21 @@ import lombok.Setter;
  * (FileInfo)表实体类
  *
  * @author pengli
- * @since 2021-12-21 14:53:08
+ * @since 2021-12-21 16:08:02
  */
 @Getter
 @Setter
 @TableName("file_info")
 public class FileInfoDO implements Serializable {
-    private static final long serialVersionUID = 262268160287048283L;
-    private Integer id;
+    private static final long serialVersionUID = 299448244129723838L;
+    private String id;
 
     private String name;
 
     private LocalDateTime createDt;
+
+    private LocalDateTime updateDt;
+
+    private Integer deleted;
 
 }

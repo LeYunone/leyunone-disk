@@ -1,14 +1,11 @@
 package com.leyuna.disk.controll;
 
 import com.leyuna.disk.DataResponse;
-import com.leyuna.disk.co.FileCO;
+import com.leyuna.disk.co.FileInfoCO;
 import com.leyuna.disk.dto.file.FileDTO;
 import com.leyuna.disk.service.file.FileQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,13 +25,8 @@ public class FileController {
      * @return
      */
     @GetMapping("/selectFile/{id}")
-    public DataResponse selectFileList(@RequestParam("id") String id){
-        DataResponse<List<FileCO>> listDataResponse = fileQueryService.selectFile(new FileDTO().setId(id));
+    public DataResponse selectFileList(@PathVariable("id") String id){
+        DataResponse<List<FileInfoCO>> listDataResponse = fileQueryService.selectFile(id);
         return listDataResponse;
-    }
-
-    @RequestMapping("/test")
-    public void text(){
-        System.out.println("11");
     }
 }

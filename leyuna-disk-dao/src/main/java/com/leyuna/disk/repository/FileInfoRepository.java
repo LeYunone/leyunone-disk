@@ -2,7 +2,7 @@ package com.leyuna.disk.repository;
 
 import com.leyuna.disk.co.FileInfoCO;
 import com.leyuna.disk.gateway.FileInfoGateway;
-import com.leyuna.disk.repository.entry.FileInfoDO;
+import com.leyuna.disk.entry.FileInfoDO;
 import com.leyuna.disk.repository.mapper.FileInfoMapper;
 import org.springframework.stereotype.Service;
 

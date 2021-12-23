@@ -1,7 +1,7 @@
 package com.leyuna.disk.repository.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.leyuna.disk.repository.entry.FileInfoDO;
+import com.leyuna.disk.entry.FileInfoDO;
 
 
 /**

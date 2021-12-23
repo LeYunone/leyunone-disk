@@ -87,11 +87,13 @@ public interface BaseGateway<CO> {
      */
     List<CO> selectByCon(Object con);
 
+    List<CO> selectByConOrder(Integer type,Object con);
+
     /**
      * 分页查询根据设定的值
      * @param con
      * @return
      */
-    Page<CO> selectByPage(Object con);
+    Page<CO> selectByPage (Object con,Integer index,Integer size);
 
 }

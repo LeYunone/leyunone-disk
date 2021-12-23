@@ -7,8 +7,11 @@ package com.leyuna.disk.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
-public class SpringContextUtil {
+@Component
+public class SpringContextUtil implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
     private SpringContextUtil() {
@@ -33,5 +36,10 @@ public class SpringContextUtil {
 
     public static boolean containsBean(String name) {
         return applicationContext.containsBean(name);
+    }
+
+    @Override
+    public void setApplicationContext (ApplicationContext applicationContext) throws BeansException {
+        SpringContextUtil.applicationContext = applicationContext;
     }
 }

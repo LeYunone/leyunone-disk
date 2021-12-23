@@ -13,6 +13,10 @@
         <artifactId>disk</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+    <properties>
+        <!-- 不允许将此module部署到仓库 -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
     <dependencies>
         <dependency>

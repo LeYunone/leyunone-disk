@@ -2,10 +2,12 @@ package com.leyuna.disk.start;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.ComponentScan;
 
-@SpringBootApplication
-@ComponentScan({"com.leyuna.*"})
+@SpringBootApplication()
+@ComponentScan({"com.leyuna.disk"})
+@EnableEurekaClient
 public class DiskStartApplication {
 
     public static void main (String[] args) {

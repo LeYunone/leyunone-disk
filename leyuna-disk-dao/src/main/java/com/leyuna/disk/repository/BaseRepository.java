@@ -2,6 +2,7 @@ package com.leyuna.disk.repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.leyuna.disk.util.TransformationUtil;
@@ -173,8 +174,46 @@ public abstract class BaseRepository<M extends BaseMapper<DO>, DO,CO> extends Se
     }
 
     @Override
-    public Page<CO> selectByPage (Object con) {
-        return null;
+    public List<CO> selectByConOrder(Integer type,Object con){
+        //delete设置为false
+        deletedToFalse(con);
+        Object copy = TransformationUtil.copyToDTO(con, DOclass);
+        QueryWrapper<DO> dQueryWrapper = null;
+        switch (type){
+            case 1:
+                //创建时间
+                dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false).orderByDesc("create_dt");
+                break;
+            case 2:
+                dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false).orderByAsc("create_dt");
+                break;
+            case 3:
+                dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false).orderByAsc("update_dt");
+                break;
+            case 4:
+                dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false).orderByDesc("update_dt");
+                break;
+            default:
+                dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false);
+        }
+        List<DO> ds = this.baseMapper.selectList(dQueryWrapper);
+        return TransformationUtil.copyToLists(ds, COclass);
+    }
+
+    @Override
+    public Page<CO> selectByPage (Object con,Integer index,Integer size) {
+        IPage<DO> page = new Page<>(index,size);
+        Object copy = TransformationUtil.copyToDTO(con, DOclass);
+        QueryWrapper<DO> dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false);
+        IPage<DO> doiPage = this.baseMapper.selectPage(page, dQueryWrapper);
+
+        Page<CO> result=new Page<>();
+        result.setRecords(TransformationUtil.copyToLists(doiPage.getRecords(),COclass));
+        result.setTotal(doiPage.getTotal());
+        result.setPages(doiPage.getPages());
+        result.setCurrent(doiPage.getCurrent());
+        result.setSize(doiPage.getSize());
+        return  result;
     }
 
     /**
