@@ -1,5 +1,6 @@
 package com.leyuna.disk.dto.file;
 
+import com.leyuna.disk.dto.QueryPage;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,7 @@ import lombok.experimental.Accessors;
 @ToString
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = false)
-public class FileDTO {
+public class FileDTO extends QueryPage {
 
     private String id;
 
