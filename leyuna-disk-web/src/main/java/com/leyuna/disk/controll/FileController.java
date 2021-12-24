@@ -24,9 +24,9 @@ public class FileController {
      * 查询服务器内文件[条件-分页]
      * @return
      */
-    @GetMapping("/selectFile/{id}")
-    public DataResponse selectFileList(@PathVariable("id") String id){
-        DataResponse<List<FileInfoCO>> listDataResponse = fileQueryService.selectFile(id);
+    @GetMapping("/selectFile/")
+    public DataResponse selectFileList(FileDTO file){
+        DataResponse<List<FileInfoCO>> listDataResponse = fileQueryService.selectFile(file);
         return listDataResponse;
     }
 }

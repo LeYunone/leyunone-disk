@@ -9,6 +9,7 @@ import lombok.experimental.Accessors;
 /**
  * @author pengli
  * @create 2021-12-09 16:20
+ *  文件操作类
  */
 @Getter
 @Setter
@@ -18,4 +19,7 @@ import lombok.experimental.Accessors;
 public class FileDTO {
 
     private String id;
+
+    private String name;
+
 }

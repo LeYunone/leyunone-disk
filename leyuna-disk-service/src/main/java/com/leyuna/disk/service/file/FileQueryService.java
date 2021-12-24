@@ -17,8 +17,8 @@ import java.util.List;
 @Service
 public class FileQueryService {
 
-    public DataResponse<List<FileInfoCO>> selectFile(String id){
-        List<FileInfoCO> fileInfoCOS = FileInfoE.queryInstance().setId(id).selectByCon();
+    public DataResponse<List<FileInfoCO>> selectFile(FileDTO file){
+        List<FileInfoCO> fileInfoCOS = FileInfoE.of(file).selectByCon();
         return DataResponse.of(fileInfoCOS);
     }
 }

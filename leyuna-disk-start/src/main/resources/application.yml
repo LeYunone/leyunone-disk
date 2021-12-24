@@ -20,4 +20,10 @@ spring:
     testOnReturn: false
     poolPreparedStatements: true
     maxOpenPreparedStatements: 20
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    driver-class-name: com.mysql.jdbc.Driver
+  application:
+    name: leyuna-disk
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8001/eureka/
