@@ -3,6 +3,9 @@ package com.leyuna.disk.dto.file;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDateTime;
 
 /**
  * @author pengli
@@ -15,9 +18,9 @@ import lombok.ToString;
 public class UpFileDTO {
 
     /**
-     * 上传文件人的ip
+     * 上传文件人的userId
      */
-    private String ip;
+    private String userId;
 
     /**
      * 文件名
@@ -28,4 +31,14 @@ public class UpFileDTO {
      * 文件大小
      */
     private Integer fileSize;
+
+    /**
+     * 多文件
+     */
+    private MultipartFile[] files;
+
+    /**
+     * 保存时间
+     */
+    private LocalDateTime saveTime;
 }

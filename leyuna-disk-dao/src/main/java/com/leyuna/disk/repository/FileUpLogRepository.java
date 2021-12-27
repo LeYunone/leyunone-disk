@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
  * (FileUpLog)表服务实现类
  *
  * @author pengli
- * @since 2021-12-24 17:13:18
+ * @since 2021-12-27 15:01:53
  */
 @Service
 public class FileUpLogRepository extends BaseRepository<FileUpLogMapper, FileUpLogDO, FileUpLogCO>

@@ -11,18 +11,23 @@ import java.io.Serializable;
  * (FileUpLog)出参
  *
  * @author pengli
- * @since 2021-12-24 17:13:32
+ * @since 2021-12-27 15:01:44
  */
 @Getter
 @Setter
 public class FileUpLogCO implements Serializable {
-    private static final long serialVersionUID = 346000585648870950L;
+    private static final long serialVersionUID = 620969943496973627L;
 
     private String id;
 
-    private String ip;
+    private String userId;
 
     private LocalDateTime updateDt;
 
-    private String createDt;
+    private LocalDateTime createDt;
+
+    /**
+     * 最后一次上传的合法标志
+     */
+    private Integer upSign;
 }

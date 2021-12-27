@@ -12,12 +12,16 @@ public class StringUtil {
         if(null==str){
             return false;
         }else{
-            if(str.length() != 0 ){
+            if(str.trim().length() != 0 ){
                 return true;
             }else{
                 return false;
             }
         }
+    }
+
+    public static boolean isBanks(String str){
+        return !isNotBanks(str);
     }
 
     /**

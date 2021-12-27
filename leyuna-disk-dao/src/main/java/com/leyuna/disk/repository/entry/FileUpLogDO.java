@@ -13,19 +13,24 @@ import lombok.Setter;
  * (FileUpLog)表实体类
  *
  * @author pengli
- * @since 2021-12-24 17:13:16
+ * @since 2021-12-27 15:01:51
  */
 @Getter
 @Setter
 @TableName("file_up_log")
 public class FileUpLogDO implements Serializable {
-    private static final long serialVersionUID = -43900947952796517L;
+    private static final long serialVersionUID = -33134633636025573L;
     private String id;
 
-    private String ip;
+    private String userId;
 
     private LocalDateTime updateDt;
 
-    private String createDt;
+    private LocalDateTime createDt;
+
+    /**
+     * 最后一次上传的合法标志
+     */
+    private Integer upSign;
 
 }

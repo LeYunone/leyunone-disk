@@ -24,7 +24,8 @@ public class FileQueryService {
      * @return
      */
     public DataResponse selectFile(FileDTO file){
-        Page<FileInfoCO> fileInfoCOPage = FileInfoE.queryInstance().getGateway().selectByPage(file, file.getIndex(), file.getSize());
+        Page<FileInfoCO> fileInfoCOPage = FileInfoE.queryInstance().getGateway().
+                selectByPage(file, file.getIndex(), file.getSize());
         return DataResponse.of(fileInfoCOPage);
     }
 }

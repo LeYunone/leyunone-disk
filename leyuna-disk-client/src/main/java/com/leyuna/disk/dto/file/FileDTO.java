@@ -23,4 +23,5 @@ public class FileDTO extends QueryPage {
 
     private String name;
 
+    private String userId;
 }

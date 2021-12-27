@@ -1,6 +1,7 @@
 package com.leyuna.disk.domain;
 
 import com.leyuna.disk.co.FileUpLogCO;
+import com.leyuna.disk.enums.SortEnum;
 import com.leyuna.disk.gateway.FileUpLogGateway;
 import com.leyuna.disk.util.SpringContextUtil;
 import com.leyuna.disk.util.TransformationUtil;
@@ -18,22 +19,26 @@ import java.util.Objects;
  * (FileUpLog) 工作台
  *
  * @author pengli
- * @since 2021-12-24 17:12:16
+ * @since 2021-12-27 15:02:00
  */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class FileUpLogE implements Serializable {
-    private static final long serialVersionUID = 708477209678719199L;
+    private static final long serialVersionUID = -25693128206428474L;
 
     private String id;
 
-    private String ip;
+    private String userId;
 
     private LocalDateTime updateDt;
 
-    private String createDt;
+    private LocalDateTime createDt;
+    /**
+     * 最后一次上传的合法标志
+     */
+    private Integer upSign;
 
     //===========自定义方法区==========
     private FileUpLogGateway gateway;
@@ -58,6 +63,10 @@ public class FileUpLogE implements Serializable {
         return gateway.selectByCon(this);
     }
 
+    public List<FileUpLogCO> selectByConOrder (SortEnum sort) {
+        return this.getGateway().selectByConOrder(sort.getType(), this);
+    }
+
     public boolean save () {
         FileUpLogGateway gateway = this.getGateway();
         return gateway.insertOrUpdate(this);
@@ -80,9 +89,5 @@ public class FileUpLogE implements Serializable {
 
     public static boolean batchCreate (List<FileUpLogE> list) {
         return FileUpLogE.queryInstance().getGateway().batchCreate(list);
-    }
-
-    public List<FileUpLogCO> selectByConOrder(Integer type){
-        return gateway.selectByConOrder(type,this);
     }
 }

@@ -1,6 +1,7 @@
 package com.leyuna.disk.domain;
 
 import com.leyuna.disk.co.FileInfoCO;
+import com.leyuna.disk.enums.SortEnum;
 import com.leyuna.disk.gateway.FileInfoGateway;
 import com.leyuna.disk.util.SpringContextUtil;
 import com.leyuna.disk.util.TransformationUtil;
@@ -18,14 +19,14 @@ import java.util.Objects;
  * (FileInfo) 工作台
  *
  * @author pengli
- * @since 2021-12-21 16:08:24
+ * @since 2021-12-27 15:16:57
  */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class FileInfoE implements Serializable {
-    private static final long serialVersionUID = 176152346728039134L;
+    private static final long serialVersionUID = -71950622249207814L;
 
     private String id;
 
@@ -36,6 +37,12 @@ public class FileInfoE implements Serializable {
     private LocalDateTime updateDt;
 
     private Integer deleted;
+
+    private Long fileSize;
+
+    private String userId;
+
+    private Long fileSizeTotal;
 
     //===========自定义方法区==========
     private FileInfoGateway gateway;
@@ -58,6 +65,10 @@ public class FileInfoE implements Serializable {
     public List<FileInfoCO> selectByCon () {
         FileInfoGateway gateway = this.getGateway();
         return gateway.selectByCon(this);
+    }
+
+    public List<FileInfoCO> selectByConOrder (SortEnum sort) {
+        return this.getGateway().selectByConOrder(sort.getType(), this);
     }
 
     public boolean save () {
