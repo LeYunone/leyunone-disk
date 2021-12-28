@@ -19,14 +19,14 @@ import java.util.Objects;
  * (FileInfo) 工作台
  *
  * @author pengli
- * @since 2021-12-27 15:16:57
+ * @since 2021-12-28 09:45:13
  */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class FileInfoE implements Serializable {
-    private static final long serialVersionUID = -71950622249207814L;
+    private static final long serialVersionUID = -86181643445529472L;
 
     private String id;
 
@@ -43,6 +43,10 @@ public class FileInfoE implements Serializable {
     private String userId;
 
     private Long fileSizeTotal;
+    /**
+     * 文件类型：1图片、2音视、3文档、4其他文件
+     */
+    private Integer fileType;
 
     //===========自定义方法区==========
     private FileInfoGateway gateway;

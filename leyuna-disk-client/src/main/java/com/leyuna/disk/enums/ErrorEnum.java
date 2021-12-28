@@ -11,10 +11,11 @@ public enum  ErrorEnum {
 
     FILE_NAME_EMPTY("操作失败：请检测文件名是否为空","3"),
     FILE_UPLOAD_FILE("操作失败：服务器上传文件异常，请联系站长","4"),
+    FILE_USER_OVER("操作失败：用户文件内存已满，请清理掉无用文件释放空间","5"),
 
-    SERVER_ERROR("操作失败：服务器异常","5"),
+    SERVER_ERROR("操作失败：服务器异常","6"),
 
-    SELECT_NOT_FOUND("操作失败：相关信息已丢失,请联系站长","6");
+    SELECT_NOT_FOUND("操作失败：相关信息已丢失,请联系站长","7");
 
 
     private String name;

@@ -13,13 +13,13 @@ import lombok.Setter;
  * (FileInfo)表实体类
  *
  * @author pengli
- * @since 2021-12-27 15:16:50
+ * @since 2021-12-28 09:45:22
  */
 @Getter
 @Setter
 @TableName("file_info")
 public class FileInfoDO implements Serializable {
-    private static final long serialVersionUID = -23940414418213709L;
+    private static final long serialVersionUID = 761022345317399509L;
     private String id;
 
     private String name;
@@ -35,5 +35,10 @@ public class FileInfoDO implements Serializable {
     private String userId;
 
     private Long fileSizeTotal;
+
+    /**
+     * 文件类型：1图片、2音视、3文档、4其他文件
+     */
+    private Integer fileType;
 
 }

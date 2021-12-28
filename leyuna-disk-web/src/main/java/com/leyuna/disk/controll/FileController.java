@@ -7,9 +7,16 @@ import com.leyuna.disk.dto.file.UpFileDTO;
 import com.leyuna.disk.service.file.FileQueryService;
 import com.leyuna.disk.service.file.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -60,5 +67,29 @@ public class FileController {
     @PostMapping("/deleteFile")
     public DataResponse deleteFile(String id){
         return fileService.deleteFile(id);
+    }
+
+    /**
+     * 下载文件
+     * @param id
+     * @return
+     */
+    @PostMapping("/downloadFile")
+    public ResponseEntity downloadFile(String id){
+        File file = fileService.getFile(id);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
+        headers.add("Content-Disposition", "attachment; filename=" + System.currentTimeMillis() + ".xls");
+        headers.add("Pragma", "no-cache");
+        headers.add("Expires", "0");
+        headers.add("Last-Modified", new Date().toString());
+        headers.add("ETag", String.valueOf(System.currentTimeMillis()));
+
+        return ResponseEntity
+                .ok()
+                .headers(headers)
+                .contentLength(file.length())
+                .contentType(MediaType.parseMediaType("application/octet-stream"))
+                .body(new FileSystemResource(file));
     }
 }

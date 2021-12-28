@@ -2,8 +2,10 @@ package com.leyuna.disk.util;
 
 import com.leyuna.disk.constant.ServerCode;
 import com.leyuna.disk.enums.ErrorEnum;
+import com.leyuna.disk.enums.FileEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.util.ObjectUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -87,5 +89,13 @@ public class FileUtil {
                 AssertUtil.isFalse(false,ErrorEnum.SERVER_ERROR.getName());
             }
         }
+    }
+
+    public static File getFile(String name,String path,String type){
+
+        File file=new File(ServerCode.FILE_ADDRESS+path+"/"+type+"/"+name);
+        AssertUtil.isFalse(ObjectUtils.isEmpty(file),ErrorEnum.SELECT_NOT_FOUND.getName());
+
+        return file;
     }
 }
