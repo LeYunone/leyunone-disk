@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.leyuna.disk.util.AssertUtil;
+import com.leyuna.disk.util.ObjectUtil;
 import com.leyuna.disk.util.TransformationUtil;
 import com.leyuna.disk.gateway.BaseGateway;
 
@@ -13,6 +15,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 抽象Repository服务类
@@ -188,10 +191,10 @@ public abstract class BaseRepository<M extends BaseMapper<DO>, DO,CO> extends Se
                 dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false).orderByAsc("create_dt");
                 break;
             case 3:
-                dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false).orderByAsc("update_dt");
+                dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false).orderByDesc("update_dt");
                 break;
             case 4:
-                dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false).orderByDesc("update_dt");
+                dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false).orderByAsc("update_dt");
                 break;
             default:
                 dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false);
@@ -202,6 +205,7 @@ public abstract class BaseRepository<M extends BaseMapper<DO>, DO,CO> extends Se
 
     @Override
     public Page<CO> selectByPage (Object con,Integer index,Integer size) {
+        deletedToFalse(con);
         IPage<DO> page = new Page<>(index,size);
         Object copy = TransformationUtil.copyToDTO(con, DOclass);
         QueryWrapper<DO> dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false);
@@ -214,6 +218,35 @@ public abstract class BaseRepository<M extends BaseMapper<DO>, DO,CO> extends Se
         result.setCurrent(doiPage.getCurrent());
         result.setSize(doiPage.getSize());
         return  result;
+    }
+
+    @Override
+    public Page<CO> selectByConOrderPage(Object e,Integer index,Integer size,Integer type) {
+        deletedToFalse(e);
+        Map<String, Object> stringObjectMap = TransformationUtil.transDTOColumnMap(e);
+        Page page=new Page(index,size);
+        IPage<DO> ipage =null;
+        switch (type){
+            case 1:
+                ipage=this.baseMapper.selectPage(page, new QueryWrapper<DO>().allEq(stringObjectMap).orderByDesc("create_dt"));
+                break;
+            case 2:
+                ipage=this.baseMapper.selectPage(page, new QueryWrapper<DO>().allEq(stringObjectMap).orderByAsc("create_dt"));
+                break;
+            case 3:
+                ipage=this.baseMapper.selectPage(page, new QueryWrapper<DO>().allEq(stringObjectMap).orderByDesc("update_dt"));
+                break;
+            default:
+                break;
+        }
+
+        Page<CO> result=new Page<>();
+        result.setRecords(TransformationUtil.copyToLists(ipage.getRecords(),COclass));
+        result.setTotal(ipage.getTotal());
+        result.setPages(ipage.getPages());
+        result.setCurrent(ipage.getCurrent());
+        result.setSize(ipage.getSize());
+        return result;
     }
 
     /**

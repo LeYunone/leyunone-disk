@@ -35,7 +35,7 @@ public class FileInfoCO implements Serializable {
     private Long fileSizeTotal;
 
     /**
-     * 文件类型：1图片、2音视、3文档、4其他文件
+     * 文件类型：1图片、2音乐、3视频、4文档、5其他文件
      */
     private Integer fileType;
 }

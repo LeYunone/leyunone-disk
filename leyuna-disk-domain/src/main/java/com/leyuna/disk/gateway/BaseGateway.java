@@ -96,4 +96,5 @@ public interface BaseGateway<CO> {
      */
     Page<CO> selectByPage (Object con,Integer index,Integer size);
 
+    Page<CO> selectByConOrderPage(Object e,Integer index,Integer size,Integer type);
 }

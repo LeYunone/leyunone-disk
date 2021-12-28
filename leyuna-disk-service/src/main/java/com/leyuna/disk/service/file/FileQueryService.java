@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-
 /**
  * @author pengli
  * @create 2021-12-13 10:49
@@ -19,13 +18,13 @@ import java.util.List;
 public class FileQueryService {
 
     /**
-     * 分页查询文件
+     * 分页查询文件[有排序]
      * @param file
      * @return
      */
     public DataResponse selectFile(FileDTO file){
         Page<FileInfoCO> fileInfoCOPage = FileInfoE.queryInstance().getGateway().
-                selectByPage(file, file.getIndex(), file.getSize());
+                selectByConOrderPage(file, file.getIndex(), file.getSize(),file.getType());
         return DataResponse.of(fileInfoCOPage);
     }
 }

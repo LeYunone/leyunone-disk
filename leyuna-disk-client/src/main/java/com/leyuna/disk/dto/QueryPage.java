@@ -15,7 +15,7 @@ import lombok.experimental.Accessors;
 @Accessors( chain = true)
 public class QueryPage {
 
-    private Integer index;
+    private Integer index=10;
 
-    private Integer size;
+    private Integer size=1;
 }

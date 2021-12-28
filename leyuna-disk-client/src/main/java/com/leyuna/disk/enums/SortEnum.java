@@ -7,9 +7,9 @@ package com.leyuna.disk.enums;
 public enum  SortEnum {
 
     CREATE_DESC(1,"create_desc"),
-    CREATE_ASC(2,"create_asc"),
+    CREATE_ASC(2,"create_dasc"),
     UPDATE_DESC(3,"update_desc"),
-    UPDATE_ASC(4,"update_asc");
+    UPDATE_ASC(4,"update_dasc");
 
     private Integer type;
     private String name;

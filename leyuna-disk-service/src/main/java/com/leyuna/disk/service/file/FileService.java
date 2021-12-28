@@ -97,7 +97,7 @@ public class FileService {
                 if (CollectionUtils.isNotEmpty(fileInfoCOS)) {
                     lastFile=fileInfoCOS.get(0);
                     //大于5G非法
-                    if (lastFile.getFileSizeTotal() > 5000000) {
+                    if (lastFile.getFileSizeTotal()+file.getSize() > 5000000) {
                         //用户列表内存已满，无法继续上传文件
                         FileUpLogE.queryInstance().setUpdateDt(LocalDateTime.now())
                                 .setUpSign(1).setUserId(userId).setCreateDt(LocalDateTime.now()).save();
@@ -153,7 +153,7 @@ public class FileService {
         FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(id).selectById();
         AssertUtil.isFalse(null == fileInfoCO, ErrorEnum.SELECT_NOT_FOUND.getName());
 
-        //逻辑删除数据条
+        //逻辑删除数据条 按照创建时间排序查询 第一条的内存总量就是当前用户的内存总量
         FileInfoE.queryInstance().setId(id).setDeleted(1).update();
 
         //物理删除文件
