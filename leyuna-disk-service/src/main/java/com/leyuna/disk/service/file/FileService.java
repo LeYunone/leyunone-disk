@@ -19,6 +19,7 @@ import com.leyuna.disk.validator.FileValidator;
 import com.leyuna.disk.validator.UserValidator;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,6 +45,12 @@ public class FileService {
 
     @Autowired
     private CacheExe cacheExe;
+
+    @Value("${disk.max.memory}")
+    private Long maxMemory;
+
+    @Value("${disk.max.file}")
+    private Long maxFile;
 
 
     /**
@@ -97,7 +104,7 @@ public class FileService {
                 if (CollectionUtils.isNotEmpty(fileInfoCOS)) {
                     lastFile=fileInfoCOS.get(0);
                     //大于5G非法
-                    if (lastFile.getFileSizeTotal()+file.getSize() > 5000000) {
+                    if (lastFile.getFileSizeTotal()+file.getSize() > maxMemory) {
                         //用户列表内存已满，无法继续上传文件
                         FileUpLogE.queryInstance().setUpdateDt(LocalDateTime.now())
                                 .setUpSign(1).setUserId(userId).setCreateDt(LocalDateTime.now()).save();
@@ -108,7 +115,7 @@ public class FileService {
 
                 //如果保存的文件非永久，则进行一个度的校验
                 if (null != upFileDTO.getSaveTime()) {
-                    if (file.getSize() <= 51000) {
+                    if (file.getSize() <= maxFile) {
                         String base64 = null;
                         base64 = Base64.encode(file.getBytes());
 

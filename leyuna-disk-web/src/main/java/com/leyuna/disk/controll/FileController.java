@@ -1,5 +1,6 @@
 package com.leyuna.disk.controll;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.leyuna.disk.DataResponse;
 import com.leyuna.disk.co.FileInfoCO;
 import com.leyuna.disk.dto.file.FileDTO;
@@ -36,9 +37,9 @@ public class FileController {
      * 查询服务器内文件[条件-分页]
      * @return
      */
-    @GetMapping("/selectFile")
-    public DataResponse selectFileList(FileDTO file){
-        DataResponse<List<FileInfoCO>> listDataResponse = fileQueryService.selectFile(file);
+    @PostMapping("/selectFile")
+    public DataResponse<Page<FileInfoCO>> selectFileList(@RequestBody FileDTO file){
+        DataResponse<Page<FileInfoCO>> listDataResponse = fileQueryService.selectFile(file);
         return listDataResponse;
     }
 
@@ -46,8 +47,8 @@ public class FileController {
      * 请求存储文件 >存储文件的前提
      * @return
      */
-    @RequestMapping("/requestSaveFile")
-    public DataResponse requestSaveFile(UpFileDTO upFileDTO){
+    @PostMapping("/requestSaveFile")
+    public DataResponse requestSaveFile(@RequestBody UpFileDTO upFileDTO){
         return fileService.JudgeFile(upFileDTO);
     }
 

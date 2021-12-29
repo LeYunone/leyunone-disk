@@ -19,7 +19,7 @@ public class ExceptionConfig {
 
     @ExceptionHandler(value = RuntimeException.class)
     public DataResponse errorHandler(Exception e){
-        logger.error(e.getMessage());
+        e.printStackTrace();
         return DataResponse.buildFailure(e.getMessage());
     }
 }

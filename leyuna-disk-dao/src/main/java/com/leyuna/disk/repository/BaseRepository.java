@@ -9,6 +9,7 @@ import com.leyuna.disk.util.AssertUtil;
 import com.leyuna.disk.util.ObjectUtil;
 import com.leyuna.disk.util.TransformationUtil;
 import com.leyuna.disk.gateway.BaseGateway;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -221,7 +222,7 @@ public abstract class BaseRepository<M extends BaseMapper<DO>, DO,CO> extends Se
     }
 
     @Override
-    public Page<CO> selectByConOrderPage(Object e,Integer index,Integer size,Integer type) {
+    public Page<CO> selectByConOrderPage(Object e, Integer index, Integer size, Integer type) {
         deletedToFalse(e);
         Map<String, Object> stringObjectMap = TransformationUtil.transDTOColumnMap(e);
         Page page=new Page(index,size);
