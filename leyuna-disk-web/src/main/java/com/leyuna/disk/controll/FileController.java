@@ -48,7 +48,7 @@ public class FileController {
      * @return
      */
     @PostMapping("/requestSaveFile")
-    public DataResponse requestSaveFile(@RequestBody UpFileDTO upFileDTO){
+    public DataResponse<List<MultipartFile>> requestSaveFile(@RequestBody UpFileDTO upFileDTO){
         return fileService.JudgeFile(upFileDTO);
     }
 

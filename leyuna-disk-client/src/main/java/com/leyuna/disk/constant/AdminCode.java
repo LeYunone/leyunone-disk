@@ -8,5 +8,5 @@ package com.leyuna.disk.constant;
  */
 public class AdminCode {
 
-    public static String ADMIN_USER_ID = "admin";
+    public static String ADMIN_USER_ID = "leyuna";
 }

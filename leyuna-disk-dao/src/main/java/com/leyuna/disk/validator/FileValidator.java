@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Component
 public class FileValidator {
 
-    public void validator(String fileName, Integer size, MultipartFile file){
+    public void validator(String fileName, Long size, MultipartFile file){
         if(ObjectUtils.isEmpty(file)){
             //检查文件名和文件大小
             AssertUtil.isFalse(StringUtil.isBanks(fileName), ErrorEnum.FILE_NAME_EMPTY.getName());

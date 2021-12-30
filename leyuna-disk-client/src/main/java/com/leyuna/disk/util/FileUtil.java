@@ -29,7 +29,7 @@ public class FileUtil {
      * @param size
      * @return
      */
-    public static File searchFile (String name, Integer size) {
+    public static File searchFile (String name, Long size) {
         //服务器文件夹目录
         File file = new File(ServerCode.FILE_ADDRESS);
 

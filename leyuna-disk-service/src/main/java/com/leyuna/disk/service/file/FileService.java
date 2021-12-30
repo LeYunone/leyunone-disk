@@ -27,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,24 +60,34 @@ public class FileService {
      * @param upFileDTO
      * @return
      */
-    public DataResponse JudgeFile (UpFileDTO upFileDTO) {
+    public DataResponse<List<MultipartFile>> JudgeFile (UpFileDTO upFileDTO) {
+
+        //符合上传结果的文件集
+        List<MultipartFile> result=new ArrayList<>();
 
         //首先看这个用户是否符合上传文件规则
         userValidator.validator(upFileDTO.getUserId());
 
-        //判断这个文件大小 文件格式  文件名 是否合法
-        String fileName = upFileDTO.getFileName();
-        Integer fileSize = upFileDTO.getFileSize();
-        fileValidator.validator(fileName, fileSize, null);
-
-        //按文件名和大小 判断是否有数据一样的文件
-        File file = FileUtil.searchFile(fileName, fileSize);
-        if (ObjectUtil.isNotNull(file)) {
-            //如果服务器中有一个一模一样的文件，则直接进行拷贝操作
-            FileUtil.copyFile(file, upFileDTO.getUserId());
+        List<MultipartFile> files = upFileDTO.getFiles();
+        if(CollectionUtils.isEmpty(files)){
+            return DataResponse.buildFailure();
         }
-
-        return DataResponse.buildSuccess();
+        for(MultipartFile file:files){
+            Long fileSize = file.getSize();
+            String fileName = file.getName();
+            //名称校验
+            fileValidator.validator(fileName, fileSize, null);
+            //按文件名和大小 判断是否有数据一样的文件
+            File theFile = FileUtil.searchFile(fileName, fileSize);
+            if (ObjectUtil.isNotNull(file)) {
+                //如果服务器中有一个一模一样的文件，则直接进行拷贝操作
+                FileUtil.copyFile(theFile, upFileDTO.getUserId());
+            }else{
+                //如果服务器没有这个文件，且通过校验，进入上传文件流程
+                result.add(file);
+            }
+        }
+        return DataResponse.of(result);
     }
 
     /**
@@ -89,7 +100,7 @@ public class FileService {
         //上传用户编号
         String userId = upFileDTO.getUserId();
         try {
-            MultipartFile[] files = upFileDTO.getFiles();
+            List<MultipartFile> files = upFileDTO.getFiles();
 
             for (MultipartFile file : files) {
                 String name = file.getName();
