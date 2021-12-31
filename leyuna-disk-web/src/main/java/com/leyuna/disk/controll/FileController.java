@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -48,7 +49,13 @@ public class FileController {
      * @return
      */
     @PostMapping("/requestSaveFile")
-    public DataResponse<List<MultipartFile>> requestSaveFile(@RequestBody UpFileDTO upFileDTO){
+    public DataResponse<List<MultipartFile>> requestSaveFile(@RequestParam("userId") String userId,
+                                                             @RequestPart MultipartFile file,
+                                                             @RequestParam(value = "saveTime", required = false) LocalDateTime saveTime){
+        UpFileDTO upFileDTO=new UpFileDTO();
+        upFileDTO.setUserId(userId);
+        upFileDTO.setFile(file);
+        upFileDTO.setSaveTime(saveTime);
         return fileService.JudgeFile(upFileDTO);
     }
 
@@ -56,7 +63,13 @@ public class FileController {
      * 存储文件
      */
     @PostMapping("/saveFile")
-    public DataResponse saveFile(@RequestBody UpFileDTO upFileDTO){
+    public DataResponse saveFile(@RequestParam("userId") String userId,
+                                 @RequestPart MultipartFile file,
+                                 @RequestParam(value = "saveTime", required = false) LocalDateTime saveTime){
+        UpFileDTO upFileDTO=new UpFileDTO();
+        upFileDTO.setUserId(userId);
+        upFileDTO.setFile(file);
+        upFileDTO.setSaveTime(saveTime);
         return fileService.savaFile(upFileDTO);
     }
 

@@ -27,7 +27,7 @@ public class UpFileDTO implements Serializable {
     /**
      * 多文件
      */
-    private List<MultipartFile> files;
+    private MultipartFile file;
 
     /**
      * 保存时间
