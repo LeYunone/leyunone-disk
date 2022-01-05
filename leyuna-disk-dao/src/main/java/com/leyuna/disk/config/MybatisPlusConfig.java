@@ -1,6 +1,7 @@
 package com.leyuna.disk.config;
 
 
+import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.springframework.context.annotation.Bean;
@@ -32,6 +33,11 @@ public class MybatisPlusConfig {
         //可以通过环境变量获取你的mapper路径,这样mapper扫描可以通过配置文件配置了
         scannerConfigurer.setBasePackage("com.leyuna.disk.repository.mapper");
         return scannerConfigurer;
+    }
+
+    @Bean
+    public MetaObjectHandler metaObjectHandler() {
+        return new DiskMetaObjectHandler();
     }
 
 }

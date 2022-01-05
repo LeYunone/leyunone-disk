@@ -8,7 +8,7 @@ package com.leyuna.disk.constant;
  */
 public enum  ResponseCode {
     SUCCESS("200", "操作成功"),
-    ERROR("404", "操作失败");
+    ERROR("505", "操作失败");
 
     private final String code;
     private final String desc;

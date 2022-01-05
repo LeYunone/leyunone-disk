@@ -18,9 +18,11 @@ import com.leyuna.disk.util.ObjectUtil;
 import com.leyuna.disk.validator.FileValidator;
 import com.leyuna.disk.validator.UserValidator;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,6 +31,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 /**
  * @author pengli
@@ -36,6 +39,7 @@ import java.util.List;
  * 文件相关服务 [非查询]
  */
 @Service
+@Log4j2
 public class FileService {
 
     @Autowired
@@ -60,7 +64,8 @@ public class FileService {
      * @param upFileDTO
      * @return
      */
-    public DataResponse<MultipartFile> JudgeFile (UpFileDTO upFileDTO) {
+    @Transactional(rollbackFor = Exception.class)
+    public DataResponse<Integer> JudgeFile (UpFileDTO upFileDTO) {
 
         //首先看这个用户是否符合上传文件规则
         userValidator.validator(upFileDTO.getUserId());
@@ -74,12 +79,14 @@ public class FileService {
         fileValidator.validator(fileName, fileSize, null);
         //按文件名和大小 判断是否有数据一样的文件
         File theFile = FileUtil.searchFile(fileName, fileSize);
-        if (ObjectUtil.isNotNull(file)) {
+        if (null!=theFile) {
             //如果服务器中有一个一模一样的文件，则直接进行拷贝操作
             FileUtil.copyFile(theFile, upFileDTO.getUserId());
-            return DataResponse.buildSuccess();
+
+            //返回一个空对象
+            return DataResponse.of(0);
         }
-        return DataResponse.of(file);
+        return DataResponse.of(1);
     }
 
     /**
@@ -88,35 +95,38 @@ public class FileService {
      * @param upFileDTO
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public DataResponse savaFile (UpFileDTO upFileDTO) {
         //上传用户编号
         String userId = upFileDTO.getUserId();
         try {
             MultipartFile file = upFileDTO.getFile();
-            String name = file.getName();
-            String type = name.substring(name.lastIndexOf('.'), name.length());
+            String name = file.getOriginalFilename();
+            String type = name.substring(name.lastIndexOf('.')+1);
             //文件类型
             FileEnum fileEnum = FileEnum.loadType(type);
 
+            //计算K级内存大小
+            double fileSize=(double)file.getSize()/1024;
+
             //用户的文件列表
-            List<FileInfoCO> fileInfoCOS = FileInfoE.queryInstance().setUserId(userId)
-                    .selectByConOrder(SortEnum.UPDATE_DESC);
+            List<FileInfoCO> fileInfoCOS = FileInfoE.selectByUserIdMaxSize(userId);
             FileInfoCO lastFile = null;
             if (CollectionUtils.isNotEmpty(fileInfoCOS)) {
                 lastFile = fileInfoCOS.get(0);
                 //大于5G非法
-                if (lastFile.getFileSizeTotal() + file.getSize() > maxMemory) {
+                if (lastFile.getFileSizeTotal() + fileSize > maxMemory) {
                     //用户列表内存已满，无法继续上传文件
-                    FileUpLogE.queryInstance().setUpdateDt(LocalDateTime.now())
-                            .setUpSign(1).setUserId(userId).setCreateDt(LocalDateTime.now()).save();
+                    FileUpLogE.queryInstance()
+                            .setUpSign(1).setUserId(userId).save();
                     AssertUtil.isFalse(true, ErrorEnum.FILE_USER_OVER.getName());
                 }
             }
-            long sizetotal = ObjectUtils.isEmpty(lastFile) ? file.getSize() : lastFile.getFileSizeTotal() + file.getSize();
+            Double sizetotal = ObjectUtils.isEmpty(lastFile) ? fileSize : lastFile.getFileSizeTotal() + fileSize;
 
             //如果保存的文件非永久，则进行一个度的校验
             if (null != upFileDTO.getSaveTime()) {
-                if (file.getSize() <= maxFile) {
+                if (fileSize <= maxFile) {
                     String base64 = null;
                     base64 = Base64.encode(file.getBytes());
 
@@ -134,16 +144,20 @@ public class FileService {
                 }
             } else {
                 //如果需要的是永久保存 如果小于5G 则进行累计计算，并将文件转入磁盘中
-                file.transferTo(new File(ServerCode.FILE_ADDRESS + userId));
+                File saveFile = new File(ServerCode.FILE_ADDRESS + userId+"/"+fileEnum.getName()+"/"+name);
+                if(!saveFile.getParentFile().exists()){
+                    saveFile.getParentFile().mkdirs();
+                }
+                file.transferTo(saveFile);
             }
 
-            FileInfoE.queryInstance().setUserId(userId).
-                    setCreateDt(LocalDateTime.now()).setDeleted(0).setFileSize(file.getSize())
+            FileInfoE.queryInstance().setUserId(userId)
+                    .setFileSize(fileSize)
                     .setFileSizeTotal(sizetotal)
                     .setName(file.getName())
-                    .setFileType(fileEnum.getValue())
-                    .setUpdateDt(LocalDateTime.now()).save();
+                    .setFileType(fileEnum.getValue()).save();
         } catch (Exception e) {
+            log.error(e);
             AssertUtil.isFalse(true, ErrorEnum.SERVER_ERROR.getName());
         }
         return DataResponse.buildSuccess();
@@ -155,6 +169,7 @@ public class FileService {
      * @param id
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public DataResponse deleteFile (String id) {
 
         FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(id).selectById();
@@ -176,6 +191,7 @@ public class FileService {
      * @param id 文件id
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public File getFile (String id) {
 
         //获取文件数据

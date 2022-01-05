@@ -17,5 +17,7 @@ public class ServerCode {
     //服务器站主头像地址
     public static String SERVER_HEAD_IMG_ADMIN = "https://www.leyuna.xyz/image/avatar/admin.jpg";
 
-    public static String FILE_ADDRESS = "https://www.leyuna.xyz/file/";
+//    public static String FILE_ADDRESS = "https://www.leyuna.xyz/file/";
+    public static String FILE_ADDRESS = "c:/file/";
+
 }

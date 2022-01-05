@@ -49,7 +49,7 @@ public class FileController {
      * @return
      */
     @PostMapping("/requestSaveFile")
-    public DataResponse<List<MultipartFile>> requestSaveFile(@RequestParam("userId") String userId,
+    public DataResponse<Integer> requestSaveFile(@RequestParam("userId") String userId,
                                                              @RequestPart MultipartFile file,
                                                              @RequestParam(value = "saveTime", required = false) LocalDateTime saveTime){
         UpFileDTO upFileDTO=new UpFileDTO();

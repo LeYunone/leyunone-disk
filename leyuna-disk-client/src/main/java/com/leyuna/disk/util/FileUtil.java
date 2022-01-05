@@ -2,9 +2,6 @@ package com.leyuna.disk.util;
 
 import com.leyuna.disk.constant.ServerCode;
 import com.leyuna.disk.enums.ErrorEnum;
-import com.leyuna.disk.enums.FileEnum;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.ObjectUtils;
 
 import java.io.File;
@@ -32,7 +29,9 @@ public class FileUtil {
     public static File searchFile (String name, Long size) {
         //服务器文件夹目录
         File file = new File(ServerCode.FILE_ADDRESS);
-
+        if(!file.exists()){
+            return null;
+        }
         Queue<File> queue = new LinkedList<>();
         queue.add(file);
         while (!queue.isEmpty()) {

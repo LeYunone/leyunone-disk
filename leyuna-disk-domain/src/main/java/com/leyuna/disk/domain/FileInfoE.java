@@ -38,11 +38,11 @@ public class FileInfoE implements Serializable {
 
     private Integer deleted;
 
-    private Long fileSize;
+    private Double fileSize;
 
     private String userId;
 
-    private Long fileSizeTotal;
+    private Double fileSizeTotal;
     /**
      * 文件类型：1图片、2音视、3文档、4其他文件
      */
@@ -97,5 +97,9 @@ public class FileInfoE implements Serializable {
 
     public static boolean batchCreate (List<FileInfoE> list) {
         return FileInfoE.queryInstance().getGateway().batchCreate(list);
+    }
+
+    public static List<FileInfoCO> selectByUserIdMaxSize(String userId){
+        return FileInfoE.queryInstance().getGateway().selectByUserIdMaxSize(userId);
     }
 }
