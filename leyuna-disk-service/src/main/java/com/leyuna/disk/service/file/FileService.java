@@ -27,6 +27,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -73,15 +74,22 @@ public class FileService {
         if (ObjectUtils.isEmpty(file)) {
             return DataResponse.buildFailure();
         }
-        Long fileSize = file.getSize();
-        String fileName = file.getName();
+        double fileSize=(double)file.getSize()/1024;
+        String fileName = file.getOriginalFilename();
         //名称校验
         fileValidator.validator(fileName, fileSize, null);
         //按文件名和大小 判断是否有数据一样的文件
-        File theFile = FileUtil.searchFile(fileName, fileSize);
-        if (null!=theFile) {
+        List<FileInfoCO> fileInfoCOS = FileInfoE.queryInstance().setName(fileName).setFileSize(fileSize).selectByCon();
+        //File theFile = FileUtil.searchFile(fileName, fileSize);
+
+        if(CollectionUtils.isNotEmpty(fileInfoCOS)){
+            FileInfoCO fileInfoCO = fileInfoCOS.get(0);
             //如果服务器中有一个一模一样的文件，则直接进行拷贝操作
-            FileUtil.copyFile(theFile, upFileDTO.getUserId());
+            String path="/"+fileInfoCO.getFileType()+"/"+fileInfoCO.getName();
+            File copyFile=new File(ServerCode.FILE_ADDRESS+fileInfoCO.getUserId()
+                    +path);
+
+            FileUtil.copyFile(copyFile, upFileDTO.getUserId()+path);
 
             //返回一个空对象
             return DataResponse.of(0);
@@ -126,6 +134,7 @@ public class FileService {
 
             //如果保存的文件非永久，则进行一个度的校验
             if (null != upFileDTO.getSaveTime()) {
+                //如果文件大小符合条件存入缓存，则进人redis流程
                 if (fileSize <= maxFile) {
                     String base64 = null;
                     base64 = Base64.encode(file.getBytes());
@@ -154,9 +163,9 @@ public class FileService {
             FileInfoE.queryInstance().setUserId(userId)
                     .setFileSize(fileSize)
                     .setFileSizeTotal(sizetotal)
-                    .setName(file.getName())
+                    .setName(file.getOriginalFilename())
                     .setFileType(fileEnum.getValue()).save();
-        } catch (Exception e) {
+        } catch (IOException e) {
             log.error(e);
             AssertUtil.isFalse(true, ErrorEnum.SERVER_ERROR.getName());
         }
