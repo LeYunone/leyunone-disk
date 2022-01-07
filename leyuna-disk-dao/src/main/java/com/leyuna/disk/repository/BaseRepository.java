@@ -212,19 +212,14 @@ public abstract class BaseRepository<M extends BaseMapper<DO>, DO,CO> extends Se
         QueryWrapper<DO> dQueryWrapper = new QueryWrapper<DO>().allEq(TransformationUtil.transDTOColumnMap(copy), false);
         IPage<DO> doiPage = this.baseMapper.selectPage(page, dQueryWrapper);
 
-        Page<CO> result=new Page<>();
-        result.setRecords(TransformationUtil.copyToLists(doiPage.getRecords(),COclass));
-        result.setTotal(doiPage.getTotal());
-        result.setPages(doiPage.getPages());
-        result.setCurrent(doiPage.getCurrent());
-        result.setSize(doiPage.getSize());
-        return  result;
+        return TransformationUtil.copyToPage(doiPage,COclass);
     }
 
     @Override
     public Page<CO> selectByConOrderPage(Object e, Integer index, Integer size, Integer type) {
-        deletedToFalse(e);
-        Map<String, Object> stringObjectMap = TransformationUtil.transDTOColumnMap(e);
+        Object o = TransformationUtil.copyToDTO(e, DOclass);
+        deletedToFalse(o);
+        Map<String, Object> stringObjectMap = TransformationUtil.transDTOColumnMap(o);
         Page page=new Page(index,size);
         IPage<DO> ipage =null;
         switch (type){
@@ -238,16 +233,18 @@ public abstract class BaseRepository<M extends BaseMapper<DO>, DO,CO> extends Se
                 ipage=this.baseMapper.selectPage(page, new QueryWrapper<DO>().allEq(stringObjectMap).orderByDesc("update_dt"));
                 break;
             default:
-                break;
+                Object value=null;
+                try {
+                    Field orderCondition = e.getClass().getSuperclass().getDeclaredField("orderCondition");
+                    orderCondition.setAccessible(true);
+                    value=orderCondition.get(e);
+                    orderCondition.setAccessible(false);
+                } catch (NoSuchFieldException | IllegalAccessException noSuchFieldException) {
+                    noSuchFieldException.printStackTrace();
+                }
+                ipage=this.baseMapper.selectPage(page, new QueryWrapper<DO>().allEq(stringObjectMap).orderByDesc(String.valueOf(value)));
         }
-
-        Page<CO> result=new Page<>();
-        result.setRecords(TransformationUtil.copyToLists(ipage.getRecords(),COclass));
-        result.setTotal(ipage.getTotal());
-        result.setPages(ipage.getPages());
-        result.setCurrent(ipage.getCurrent());
-        result.setSize(ipage.getSize());
-        return result;
+        return TransformationUtil.copyToPage(ipage,COclass);
     }
 
     /**

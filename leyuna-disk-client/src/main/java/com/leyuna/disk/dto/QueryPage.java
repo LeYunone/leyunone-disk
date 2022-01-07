@@ -15,7 +15,10 @@ import lombok.experimental.Accessors;
 @Accessors( chain = true)
 public class QueryPage {
 
-    private Integer index=10;
+    private Integer index=1;
 
-    private Integer size=1;
+    private Integer size=10;
+
+    //排序标准
+    private Object orderCondition;
 }

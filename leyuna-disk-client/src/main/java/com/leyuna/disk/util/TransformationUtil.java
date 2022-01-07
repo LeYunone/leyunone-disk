@@ -1,6 +1,8 @@
 package com.leyuna.disk.util;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import org.springframework.beans.BeanUtils;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -89,6 +91,16 @@ public class TransformationUtil {
                 e.printStackTrace();
             }
         });
+        return result;
+    }
+
+    public static <D> Page<D> copyToPage(IPage page, Class<D> toClass){
+        Page<D> result=new Page<>();
+        result.setRecords(TransformationUtil.copyToLists(page.getRecords(),toClass));
+        result.setTotal(page.getTotal());
+        result.setPages(page.getPages());
+        result.setCurrent(page.getCurrent());
+        result.setSize(page.getSize());
         return result;
     }
 }
