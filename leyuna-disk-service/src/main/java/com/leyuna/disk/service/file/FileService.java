@@ -52,10 +52,10 @@ public class FileService {
     @Autowired
     private CacheExe cacheExe;
 
-    @Value("${disk.max.memory}")
+    @Value("${disk.max.memory:0}")
     private Long maxMemory;
 
-    @Value("${disk.max.file}")
+    @Value("${disk.max.file:0}")
     private Long maxFile;
 
 

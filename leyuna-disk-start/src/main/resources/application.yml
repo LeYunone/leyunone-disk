@@ -18,11 +18,16 @@ spring:
     poolPreparedStatements: true
     maxOpenPreparedStatements: 20
     driver-class-name: com.mysql.jdbc.Driver
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8001/eureka/
+  cloud:
+    nacos:
+      discovery:
+        server-addr: http://localhost:8848
+  #eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://localhost:8001/eureka/
 
+#sql语句日志
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

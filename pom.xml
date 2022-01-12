@@ -17,13 +17,14 @@
     </modules>
     <!--控制依赖版本-->
     <properties>
-        <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <spring-boot.version>2.0.3.RELEASE</spring-boot.version>
-        <spring-cloud.version>Finchley.RELEASE</spring-cloud.version>
+        <lucene.version>7.6.0</lucene.version>
+        <sa-token.verison>1.25.0</sa-token.verison>
         <mybatis-plus.version>3.1.0</mybatis-plus.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-boot.version>2.4.4</spring-boot.version>
+        <spring-cloud.version>2020.0.2</spring-cloud.version>
+        <spring-cloud-alibaba.version>2020.0.RC1</spring-cloud-alibaba.version>
     </properties>
     <dependencies>
         <dependency>
@@ -63,17 +64,28 @@
                 <artifactId>disk-dao</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <!-- spring boot 依赖 -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-test-autoconfigure</artifactId>
+                <artifactId>spring-boot-dependencies</artifactId>
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <!-- spring cloud 依赖 -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- spring cloud alibaba 依赖 -->
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
