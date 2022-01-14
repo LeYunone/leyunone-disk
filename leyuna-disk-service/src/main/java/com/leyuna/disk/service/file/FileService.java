@@ -30,9 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * @author pengli
@@ -52,10 +50,12 @@ public class FileService {
     @Autowired
     private CacheExe cacheExe;
 
-    @Value("${disk.max.memory:0}")
+    //默认最大520000
+    @Value("${disk.max.memory:520000}")
     private Long maxMemory;
 
-    @Value("${disk.max.file:0}")
+    //默认大小5000
+    @Value("${disk.max.file:5000}")
     private Long maxFile;
 
 
@@ -65,7 +65,6 @@ public class FileService {
      * @param upFileDTO
      * @return
      */
-    @Transactional(rollbackFor = Exception.class)
     public DataResponse<Integer> JudgeFile (UpFileDTO upFileDTO) {
 
         //首先看这个用户是否符合上传文件规则
@@ -84,13 +83,15 @@ public class FileService {
 
         if(CollectionUtils.isNotEmpty(fileInfoCOS)){
             FileInfoCO fileInfoCO = fileInfoCOS.get(0);
-            //如果服务器中有一个一模一样的文件，则直接进行拷贝操作
-            String path="/"+fileInfoCO.getFileType()+"/"+fileInfoCO.getName();
-            File copyFile=new File(ServerCode.FILE_ADDRESS+fileInfoCO.getUserId()
-                    +path);
+            //如果这个文件是我自己硬盘里的文件则跳过
+            if(!fileInfoCO.getUserId().equals(upFileDTO.getUserId())){
+                //如果服务器中有一个一模一样的文件，则直接进行拷贝操作
+                String path="/"+fileInfoCO.getFileType()+"/"+fileInfoCO.getName();
+                File copyFile=new File(ServerCode.FILE_ADDRESS+fileInfoCO.getUserId()
+                        +path);
 
-            FileUtil.copyFile(copyFile, upFileDTO.getUserId()+path);
-
+                FileUtil.copyFile(copyFile, upFileDTO.getUserId()+path);
+            }
             //返回一个空对象
             return DataResponse.of(0);
         }
@@ -103,7 +104,6 @@ public class FileService {
      * @param upFileDTO
      * @return
      */
-    @Transactional(rollbackFor = Exception.class)
     public DataResponse savaFile (UpFileDTO upFileDTO) {
         //上传用户编号
         String userId = upFileDTO.getUserId();
@@ -116,7 +116,7 @@ public class FileService {
 
             //计算K级内存大小
             double fileSize=(double)file.getSize()/1024;
-
+            AssertUtil.isFalse(fileSize>maxMemory,ErrorEnum.FILE_USER_OVER.getName());
             //用户的文件列表
             List<FileInfoCO> fileInfoCOS = FileInfoE.selectByUserIdMaxSize(userId);
             FileInfoCO lastFile = null;

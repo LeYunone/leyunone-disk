@@ -18,10 +18,6 @@ spring:
     poolPreparedStatements: true
     maxOpenPreparedStatements: 20
     driver-class-name: com.mysql.jdbc.Driver
-  cloud:
-    nacos:
-      discovery:
-        server-addr: http://localhost:8848
   #eureka:
 #  client:
 #    serviceUrl:
