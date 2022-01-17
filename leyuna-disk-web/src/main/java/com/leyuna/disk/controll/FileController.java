@@ -50,12 +50,10 @@ public class FileController {
      */
     @PostMapping("/requestSaveFile")
     public DataResponse<Integer> requestSaveFile(@RequestParam("userId") String userId,
-                                                             @RequestPart MultipartFile file,
-                                                             @RequestParam(value = "saveTime", required = false) LocalDateTime saveTime){
+                                                             @RequestPart MultipartFile file){
         UpFileDTO upFileDTO=new UpFileDTO();
         upFileDTO.setUserId(userId);
         upFileDTO.setFile(file);
-        upFileDTO.setSaveTime(saveTime);
         return fileService.JudgeFile(upFileDTO);
     }
 
@@ -65,7 +63,7 @@ public class FileController {
     @PostMapping("/saveFile")
     public DataResponse saveFile(@RequestParam("userId") String userId,
                                  @RequestPart MultipartFile file,
-                                 @RequestParam(value = "saveTime", required = false) LocalDateTime saveTime){
+                                 @RequestParam(value = "saveTime", required = false) String saveTime){
         UpFileDTO upFileDTO=new UpFileDTO();
         upFileDTO.setUserId(userId);
         upFileDTO.setFile(file);

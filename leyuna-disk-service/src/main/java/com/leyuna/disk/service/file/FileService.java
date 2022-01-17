@@ -15,6 +15,7 @@ import com.leyuna.disk.enums.SortEnum;
 import com.leyuna.disk.util.AssertUtil;
 import com.leyuna.disk.util.FileUtil;
 import com.leyuna.disk.util.ObjectUtil;
+import com.leyuna.disk.util.StringUtil;
 import com.leyuna.disk.validator.FileValidator;
 import com.leyuna.disk.validator.UserValidator;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
@@ -29,7 +30,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -133,23 +136,29 @@ public class FileService {
             Double sizetotal = ObjectUtils.isEmpty(lastFile) ? fileSize : lastFile.getFileSizeTotal() + fileSize;
 
             //如果保存的文件非永久，则进行一个度的校验
-            if (null != upFileDTO.getSaveTime()) {
+            if (StringUtils.isNotEmpty(upFileDTO.getSaveTime())) {
+
+                DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate ld = LocalDate.parse(upFileDTO.getSaveTime(), DATEFORMATTER);
+                LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
+
                 //如果文件大小符合条件存入缓存，则进人redis流程
                 if (fileSize <= maxFile) {
                     String base64 = null;
                     base64 = Base64.encode(file.getBytes());
 
-                    if (StringUtils.isNotEmpty(base64)) {
-                        //计算存储时间
-                        LocalDateTime saveTime = upFileDTO.getSaveTime();
-                        Duration duration = Duration.between(saveTime, LocalDateTime.now());
-                        long saveSec = duration.getSeconds();
-                        //将小量文件存入redis中进行保存
-                        cacheExe.setCacheKey("file/" + userId, base64, saveSec);
-                    }
+                    AssertUtil.isFalse(StringUtils.isEmpty(base64),ErrorEnum.FILE_UPLOAD_FILE.getName());
+                    //计算存储时间
+                    Duration duration = Duration.between(LocalDateTime.now(), ldt);
+                    long saveSec = duration.getSeconds();
+                    //将小量文件存入redis中进行保存
+                    cacheExe.setCacheKey("file:"+name+"/" + userId, base64, 1);
+
                     //TODO 缓存过期事件，更新数据库
                 } else {
                     //TODO 走定时任务，到过期时间时，将存储的文件删除
+                    //暂时进行文件存储
+
                 }
             } else {
                 //如果需要的是永久保存 如果小于5G 则进行累计计算，并将文件转入磁盘中

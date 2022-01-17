@@ -13,7 +13,8 @@
         <module>leyuna-disk-service</module>
         <module>leyuna-disk-domain</module>
         <module>leyuna-disk-web</module>
-        <module>leyuna-disk-start</module>
+        <module>leyuna-disk-client</module>
+        <module>leyuna-disk-dao</module>
     </modules>
     <!--控制依赖版本-->
     <properties>

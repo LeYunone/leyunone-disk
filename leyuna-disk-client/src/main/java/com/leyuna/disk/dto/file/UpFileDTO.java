@@ -3,6 +3,7 @@ package com.leyuna.disk.dto.file;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
@@ -32,5 +33,6 @@ public class UpFileDTO implements Serializable {
     /**
      * 保存时间
      */
-    private LocalDateTime saveTime;
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private String saveTime;
 }
