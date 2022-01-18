@@ -36,8 +36,6 @@ public class FileInfoDO implements Serializable {
 
     private String userId;
 
-    private Double fileSizeTotal;
-
     /**
      * 文件类型：1图片、2音视、3文档、4其他文件
      */

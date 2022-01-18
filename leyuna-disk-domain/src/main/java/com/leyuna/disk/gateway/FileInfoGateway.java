@@ -1,6 +1,7 @@
 package com.leyuna.disk.gateway;
 
 import com.leyuna.disk.co.FileInfoCO;
+import com.leyuna.disk.domain.FileInfoE;
 
 import java.util.List;
 
@@ -12,5 +13,5 @@ import java.util.List;
  */
 public interface FileInfoGateway extends BaseGateway<FileInfoCO> {
 
-    List<FileInfoCO> selectByUserIdMaxSize(String userId);
+    String save(FileInfoE fileInfoE);
 }

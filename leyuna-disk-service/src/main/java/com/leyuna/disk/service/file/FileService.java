@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.leyuna.disk.DataResponse;
 import com.leyuna.disk.co.FileInfoCO;
+import com.leyuna.disk.co.FileUpLogCO;
 import com.leyuna.disk.command.CacheExe;
 import com.leyuna.disk.constant.ServerCode;
 import com.leyuna.disk.domain.FileInfoE;
@@ -107,6 +108,7 @@ public class FileService {
      * @param upFileDTO
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public DataResponse savaFile (UpFileDTO upFileDTO) {
         //上传用户编号
         String userId = upFileDTO.getUserId();
@@ -121,20 +123,26 @@ public class FileService {
             double fileSize=(double)file.getSize()/1024;
             AssertUtil.isFalse(fileSize>maxMemory,ErrorEnum.FILE_USER_OVER.getName());
             //用户的文件列表
-            List<FileInfoCO> fileInfoCOS = FileInfoE.selectByUserIdMaxSize(userId);
-            FileInfoCO lastFile = null;
-            if (CollectionUtils.isNotEmpty(fileInfoCOS)) {
-                lastFile = fileInfoCOS.get(0);
+            List<FileUpLogCO> fileUpLogCOS = FileUpLogE.queryInstance().setUserId(userId).selectByConOrder(SortEnum.UPDATE_DESC);
+            FileUpLogCO lastFile = null;
+            if (CollectionUtils.isNotEmpty(fileUpLogCOS)) {
+                lastFile = fileUpLogCOS.get(0);
                 //大于5G非法
-                if (lastFile.getFileSizeTotal() + fileSize > maxMemory) {
+                if (lastFile.getUpFileTotalSize() + fileSize > maxMemory) {
                     //用户列表内存已满，无法继续上传文件
                     FileUpLogE.queryInstance()
-                            .setUpSign(1).setUserId(userId).save();
+                            .setId(lastFile.getId())
+                            .setUpSign(1).update();
                     AssertUtil.isFalse(true, ErrorEnum.FILE_USER_OVER.getName());
                 }
             }
-            Double sizetotal = ObjectUtils.isEmpty(lastFile) ? fileSize : lastFile.getFileSizeTotal() + fileSize;
+            //当前操作后用户的所有文件内存
+            Double sizetotal = ObjectUtils.isEmpty(lastFile) ? fileSize : lastFile.getUpFileTotalSize() + fileSize;
 
+            String saveId = FileInfoE.queryInstance().setUserId(userId)
+                    .setFileSize(fileSize)
+                    .setName(file.getOriginalFilename())
+                    .setFileType(fileEnum.getValue()).save();
             //如果保存的文件非永久，则进行一个度的校验
             if (StringUtils.isNotEmpty(upFileDTO.getSaveTime())) {
 
@@ -152,8 +160,7 @@ public class FileService {
                     Duration duration = Duration.between(LocalDateTime.now(), ldt);
                     long saveSec = duration.getSeconds();
                     //将小量文件存入redis中进行保存
-                    cacheExe.setCacheKey("file:"+name+"/" + userId, base64, 1);
-
+                    cacheExe.setCacheKey("file:"+saveId, base64, 10);
                     //TODO 缓存过期事件，更新数据库
                 } else {
                     //TODO 走定时任务，到过期时间时，将存储的文件删除
@@ -168,12 +175,7 @@ public class FileService {
                 }
                 file.transferTo(saveFile);
             }
-
-            FileInfoE.queryInstance().setUserId(userId)
-                    .setFileSize(fileSize)
-                    .setFileSizeTotal(sizetotal)
-                    .setName(file.getOriginalFilename())
-                    .setFileType(fileEnum.getValue()).save();
+            FileUpLogE.queryInstance().setUserId(userId).setUpSign(0).setUpFileTotalSize(sizetotal).save();
         } catch (IOException e) {
             log.error(e);
             AssertUtil.isFalse(true, ErrorEnum.SERVER_ERROR.getName());
@@ -209,7 +211,6 @@ public class FileService {
      * @param id 文件id
      * @return
      */
-    @Transactional(rollbackFor = Exception.class)
     public File getFile (String id) {
 
         //获取文件数据

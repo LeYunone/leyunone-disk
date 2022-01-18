@@ -42,10 +42,6 @@ public class FileInfoE implements Serializable {
 
     private String userId;
 
-    private Double fileSizeTotal;
-    /**
-     * 文件类型：1图片、2音视、3文档、4其他文件
-     */
     private Integer fileType;
 
     //===========自定义方法区==========
@@ -75,9 +71,9 @@ public class FileInfoE implements Serializable {
         return this.getGateway().selectByConOrder(sort.getType(), this);
     }
 
-    public boolean save () {
+    public String save () {
         FileInfoGateway gateway = this.getGateway();
-        return gateway.insertOrUpdate(this);
+        return gateway.save(this);
     }
 
     /**
@@ -97,9 +93,5 @@ public class FileInfoE implements Serializable {
 
     public static boolean batchCreate (List<FileInfoE> list) {
         return FileInfoE.queryInstance().getGateway().batchCreate(list);
-    }
-
-    public static List<FileInfoCO> selectByUserIdMaxSize(String userId){
-        return FileInfoE.queryInstance().getGateway().selectByUserIdMaxSize(userId);
     }
 }
