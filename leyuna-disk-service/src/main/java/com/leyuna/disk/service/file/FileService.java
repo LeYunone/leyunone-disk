@@ -164,8 +164,14 @@ public class FileService {
                     //TODO 缓存过期事件，更新数据库
                 } else {
                     //TODO 走定时任务，到过期时间时，将存储的文件删除
-                    //暂时进行文件存储
+                    //暂时进行文件存储  在redis中添加一个记号
+                    cacheExe.setCacheKey("deleted:"+saveId,"DELETED",10);
 
+                    File saveFile = new File(ServerCode.FILE_ADDRESS + userId+"/"+fileEnum.getName()+"/"+name);
+                    if(!saveFile.getParentFile().exists()){
+                        saveFile.getParentFile().mkdirs();
+                    }
+                    file.transferTo(saveFile);
                 }
             } else {
                 //如果需要的是永久保存 如果小于5G 则进行累计计算，并将文件转入磁盘中
@@ -175,7 +181,11 @@ public class FileService {
                 }
                 file.transferTo(saveFile);
             }
-            FileUpLogE.queryInstance().setUserId(userId).setUpSign(0).setUpFileTotalSize(sizetotal).save();
+            if(null==lastFile){
+                FileUpLogE.queryInstance().setUpFileTotalSize(sizetotal).setUpSign(0).setUserId(userId).save();
+            }else{
+                FileUpLogE.queryInstance().setId(lastFile.getId()).setUpFileTotalSize(sizetotal).update();
+            }
         } catch (IOException e) {
             log.error(e);
             AssertUtil.isFalse(true, ErrorEnum.SERVER_ERROR.getName());

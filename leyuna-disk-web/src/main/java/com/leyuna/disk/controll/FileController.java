@@ -44,6 +44,11 @@ public class FileController {
         return listDataResponse;
     }
 
+    @GetMapping("/selectAllFileSize")
+    public DataResponse<Double> selectAllFileSize(String userId){
+        return fileQueryService.selectAllFileSizeByUserId(userId);
+    }
+
     /**
      * 请求存储文件 >存储文件的前提
      * @return

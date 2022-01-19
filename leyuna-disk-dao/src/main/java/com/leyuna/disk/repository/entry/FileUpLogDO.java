@@ -3,9 +3,7 @@ package com.leyuna.disk.repository.entry;
 import java.time.LocalDateTime;
 import java.io.Serializable;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,6 +18,8 @@ import lombok.Setter;
 @TableName("file_up_log")
 public class FileUpLogDO implements Serializable {
     private static final long serialVersionUID = 441097096600639955L;
+
+    @TableId(value = "id",type = IdType.ID_WORKER_STR)
     private String id;
 
     /**
@@ -30,12 +30,11 @@ public class FileUpLogDO implements Serializable {
     /**
      * 更新时间
      */
-    private LocalDateTime updateDt;
-
-    /**
-     * 创建时间
-     */
+    @TableField(value = "create_Dt", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime createDt;
+
+    @TableField(value = "update_Dt", fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateDt;
 
     /**
      * 最后一次上传的合法标志

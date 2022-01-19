@@ -6,8 +6,8 @@ import org.apache.ibatis.reflection.MetaObject;
 import java.time.LocalDateTime;
 
 /**
- * @author kevin
- * @date 2018/12/1 14:28
+ * @author
+ * @date
  */
 public class DiskMetaObjectHandler implements MetaObjectHandler {
 
