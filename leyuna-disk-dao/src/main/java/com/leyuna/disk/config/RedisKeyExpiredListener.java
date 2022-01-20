@@ -6,8 +6,7 @@ import com.leyuna.disk.co.FileUpLogCO;
 import com.leyuna.disk.constant.ServerCode;
 import com.leyuna.disk.domain.FileInfoE;
 import com.leyuna.disk.domain.FileUpLogE;
-import com.leyuna.disk.enums.ErrorEnum;
-import com.leyuna.disk.util.AssertUtil;
+import com.leyuna.disk.enums.FileEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.Message;
@@ -39,7 +38,11 @@ public class RedisKeyExpiredListener extends KeyExpirationEventMessageListener {
      */
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        fileExpiration(message.toString());
+        String redisKey = message.toString();
+        //走云盘 暂时保存业务逻辑
+        if(redisKey.contains("disk")){
+            fileExpiration(message.toString());
+        }
     }
 
     /**
@@ -79,8 +82,9 @@ public class RedisKeyExpiredListener extends KeyExpirationEventMessageListener {
     private void deleteFile(String fileId){
         FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(fileId).selectById();
         if(null!=fileInfoCO){
+            FileEnum fileEnum = FileEnum.loadName(fileInfoCO.getFileType());
             //物理删除文件
-            File file = new File(ServerCode.FILE_ADDRESS + fileInfoCO.getUserId() + "/" + fileInfoCO.getName());
+            File file = new File(ServerCode.FILE_ADDRESS + fileInfoCO.getUserId() + "/"+fileEnum.getName()+"/"+ fileInfoCO.getName());
             if(file.exists()){
                 file.delete();
             }

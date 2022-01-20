@@ -23,13 +23,13 @@ public class FileInfoDO implements Serializable {
 
     private String name;
 
-    @TableField(value = "create_Dt", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "create_Dt", fill = FieldFill.INSERT)
     private LocalDateTime createDt;
 
     @TableField(value = "update_Dt", fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateDt;
 
-    @TableField(value = "deleted" ,fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "deleted" ,fill = FieldFill.INSERT)
     private Integer deleted;
 
     private Double fileSize;

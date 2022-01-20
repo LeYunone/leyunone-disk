@@ -149,7 +149,8 @@ public class FileService {
                 DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                 LocalDate ld = LocalDate.parse(upFileDTO.getSaveTime(), DATEFORMATTER);
                 LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
-
+                Duration duration = Duration.between(LocalDateTime.now(), ldt);
+                long saveSec = duration.getSeconds();
                 //如果文件大小符合条件存入缓存，则进人redis流程
                 if (fileSize <= maxFile) {
                     String base64 = null;
@@ -157,15 +158,13 @@ public class FileService {
 
                     AssertUtil.isFalse(StringUtils.isEmpty(base64),ErrorEnum.FILE_UPLOAD_FILE.getName());
                     //计算存储时间
-                    Duration duration = Duration.between(LocalDateTime.now(), ldt);
-                    long saveSec = duration.getSeconds();
                     //将小量文件存入redis中进行保存
-                    cacheExe.setCacheKey("file:"+saveId, base64, 10);
+                    cacheExe.setCacheKey("disk_file:"+saveId, base64, saveSec);
                     //TODO 缓存过期事件，更新数据库
                 } else {
                     //TODO 走定时任务，到过期时间时，将存储的文件删除
                     //暂时进行文件存储  在redis中添加一个记号
-                    cacheExe.setCacheKey("deleted:"+saveId,"DELETED",10);
+                    cacheExe.setCacheKey("disk_deleted:"+saveId,"DELETED",saveSec);
 
                     File saveFile = new File(ServerCode.FILE_ADDRESS + userId+"/"+fileEnum.getName()+"/"+name);
                     if(!saveFile.getParentFile().exists()){

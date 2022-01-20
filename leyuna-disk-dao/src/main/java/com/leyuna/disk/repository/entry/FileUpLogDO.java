@@ -30,7 +30,7 @@ public class FileUpLogDO implements Serializable {
     /**
      * 更新时间
      */
-    @TableField(value = "create_Dt", fill = FieldFill.INSERT_UPDATE)
+    @TableField(value = "create_Dt", fill = FieldFill.INSERT)
     private LocalDateTime createDt;
 
     @TableField(value = "update_Dt", fill = FieldFill.INSERT_UPDATE)
