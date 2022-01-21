@@ -2,6 +2,7 @@ package com.leyuna.disk.co;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,6 +23,7 @@ public class FileInfoCO implements Serializable {
 
     private String name;
 
+    @JsonFormat( pattern = "yyyy-MM-dd")
     private LocalDateTime createDt;
 
     private LocalDateTime updateDt;
@@ -31,6 +33,8 @@ public class FileInfoCO implements Serializable {
     private Double fileSize;
 
     private String userId;
+
+    private String fileTypeName;
 
     /**
      * 文件类型：1图片、2音乐、3视频、4文档、5其他文件

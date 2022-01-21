@@ -141,13 +141,14 @@ public class FileService {
 
             String saveId = FileInfoE.queryInstance().setUserId(userId)
                     .setFileSize(fileSize)
+                    .setFileTypeName(fileEnum.getName())
                     .setName(file.getOriginalFilename())
                     .setFileType(fileEnum.getValue()).save();
             //如果保存的文件非永久，则进行一个度的校验
             if (StringUtils.isNotEmpty(upFileDTO.getSaveTime())) {
 
-                DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDate ld = LocalDate.parse(upFileDTO.getSaveTime(), DATEFORMATTER);
+                DateTimeFormatter saveTime = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate ld = LocalDate.parse(upFileDTO.getSaveTime(), saveTime);
                 LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
                 Duration duration = Duration.between(LocalDateTime.now(), ldt);
                 long saveSec = duration.getSeconds();
@@ -204,11 +205,11 @@ public class FileService {
         FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(id).selectById();
         AssertUtil.isFalse(null == fileInfoCO, ErrorEnum.SELECT_NOT_FOUND.getName());
 
-        //逻辑删除数据条 按照创建时间排序查询 第一条的内存总量就是当前用户的内存总量
+        //逻辑删除数据条
         FileInfoE.queryInstance().setId(id).setDeleted(1).update();
-
+        FileEnum fileEnum = FileEnum.loadName(fileInfoCO.getFileType());
         //物理删除文件
-        File file = new File(ServerCode.FILE_ADDRESS + fileInfoCO.getUserId() + "/" + fileInfoCO.getName());
+        File file = new File(ServerCode.FILE_ADDRESS + fileInfoCO.getUserId() + "/" +fileEnum.getName()+"/"+ fileInfoCO.getName());
         AssertUtil.isFalse(!file.exists(), ErrorEnum.SELECT_NOT_FOUND.getName());
         file.delete();
         return DataResponse.buildSuccess();

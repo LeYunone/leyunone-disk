@@ -34,6 +34,8 @@ public class FileInfoDO implements Serializable {
 
     private Double fileSize;
 
+    private String fileTypeName;
+
     private String userId;
 
     /**
