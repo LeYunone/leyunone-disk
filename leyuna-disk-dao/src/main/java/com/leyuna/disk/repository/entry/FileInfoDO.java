@@ -43,4 +43,5 @@ public class FileInfoDO implements Serializable {
      */
     private Integer fileType;
 
+    private String fileTypeName;
 }

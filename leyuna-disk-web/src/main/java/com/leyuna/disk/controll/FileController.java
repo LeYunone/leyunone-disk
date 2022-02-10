@@ -59,7 +59,7 @@ public class FileController {
         UpFileDTO upFileDTO=new UpFileDTO();
         upFileDTO.setUserId(userId);
         upFileDTO.setFile(file);
-        return fileService.JudgeFile(upFileDTO);
+        return fileService.judgeFile(upFileDTO);
     }
 
     /**

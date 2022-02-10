@@ -12,12 +12,12 @@ import java.io.Serializable;
  * (FileInfo)出参
  *
  * @author pengli
- * @since 2021-12-28 09:45:27
+ * @since 2022-02-10 10:19:51
  */
 @Getter
 @Setter
 public class FileInfoCO implements Serializable {
-    private static final long serialVersionUID = -92920680899937156L;
+    private static final long serialVersionUID = -33557261354917777L;
 
     private String id;
 
@@ -37,7 +37,12 @@ public class FileInfoCO implements Serializable {
     private String fileTypeName;
 
     /**
-     * 文件类型：1图片、2音乐、3视频、4文档、5其他文件
+     * 文件类型：1图片、2音视、3文档、4其他文件
      */
     private Integer fileType;
+
+    /**
+     * 文件类型中文
+     */
+    private String fileTypeName;
 }
