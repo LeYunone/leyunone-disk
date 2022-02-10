@@ -15,8 +15,6 @@ import com.leyuna.disk.enums.FileEnum;
 import com.leyuna.disk.enums.SortEnum;
 import com.leyuna.disk.util.AssertUtil;
 import com.leyuna.disk.util.FileUtil;
-import com.leyuna.disk.util.ObjectUtil;
-import com.leyuna.disk.util.StringUtil;
 import com.leyuna.disk.validator.FileValidator;
 import com.leyuna.disk.validator.UserValidator;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
@@ -69,7 +67,7 @@ public class FileService {
      * @param upFileDTO
      * @return
      */
-    public DataResponse<Integer> JudgeFile (UpFileDTO upFileDTO) {
+    public DataResponse<Integer> judgeFile (UpFileDTO upFileDTO) {
 
         //首先看这个用户是否符合上传文件规则
         userValidator.validator(upFileDTO.getUserId());
@@ -142,12 +140,13 @@ public class FileService {
             String saveId = FileInfoE.queryInstance().setUserId(userId)
                     .setFileSize(fileSize)
                     .setName(file.getOriginalFilename())
+                    .setFileTypeName(fileEnum.getName())
                     .setFileType(fileEnum.getValue()).save();
             //如果保存的文件非永久，则进行一个度的校验
             if (StringUtils.isNotEmpty(upFileDTO.getSaveTime())) {
 
-                DateTimeFormatter DATEFORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDate ld = LocalDate.parse(upFileDTO.getSaveTime(), DATEFORMATTER);
+                DateTimeFormatter dt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                LocalDate ld = LocalDate.parse(upFileDTO.getSaveTime(), dt);
                 LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
                 Duration duration = Duration.between(LocalDateTime.now(), ldt);
                 long saveSec = duration.getSeconds();
@@ -157,12 +156,12 @@ public class FileService {
                     base64 = Base64.encode(file.getBytes());
 
                     AssertUtil.isFalse(StringUtils.isEmpty(base64),ErrorEnum.FILE_UPLOAD_FILE.getName());
-                    //计算存储时间
-                    //将小量文件存入redis中进行保存
+                    //计算存储时间 将小量文件存入redis中进行保存
                     cacheExe.setCacheKey("disk_file:"+saveId, base64, saveSec);
                     //TODO 缓存过期事件，更新数据库
                 } else {
                     //TODO 走定时任务，到过期时间时，将存储的文件删除
+
                     //暂时进行文件存储  在redis中添加一个记号
                     cacheExe.setCacheKey("disk_deleted:"+saveId,"DELETED",saveSec);
 
@@ -206,11 +205,21 @@ public class FileService {
 
         //逻辑删除数据条 按照创建时间排序查询 第一条的内存总量就是当前用户的内存总量
         FileInfoE.queryInstance().setId(id).setDeleted(1).update();
-
         //物理删除文件
-        File file = new File(ServerCode.FILE_ADDRESS + fileInfoCO.getUserId() + "/" + fileInfoCO.getName());
-        AssertUtil.isFalse(!file.exists(), ErrorEnum.SELECT_NOT_FOUND.getName());
-        file.delete();
+//        File file = new File(ServerCode.FILE_ADDRESS + fileInfoCO.getUserId() + "/" + fileInfoCO.getName());
+//        AssertUtil.isFalse(!file.exists(), ErrorEnum.SELECT_NOT_FOUND.getName());
+//        file.delete();
+
+        //计算用户的新内存总值
+        String userId = fileInfoCO.getUserId();
+        List<FileUpLogCO> fileUpLogCOS = FileUpLogE.queryInstance().setUserId(userId).selectByCon();
+        AssertUtil.isFalse(CollectionUtils.isEmpty(fileUpLogCOS), ErrorEnum.SELECT_NOT_FOUND.getName());
+        FileUpLogCO fileUpLogCO = fileUpLogCOS.get(0);
+
+        //更新最新用户内存上传信息
+        Double size=fileUpLogCO.getUpFileTotalSize()-fileInfoCO.getFileSize();
+        FileUpLogE.queryInstance().setId(fileUpLogCO.getId()).setUpFileTotalSize(size).update();
+
         return DataResponse.buildSuccess();
     }
 

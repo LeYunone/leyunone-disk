@@ -26,4 +26,6 @@ public class FileDTO extends QueryPage {
     private String userId;
 
     private Integer type;
+
+    private Integer fileType;
 }

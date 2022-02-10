@@ -44,6 +44,8 @@ public class FileInfoE implements Serializable {
 
     private Integer fileType;
 
+    private String fileTypeName;
+
     //===========自定义方法区==========
     private FileInfoGateway gateway;
 
