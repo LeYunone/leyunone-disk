@@ -209,8 +209,9 @@ public class FileService {
         FileEnum fileEnum = FileEnum.loadName(fileInfoCO.getFileType());
         //物理删除文件
         File file = new File(ServerCode.FILE_ADDRESS + fileInfoCO.getUserId() + "/" +fileEnum.getName()+"/"+ fileInfoCO.getName());
-        AssertUtil.isFalse(!file.exists(), ErrorEnum.SELECT_NOT_FOUND.getName());
-        file.delete();
+        if(file.exists()){
+            file.delete();
+        }
 //        File file = new File(ServerCode.FILE_ADDRESS + fileInfoCO.getUserId() + "/" + fileInfoCO.getName());
 //        AssertUtil.isFalse(!file.exists(), ErrorEnum.SELECT_NOT_FOUND.getName());
 //        file.delete();
@@ -234,14 +235,20 @@ public class FileService {
      * @param id 文件id
      * @return
      */
-    public File getFile (String id) {
+    public File getFile (String id,String userId) {
 
         //获取文件数据
         FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(id).selectById();
         AssertUtil.isFalse(ObjectUtils.isEmpty(fileInfoCO), ErrorEnum.SELECT_NOT_FOUND.getName());
+        AssertUtil.isFalse(!fileInfoCO.getUserId().equals(userId),ErrorEnum.USER_INFO_ERROR.getName());
 
         File file = FileUtil.getFile(fileInfoCO.getName(), fileInfoCO.getUserId(),
                 FileEnum.loadName(fileInfoCO.getFileType()).getName());
+        if(!file.exists()){
+            //如果找不到文件，则说明这个文件暂时保存在缓存中
+            String base64= cacheExe.getCacheByKey("disk_file:" + fileInfoCO.getId());
+            Base64.decodeToFile()
+        }
         return file;
 
     }

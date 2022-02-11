@@ -23,7 +23,7 @@ public class FileInfoCO implements Serializable {
 
     private String name;
 
-    @JsonFormat( pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime createDt;
 
     private LocalDateTime updateDt;
@@ -40,9 +40,4 @@ public class FileInfoCO implements Serializable {
      * 文件类型：1图片、2音视、3文档、4其他文件
      */
     private Integer fileType;
-
-    /**
-     * 文件类型中文
-     */
-    private String fileTypeName;
 }

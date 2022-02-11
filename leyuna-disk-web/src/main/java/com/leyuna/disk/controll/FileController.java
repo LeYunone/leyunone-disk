@@ -92,8 +92,8 @@ public class FileController {
      * @return
      */
     @PostMapping("/downloadFile")
-    public ResponseEntity downloadFile(String id){
-        File file = fileService.getFile(id);
+    public ResponseEntity downloadFile(String id,String userId){
+        File file = fileService.getFile(id,userId);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
         headers.add("Content-Disposition", "attachment; filename=" + System.currentTimeMillis() + ".xls");

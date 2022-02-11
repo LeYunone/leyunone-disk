@@ -55,7 +55,7 @@ public class RedisKeyExpiredListener extends KeyExpirationEventMessageListener {
         FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(fileId).selectById();
         List<FileUpLogCO> fileUpLogCOS = FileUpLogE.queryInstance().setUserId(fileInfoCO.getUserId()).selectByCon();
         if(CollectionUtils.isEmpty(fileUpLogCOS)){
-            //理论上不可能出现的情况，如果出现，只跳过这次文件的操作行为
+            //如果找不到值，则说明该文件已经被前置删除 不需要处理
             return;
         }
         //

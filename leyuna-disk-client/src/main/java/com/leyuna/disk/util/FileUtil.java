@@ -2,11 +2,10 @@ package com.leyuna.disk.util;
 
 import com.leyuna.disk.constant.ServerCode;
 import com.leyuna.disk.enums.ErrorEnum;
+import com.sun.org.apache.xml.internal.security.utils.Base64;
 import org.springframework.util.ObjectUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.nio.channels.FileChannel;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -97,4 +96,10 @@ public class FileUtil {
 
         return file;
     }
+
+    public static File base64ToFile(String base64) {
+        byte[] decode = Base64.decode(base64);
+        File file=new File(decode);
+    }
+
 }
