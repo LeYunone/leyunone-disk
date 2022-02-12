@@ -17,17 +17,18 @@ import com.leyuna.disk.util.AssertUtil;
 import com.leyuna.disk.util.FileUtil;
 import com.leyuna.disk.validator.FileValidator;
 import com.leyuna.disk.validator.UserValidator;
+import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
 import com.sun.org.apache.xml.internal.security.utils.Base64;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -235,7 +236,7 @@ public class FileService {
      * @param id 文件id
      * @return
      */
-    public File getFile (String id,String userId) {
+    public FileInfoCO getFile (String id,String userId) {
 
         //获取文件数据
         FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(id).selectById();
@@ -247,9 +248,15 @@ public class FileService {
         if(!file.exists()){
             //如果找不到文件，则说明这个文件暂时保存在缓存中
             String base64= cacheExe.getCacheByKey("disk_file:" + fileInfoCO.getId());
-            Base64.decodeToFile()
+            try {
+                fileInfoCO.setBase64File(Base64.decode(base64));
+            } catch (Base64DecodingException e) {
+            }
+        }else{
+            //文件转换成数组byte 
+            byte[] bytes = FileUtil.FiletoByte(file);
+            fileInfoCO.setBase64File(bytes);
         }
-        return file;
-
+        return fileInfoCO;
     }
 }

@@ -40,4 +40,7 @@ public class FileInfoCO implements Serializable {
      * 文件类型：1图片、2音视、3文档、4其他文件
      */
     private Integer fileType;
+    
+    //数组类型存储的文件
+    private byte[] base64File;
 }

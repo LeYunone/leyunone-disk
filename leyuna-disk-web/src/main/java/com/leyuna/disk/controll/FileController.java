@@ -9,6 +9,7 @@ import com.leyuna.disk.service.file.FileQueryService;
 import com.leyuna.disk.service.file.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -92,21 +93,7 @@ public class FileController {
      * @return
      */
     @PostMapping("/downloadFile")
-    public ResponseEntity downloadFile(String id,String userId){
-        File file = fileService.getFile(id,userId);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Cache-Control", "no-cache, no-store, must-revalidate");
-        headers.add("Content-Disposition", "attachment; filename=" + System.currentTimeMillis() + ".xls");
-        headers.add("Pragma", "no-cache");
-        headers.add("Expires", "0");
-        headers.add("Last-Modified", new Date().toString());
-        headers.add("ETag", String.valueOf(System.currentTimeMillis()));
-
-        return ResponseEntity
-                .ok()
-                .headers(headers)
-                .contentLength(file.length())
-                .contentType(MediaType.parseMediaType("application/octet-stream"))
-                .body(new FileSystemResource(file));
+    public DataResponse<FileInfoCO> downloadFile(String id,String userId){
+        return DataResponse.of(fileService.getFile(id,userId));
     }
 }
