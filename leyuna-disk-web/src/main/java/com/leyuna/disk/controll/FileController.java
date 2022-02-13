@@ -83,8 +83,8 @@ public class FileController {
      * @return
      */
     @PostMapping("/deleteFile")
-    public DataResponse deleteFile(String id){
-        return fileService.deleteFile(id);
+    public DataResponse deleteFile(String id,String userId){
+        return fileService.deleteFile(id,userId);
     }
 
     /**

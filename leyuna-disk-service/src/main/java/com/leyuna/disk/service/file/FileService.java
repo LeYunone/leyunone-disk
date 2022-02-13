@@ -200,9 +200,10 @@ public class FileService {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public DataResponse deleteFile (String id) {
+    public DataResponse deleteFile (String id,String userId) {
 
         FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(id).selectById();
+        AssertUtil.isFalse(!fileInfoCO.getUserId().equals(userId),ErrorEnum.USER_INFO_ERROR.getName());
         AssertUtil.isFalse(null == fileInfoCO, ErrorEnum.SELECT_NOT_FOUND.getName());
 
         //逻辑删除数据条
@@ -212,13 +213,14 @@ public class FileService {
         File file = new File(ServerCode.FILE_ADDRESS + fileInfoCO.getUserId() + "/" +fileEnum.getName()+"/"+ fileInfoCO.getName());
         if(file.exists()){
             file.delete();
+        }else{
+            cacheExe.clearCacheKey("disk_file:"+fileInfoCO.getId());
         }
 //        File file = new File(ServerCode.FILE_ADDRESS + fileInfoCO.getUserId() + "/" + fileInfoCO.getName());
 //        AssertUtil.isFalse(!file.exists(), ErrorEnum.SELECT_NOT_FOUND.getName());
 //        file.delete();
 
         //计算用户的新内存总值
-        String userId = fileInfoCO.getUserId();
         List<FileUpLogCO> fileUpLogCOS = FileUpLogE.queryInstance().setUserId(userId).selectByCon();
         AssertUtil.isFalse(CollectionUtils.isEmpty(fileUpLogCOS), ErrorEnum.SELECT_NOT_FOUND.getName());
         FileUpLogCO fileUpLogCO = fileUpLogCOS.get(0);
