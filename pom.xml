@@ -9,7 +9,6 @@
     <name>disk</name>
     <description>Demo project for Spring Boot</description>
     <modules>
-        <module>leyuna-disk-start</module>
         <module>leyuna-disk-service</module>
         <module>leyuna-disk-domain</module>
         <module>leyuna-disk-web</module>
@@ -33,10 +32,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.20</version>
-        </dependency>
-        <dependency>
-            <groupId>com.leyuna</groupId>
-            <artifactId>disk-client</artifactId>
         </dependency>
     </dependencies>
     <dependencyManagement>

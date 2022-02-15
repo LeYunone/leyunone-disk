@@ -2,8 +2,6 @@ package com.leyuna.disk.util;
 
 import com.leyuna.disk.constant.ServerCode;
 import com.leyuna.disk.enums.ErrorEnum;
-import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
 import org.springframework.util.ObjectUtils;
 
 import java.io.*;
@@ -96,22 +94,6 @@ public class FileUtil {
         AssertUtil.isFalse(ObjectUtils.isEmpty(file),ErrorEnum.SELECT_NOT_FOUND.getName());
 
         return file;
-    }
-
-    public static ByteArrayInputStream base64ToFile(String base64) {
-        ByteArrayInputStream bai=null;
-        try {
-            byte[] decode = Base64.decode(base64);
-            bai=new ByteArrayInputStream(decode);
-        } catch (Base64DecodingException e) {
-        }finally {
-            try {
-                bai.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return bai;
     }
 
     public static byte[] FiletoByte(File tradeFile){

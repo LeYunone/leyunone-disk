@@ -38,6 +38,8 @@ public class FileInfoE implements Serializable {
 
     private Integer deleted;
 
+    private String saveDt;
+
     private Double fileSize;
 
     private String userId;

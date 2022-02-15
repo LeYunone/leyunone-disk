@@ -33,6 +33,6 @@ public class UpFileDTO implements Serializable {
     /**
      * 保存时间
      */
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private String saveTime;
 }

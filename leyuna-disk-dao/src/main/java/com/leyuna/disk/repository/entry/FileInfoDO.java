@@ -42,4 +42,6 @@ public class FileInfoDO implements Serializable {
      * 文件类型：1图片、2音视、3文档、4其他文件
      */
     private Integer fileType;
+
+    private String saveDt;
 }

@@ -17,8 +17,7 @@ import com.leyuna.disk.util.AssertUtil;
 import com.leyuna.disk.util.FileUtil;
 import com.leyuna.disk.validator.FileValidator;
 import com.leyuna.disk.validator.UserValidator;
-import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
-import com.sun.org.apache.xml.internal.security.utils.Base64;
+import org.apache.commons.codec.binary.Base64;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -140,6 +139,7 @@ public class FileService {
 
             String saveId = FileInfoE.queryInstance().setUserId(userId)
                     .setFileSize(fileSize)
+                    .setSaveDt(StringUtils.isEmpty(upFileDTO.getSaveTime())?"永久保存":upFileDTO.getSaveTime())
                     .setFileTypeName(fileEnum.getName())
                     .setName(file.getOriginalFilename())
                     .setFileTypeName(fileEnum.getName())
@@ -155,7 +155,7 @@ public class FileService {
                 //如果文件大小符合条件存入缓存，则进人redis流程
                 if (fileSize <= maxFile) {
                     String base64 = null;
-                    base64 = Base64.encode(file.getBytes());
+                    base64 = Base64.encodeBase64String(file.getBytes());
 
                     AssertUtil.isFalse(StringUtils.isEmpty(base64),ErrorEnum.FILE_UPLOAD_FILE.getName());
                     //计算存储时间 将小量文件存入redis中进行保存
@@ -250,10 +250,7 @@ public class FileService {
         if(!file.exists()){
             //如果找不到文件，则说明这个文件暂时保存在缓存中
             String base64= cacheExe.getCacheByKey("disk_file:" + fileInfoCO.getId());
-            try {
-                fileInfoCO.setBase64File(Base64.decode(base64));
-            } catch (Base64DecodingException e) {
-            }
+            fileInfoCO.setBase64File(Base64.decodeBase64(base64));
         }else{
             //文件转换成数组byte 
             byte[] bytes = FileUtil.FiletoByte(file);

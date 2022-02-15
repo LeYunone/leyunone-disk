@@ -5,6 +5,7 @@
     <groupId>com.leyuna</groupId>
     <artifactId>disk-start</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>war</packaging>
     <name>disk-start</name>
     <description>Demo project for Spring Boot</description>
     <parent>
@@ -13,8 +14,7 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <properties>
-        <!-- 不允许将此module部署到仓库 -->
-        <maven.deploy.skip>true</maven.deploy.skip>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
     </properties>
     <dependencies>
 <!--        <dependency>-->
@@ -25,7 +25,6 @@
 <!--            <groupId>org.springframework.cloud</groupId>-->
 <!--            <artifactId>spring-cloud-starter-config</artifactId>-->
 <!--        </dependency>-->
-
         <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>

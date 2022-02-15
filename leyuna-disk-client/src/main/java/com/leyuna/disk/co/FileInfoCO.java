@@ -28,6 +28,8 @@ public class FileInfoCO implements Serializable {
 
     private LocalDateTime updateDt;
 
+    private String saveDt;
+
     private Integer deleted;
 
     private Double fileSize;
