@@ -5,6 +5,7 @@
     <groupId>com.leyuna</groupId>
     <artifactId>disk-start</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
     <name>disk-start</name>
     <description>Demo project for Spring Boot</description>
     <parent>
