@@ -1,3 +1,4 @@
+
 spring:
   application:
     name: LEYUNA-DISK
@@ -11,3 +12,5 @@ spring:
         server-addr: localhost:8848
         file-extension: properties
         prefix: LEYUNA-DISK
+server:
+  port: 9001
