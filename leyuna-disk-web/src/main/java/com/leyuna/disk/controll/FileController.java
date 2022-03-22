@@ -1,26 +1,15 @@
 package com.leyuna.disk.controll;
 
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.leyuna.disk.DataResponse;
 import com.leyuna.disk.co.FileInfoCO;
+import com.leyuna.disk.co.UserFileInfoCO;
 import com.leyuna.disk.dto.file.FileDTO;
 import com.leyuna.disk.dto.file.UpFileDTO;
 import com.leyuna.disk.service.file.FileQueryService;
 import com.leyuna.disk.service.file.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.File;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author pengli
@@ -40,9 +29,8 @@ public class FileController {
      * @return
      */
     @PostMapping("/selectFile")
-    public DataResponse<Page<FileInfoCO>> selectFileList(@RequestBody FileDTO file){
-        DataResponse<Page<FileInfoCO>> listDataResponse = fileQueryService.selectFile(file);
-        return listDataResponse;
+    public DataResponse<UserFileInfoCO> selectFileList(@RequestBody FileDTO file){
+        return fileQueryService.selectFile(file);
     }
 
     @GetMapping("/selectAllFileSize")
