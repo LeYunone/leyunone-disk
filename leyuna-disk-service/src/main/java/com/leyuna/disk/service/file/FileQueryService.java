@@ -36,7 +36,7 @@ public class FileQueryService {
         }else{
             userFileInfCO.setFileTotal(0.0);
         }
-        userFileInfCO.setFileinfos(fileInfoCOPage.getRecords());
+        userFileInfCO.setFileinfos(fileInfoCOPage);
         return DataResponse.of(userFileInfCO);
     }
 

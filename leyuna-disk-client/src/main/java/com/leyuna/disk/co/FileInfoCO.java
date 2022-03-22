@@ -1,12 +1,11 @@
 package com.leyuna.disk.co;
 
-import java.time.LocalDateTime;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * (FileInfo)出参
@@ -26,6 +25,7 @@ public class FileInfoCO implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime createDt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime updateDt;
 
     private String saveDt;
