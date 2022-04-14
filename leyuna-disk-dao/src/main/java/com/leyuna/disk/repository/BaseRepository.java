@@ -1,5 +1,6 @@
 package com.leyuna.disk.repository;
 
+import com.alibaba.cloud.commons.lang.StringUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -242,7 +243,7 @@ public abstract class BaseRepository<M extends BaseMapper<DO>, DO,CO> extends Se
                 } catch (NoSuchFieldException | IllegalAccessException noSuchFieldException) {
                     noSuchFieldException.printStackTrace();
                 }
-                ipage=this.baseMapper.selectPage(page, new QueryWrapper<DO>().allEq(stringObjectMap).orderByDesc(String.valueOf(value)));
+                ipage=this.baseMapper.selectPage(page, new QueryWrapper<DO>().allEq(stringObjectMap).orderByDesc(StringUtils.isNotBlank(value.toString()),String.valueOf(value)));
         }
         return TransformationUtil.copyToPage(ipage,COclass);
     }
