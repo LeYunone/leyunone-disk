@@ -10,7 +10,8 @@ import java.io.Serializable;
 /**
  * (FileMd5)出参
  *
- * @author pengli@asiainfo.com
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @since 2022-04-21 15:26:44
  */
 @Getter

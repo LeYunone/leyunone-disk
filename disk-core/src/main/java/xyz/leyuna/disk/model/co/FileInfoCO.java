@@ -10,7 +10,8 @@ import java.io.Serializable;
 /**
  * (FileInfo)出参
  *
- * @author pengli@asiainfo.com
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @since 2022-04-21 15:53:42
  */
 @Getter
@@ -50,6 +51,6 @@ public class FileInfoCO implements Serializable {
      * 文件路径
      */
     private String filePath;
-    
+
     private byte[] base64File;
 }

@@ -4,7 +4,8 @@ import lombok.*;
 import xyz.leyuna.disk.model.constant.ResponseCode;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @create 2021-08-10 15:05
  *   一般响应结果集
  */

@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @date   mybatis-plus 配置类
  *  配置扫描包注释 只需要一个，在application里
  */

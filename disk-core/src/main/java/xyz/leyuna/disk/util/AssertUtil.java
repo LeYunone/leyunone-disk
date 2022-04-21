@@ -1,7 +1,8 @@
 package xyz.leyuna.disk.util;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @create 2021-12-27 09:50
  */
 public class AssertUtil {

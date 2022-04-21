@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @create 2021-08-10 16:46
  * 转换对象工具类
  */

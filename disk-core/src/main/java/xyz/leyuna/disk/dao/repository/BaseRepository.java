@@ -18,7 +18,8 @@ import java.util.Map;
 
 /**
  * 抽象Repository服务类
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @since 2021-10-18
  */
 public abstract class BaseRepository<M extends BaseMapper<DO>, DO,CO> extends ServiceImpl<M, DO> implements BaseGateway<CO> {

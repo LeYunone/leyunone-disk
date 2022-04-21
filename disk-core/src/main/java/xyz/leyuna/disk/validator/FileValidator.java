@@ -8,7 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @create 2021-12-27 10:54
  * 检查文件合法性
  */

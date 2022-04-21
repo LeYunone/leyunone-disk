@@ -18,7 +18,8 @@ import java.util.Objects;
 /**
  * (FileInfo) 工作台
  *
- * @author pengli@asiainfo.com
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @since 2022-04-21 15:53:41
  */
 @Getter
@@ -83,9 +84,9 @@ public class FileInfoE implements Serializable {
         return this.getGateway().selectByConOrder(sort.getType(), this);
     }
 
-    public boolean save() {
+    public String save() {
         FileInfoGateway gateway = this.getGateway();
-        return gateway.insertOrUpdate(this);
+        return gateway.save(this);
     }
 
     /**

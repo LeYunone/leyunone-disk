@@ -9,7 +9,8 @@ import xyz.leyuna.disk.model.co.FileUpLogCO;
 /**
  * (FileUpLog)表服务实现类
  *
- * @author pengli@asiainfo.com
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @since 2022-04-21 15:26:52
  */
 @Service

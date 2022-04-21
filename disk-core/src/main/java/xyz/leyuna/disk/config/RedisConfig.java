@@ -15,7 +15,8 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import java.time.Duration;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @create 2021-08-31 16:31
  *  redis 配置
  */

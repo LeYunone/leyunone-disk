@@ -2,6 +2,7 @@ package xyz.leyuna.disk.controll;
 
 import xyz.leyuna.disk.model.DataResponse;
 import xyz.leyuna.disk.model.co.FileInfoCO;
+import xyz.leyuna.disk.model.co.FileValidatorCO;
 import xyz.leyuna.disk.model.co.UserFileInfoCO;
 import xyz.leyuna.disk.model.dto.file.FileDTO;
 import xyz.leyuna.disk.model.dto.file.UpFileDTO;
@@ -13,7 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 import xyz.leyuna.disk.service.file.ValidatorService;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @create 2021-12-09 10:38
  * 文件方接口
  */
@@ -25,7 +27,7 @@ public class FileController {
     private FileQueryService fileQueryService;
     @Autowired
     private FileService fileService;
-    
+
     @Autowired
     private ValidatorService validatorService;
     /**
@@ -47,7 +49,7 @@ public class FileController {
      * @return
      */
     @PostMapping("/requestSaveFile")
-    public DataResponse<Integer> requestSaveFile(@RequestBody UpFileDTO upFileDTO){
+    public DataResponse<FileValidatorCO> requestSaveFile(@RequestBody UpFileDTO upFileDTO){
         return validatorService.judgeFile(upFileDTO);
     }
 

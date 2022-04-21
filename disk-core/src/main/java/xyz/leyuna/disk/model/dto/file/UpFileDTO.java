@@ -9,7 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.Serializable;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @create 2021-12-24 16:51
  * 上传文件
  */
@@ -24,13 +25,43 @@ public class UpFileDTO implements Serializable {
     private String userId;
 
     /**
-     * 多文件
+     * 文件
      */
     private MultipartFile file;
+
+    /**
+     * 文件类型
+     */
+    private Integer fileType;
+
+    /**
+     * 文件大小 [和分片无关]
+     */
+    private Long fileSize;
 
     /**
      * 保存时间
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private String saveTime;
+
+    /**
+     * 文件钥匙
+     */
+    private String fileKey;
+
+    /**
+     * 文件名
+     */
+    private String fileName;
+
+    /**
+     * 当前分片索引
+     */
+    private Integer sliceIndex;
+
+    /**
+     * 总分片数
+     */
+    private Integer sliceAll;
 }

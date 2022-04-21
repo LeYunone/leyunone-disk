@@ -7,12 +7,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sun.security.provider.MD5;
+import xyz.leyuna.disk.command.CacheExe;
 import xyz.leyuna.disk.domain.domain.FileInfoE;
 import xyz.leyuna.disk.domain.domain.FileMd5E;
 import xyz.leyuna.disk.domain.domain.FileUserE;
 import xyz.leyuna.disk.model.DataResponse;
 import xyz.leyuna.disk.model.co.FileInfoCO;
 import xyz.leyuna.disk.model.co.FileMd5CO;
+import xyz.leyuna.disk.model.co.FileValidatorCO;
 import xyz.leyuna.disk.model.constant.ServerCode;
 import xyz.leyuna.disk.model.dto.file.UpFileDTO;
 import xyz.leyuna.disk.util.FileUtil;
@@ -23,9 +25,12 @@ import xyz.leyuna.disk.validator.UserValidator;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @date 2022-04-21
  */
 @Service
@@ -37,17 +42,21 @@ public class ValidatorService {
     @Autowired
     private FileValidator fileValidator;
 
+    @Autowired
+    private CacheExe cacheExe;
+
     /**
      * 校验本次文件上传请求是否合法
      *
      * @param upFileDTO
      * @return
      */
-    public DataResponse<Integer> judgeFile (UpFileDTO upFileDTO){
+    public DataResponse<FileValidatorCO> judgeFile (UpFileDTO upFileDTO){
+        FileValidatorCO result = new FileValidatorCO();
         String userId = upFileDTO.getUserId();
         //首先看这个用户是否符合上传文件规则
         userValidator.validator(userId);
-        
+
         MultipartFile multipartFile = upFileDTO.getFile();
         if (ObjectUtil.isEmpty(multipartFile)) {
             return DataResponse.buildFailure();
@@ -57,7 +66,7 @@ public class ValidatorService {
         Integer resultType = 1;
         try {
             FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
-            
+
             String md5 = MD5Util.fileToMD5(file);
             List<FileMd5CO> fileMd5COS = FileMd5E.queryInstance().setMd5Code(md5).selectByCon();
 
@@ -68,15 +77,23 @@ public class ValidatorService {
                 FileUserE.queryInstance().setUserId(userId).setFileId(fileId).save();
                 //返回给前端：不用继续操作
                 resultType = 0;
+            }else{
+                //继续操作，上传文件，交给前端本次文件标识key
+                UUID uuid = UUID.randomUUID();
+                result.setFileKey(uuid.toString());
+                //在redis中存入本次上传文件的钥匙
+                cacheExe.setFileMD5Key(userId,uuid.toString(),md5);
             }
-            //继续操作，上传文件
+
         } catch (IOException e) {
             //如果发生转化异常，本次校验视为通过，上传文件
         }finally {
             if(file.exists()){
                 file.delete();
             }
-            return DataResponse.of(resultType);
+            //封装结果集
+            result.setResponseType(resultType);
+            return DataResponse.of(result);
         }
     }
 

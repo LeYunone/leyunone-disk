@@ -5,12 +5,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @create 2021-09-02 15:24
  *
  * 清除缓存指令
@@ -31,6 +36,48 @@ public class CacheExe {
         if (ObjectUtil.isNotEmpty(allKeys)) {
             stringRedisTemplate.delete(allKeys);
         }
+    }
+
+    /**
+     * 存放未上传的文件 key 钥匙  value MD5码
+     * @param key
+     * @param value
+     */
+    public void setFileMD5Key(String userId,String key,String value){
+        stringRedisTemplate.opsForValue().set("disk_file_"+userId+"_"+key,value);
+    }
+
+    /**
+     * 获得MD5
+     * @param userId
+     * @param key
+     * @return
+     */
+    public String getFileMD5Value(String userId,String key){
+        return this.getCacheByKey("disk_file_"+userId+"_"+key);
+    }
+
+    /**
+     * 清空文件钥匙
+     * @param userId
+     * @param key
+     */
+    public void clearFileMD5(String userId,String key){
+        stringRedisTemplate.delete("disk_file_"+userId+"_"+key);
+    }
+
+    /**
+     * 保存模式文件，进入redis存储
+     * @param
+     * @param saveTime
+     */
+    public void setSaveTimeFileCache(String fileId,String userId,String saveTime){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate ld = LocalDate.parse(saveTime, formatter);
+        LocalDateTime ldt = LocalDateTime.of(ld, LocalDateTime.now().toLocalTime());
+        Duration duration = Duration.between(LocalDateTime.now(), ldt);
+        long saveSec = duration.getSeconds();
+        this.setCacheKey("disk_file_time:" + fileId+","+userId, "DELETED", saveSec);
     }
 
     /**

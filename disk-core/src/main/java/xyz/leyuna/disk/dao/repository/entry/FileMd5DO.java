@@ -10,7 +10,8 @@ import lombok.Setter;
 /**
  * (FileMd5)表实体类
  *
- * @author pengli@asiainfo.com
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @since 2022-04-21 15:26:43
  */
 @Getter

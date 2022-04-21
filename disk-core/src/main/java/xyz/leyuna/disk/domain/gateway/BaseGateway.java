@@ -6,7 +6,8 @@ import java.util.List;
 
 /**
  *基础Geteway
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @since 2021-10-18
  */
 public interface BaseGateway<CO> {

@@ -1,7 +1,8 @@
 package xyz.leyuna.disk.model.constant;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @create 2021-08-13 15:07
  *
  * 响应control的编码

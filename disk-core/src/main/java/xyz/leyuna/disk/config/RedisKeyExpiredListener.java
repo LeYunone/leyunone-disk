@@ -1,5 +1,6 @@
 package xyz.leyuna.disk.config;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +10,10 @@ import org.springframework.data.redis.listener.KeyExpirationEventMessageListener
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import xyz.leyuna.disk.domain.domain.FileInfoE;
 import xyz.leyuna.disk.domain.domain.FileUpLogE;
+import xyz.leyuna.disk.domain.domain.FileUserE;
 import xyz.leyuna.disk.model.co.FileInfoCO;
 import xyz.leyuna.disk.model.co.FileUpLogCO;
+import xyz.leyuna.disk.model.co.FileUserCO;
 import xyz.leyuna.disk.model.constant.ServerCode;
 import xyz.leyuna.disk.model.enums.FileEnum;
 
@@ -18,7 +21,8 @@ import java.io.File;
 import java.util.List;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @create 2022-01-17 16:22
  *
  *  redis key过期监听事件
@@ -40,7 +44,7 @@ public class RedisKeyExpiredListener extends KeyExpirationEventMessageListener {
     public void onMessage(Message message, byte[] pattern) {
         String redisKey = message.toString();
         //走云盘 暂时保存业务逻辑
-        if(redisKey.contains("disk")){
+        if(redisKey.contains("disk_")){
             fileExpiration(message.toString());
         }
     }
@@ -51,43 +55,38 @@ public class RedisKeyExpiredListener extends KeyExpirationEventMessageListener {
      */
     private void fileExpiration(String message){
         // file: id
-        String fileId = message.substring(message.indexOf(":")+1);
-        FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(fileId).selectById();
-        List<FileUpLogCO> fileUpLogCOS = FileUpLogE.queryInstance().setUserId(fileInfoCO.getUserId()).selectByCon();
-        if(CollectionUtils.isEmpty(fileUpLogCOS)){
+        String[] split = message.substring(message.indexOf(":") + 1).split(",");
+        String fileId = split[0];
+        String userId = split[1];
+        FileUserCO fileUserCO = FileUserE.queryInstance().setFileId(fileId).setUserId(userId).selectOne();
+        if(ObjectUtil.isEmpty(fileUserCO)){
             //如果找不到值，则说明该文件已经被前置删除 不需要处理
             return;
         }
-        //
-        FileUpLogCO fileUpLogCO = fileUpLogCOS.get(0);
-        //如果在缓存里 只需要计算数据库
 
-        //半永久则需要进行硬盘中删除文件
-        if(message.contains("deleted")){
-            //从硬盘上删除该文件
-            deleteFile(fileId);
-        }
+        FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(fileId).selectById();
+        //删除该文件
+        deleteFile(fileInfoCO);
 
-        //删除数据库信息
-        FileInfoE.queryInstance().setId(fileInfoCO.getId()).setDeleted(1).update();
+        FileUpLogCO fileUpLogCO = FileUpLogE.queryInstance().setUserId(userId).selectOne();
         //重新计算用户的内存大小
-        Double lastFileSize = fileUpLogCO.getUpFileTotalSize() - fileInfoCO.getFileSize();
+        Long lastFileSize = fileUpLogCO.getUpFileTotalSize() - fileInfoCO.getFileSize();
         FileUpLogE.queryInstance().setId(fileUpLogCO.getId()).setUpFileTotalSize(lastFileSize).update();
     }
 
     /**
-     * 物理删除文件
-     * @param fileId
+     * 删除文件
+     * @param
      */
-    private void deleteFile(String fileId){
-        FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(fileId).selectById();
+    private void deleteFile(FileInfoCO fileInfoCO){
         if(null!=fileInfoCO){
-            FileEnum fileEnum = FileEnum.loadName(fileInfoCO.getFileType());
             //物理删除文件
-            File file = new File(ServerCode.FILE_ADDRESS + fileInfoCO.getUserId() + "/"+fileEnum.getName()+"/"+ fileInfoCO.getName());
+            File file = new File(fileInfoCO.getFilePath());
             if(file.exists()){
                 file.delete();
             }
         }
+        //删除数据库信息
+        FileInfoE.queryInstance().setId(fileInfoCO.getId()).setDeleted(1).update();
     }
 }

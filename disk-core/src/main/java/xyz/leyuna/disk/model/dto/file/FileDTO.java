@@ -9,7 +9,8 @@ import org.springframework.web.multipart.MultipartFile;
 import xyz.leyuna.disk.model.dto.QueryPage;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @create 2021-12-09 16:20
  *  文件操作类
  */
@@ -27,7 +28,7 @@ public class FileDTO extends QueryPage {
     private String userId;
 
     private Integer type;
-    
+
     private MultipartFile file;
 
     private Integer fileType;

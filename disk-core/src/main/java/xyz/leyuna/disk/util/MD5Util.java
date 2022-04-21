@@ -9,7 +9,8 @@ import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 
 /**
- * @author pengli
+ * @author LeYuna
+ * @email 365627310@qq.com
  * @date 2022-04-21
  * MD5码处理工具
  */

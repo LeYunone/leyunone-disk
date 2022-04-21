@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * (FileUpLog)出参
  *
- * @author pengli@asiainfo.com
+ * @author LeYuna
  * @since 2022-04-21 15:26:52
  */
 @Getter
