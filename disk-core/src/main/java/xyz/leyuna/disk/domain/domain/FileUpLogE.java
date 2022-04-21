@@ -18,66 +18,56 @@ import java.util.Objects;
 /**
  * (FileUpLog) 工作台
  *
- * @author pengli
- * @since 2022-01-18 15:24:11
+ * @author pengli@asiainfo.com
+ * @since 2022-04-21 15:51:45
  */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class FileUpLogE implements Serializable {
-    private static final long serialVersionUID = -72076318261188848L;
+    private static final long serialVersionUID = -94808602625431516L;
 
     private String id;
-    /**
-     * 用户
-     */
+
     private String userId;
-    /**
-     * 更新时间
-     */
-    private LocalDateTime updateDt;
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createDt;
-    /**
-     * 最后一次上传的合法标志
-     */
+
     private Integer upSign;
-    /**
-     * 当前操作后的文件总内存
-     */
-    private Double upFileTotalSize;
+
+    private Long upFileTotalSize;
+
+    private LocalDateTime updateDt;
+
+    private LocalDateTime createDt;
 
     //===========自定义方法区==========
     private FileUpLogGateway gateway;
 
-    public FileUpLogGateway getGateway () {
+    public FileUpLogGateway getGateway() {
         if (Objects.isNull(this.gateway)) {
             this.gateway = SpringContextUtil.getBean(FileUpLogGateway.class);
         }
         return this.gateway;
     }
 
-    public static FileUpLogE queryInstance () {
+    public static FileUpLogE queryInstance() {
         return new FileUpLogE();
     }
 
-    public static FileUpLogE of (Object data) {
+    public static FileUpLogE of(Object data) {
         return TransformationUtil.copyToDTO(data, FileUpLogE.class);
     }
 
-    public List<FileUpLogCO> selectByCon () {
+    public List<FileUpLogCO> selectByCon() {
         FileUpLogGateway gateway = this.getGateway();
         return gateway.selectByCon(this);
     }
 
-    public List<FileUpLogCO> selectByConOrder (SortEnum sort) {
+    public List<FileUpLogCO> selectByConOrder(SortEnum sort) {
         return this.getGateway().selectByConOrder(sort.getType(), this);
     }
 
-    public boolean save () {
+    public boolean save() {
         FileUpLogGateway gateway = this.getGateway();
         return gateway.insertOrUpdate(this);
     }
@@ -85,19 +75,24 @@ public class FileUpLogE implements Serializable {
     /**
      * 根据id查询
      */
-    public FileUpLogCO selectById () {
+    public FileUpLogCO selectById() {
         return this.getGateway().selectById(this.getId());
     }
 
     /**
      * 更新
      */
-    public boolean update () {
+    public boolean update() {
         FileUpLogGateway gateway = this.getGateway();
         return gateway.update(this);
     }
 
-    public static boolean batchCreate (List<FileUpLogE> list) {
+    public FileUpLogCO selectOne() {
+        FileUpLogGateway gateway = this.getGateway();
+        return gateway.selectOne(this);
+    }
+
+    public static boolean batchCreate(List<FileUpLogE> list) {
         return FileUpLogE.queryInstance().getGateway().batchCreate(list);
     }
 }

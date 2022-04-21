@@ -35,17 +35,17 @@ public class FileQueryService {
         if(CollectionUtils.isNotEmpty(fileUpLogCOS)){
             userFileInfCO.setFileTotal(fileUpLogCOS.get(0).getUpFileTotalSize());
         }else{
-            userFileInfCO.setFileTotal(0.0);
+            userFileInfCO.setFileTotal(0L);
         }
         userFileInfCO.setFileinfos(fileInfoCOPage);
         return DataResponse.of(userFileInfCO);
     }
 
-    public DataResponse<Double> selectAllFileSizeByUserId(String userId){
+    public DataResponse<Long> selectAllFileSizeByUserId(String userId){
         List<FileUpLogCO> fileUpLogCOS =
                 FileUpLogE.queryInstance().setUserId(userId).selectByCon();
         if(CollectionUtils.isEmpty(fileUpLogCOS)){
-            return DataResponse.of(0.0);
+            return DataResponse.of(0L);
         }
         return DataResponse.of(fileUpLogCOS.get(0).getUpFileTotalSize());
     }

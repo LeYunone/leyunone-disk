@@ -9,8 +9,8 @@ import xyz.leyuna.disk.model.co.FileUpLogCO;
 /**
  * (FileUpLog)表服务实现类
  *
- * @author pengli
- * @since 2021-12-27 15:01:53
+ * @author pengli@asiainfo.com
+ * @since 2022-04-21 15:26:52
  */
 @Service
 public class FileUpLogRepository extends BaseRepository<FileUpLogMapper, FileUpLogDO, FileUpLogCO>

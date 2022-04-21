@@ -18,84 +18,97 @@ import java.util.Objects;
 /**
  * (FileInfo) 工作台
  *
- * @author pengli
- * @since 2021-12-28 09:45:13
+ * @author pengli@asiainfo.com
+ * @since 2022-04-21 15:53:41
  */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class FileInfoE implements Serializable {
-    private static final long serialVersionUID = -86181643445529472L;
+    private static final long serialVersionUID = 126836289499117137L;
 
     private String id;
-
+    /**
+     * 文件名
+     */
     private String name;
-
-    private LocalDateTime createDt;
+    /**
+     * 文件大小
+     */
+    private Long fileSize;
+    /**
+     * 文件类型
+     */
+    private Integer fileType;
+    /**
+     * 保存时间
+     */
+    private String saveDt;
 
     private LocalDateTime updateDt;
 
+    private LocalDateTime createDt;
+
     private Integer deleted;
-
-    private String saveDt;
-
-    private Double fileSize;
-
-    private String userId;
-
-    private Integer fileType;
-
-    private String fileTypeName;
+    /**
+     * 文件路径
+     */
+    private String filePath;
 
     //===========自定义方法区==========
     private FileInfoGateway gateway;
 
-    public FileInfoGateway getGateway () {
+    public FileInfoGateway getGateway() {
         if (Objects.isNull(this.gateway)) {
             this.gateway = SpringContextUtil.getBean(FileInfoGateway.class);
         }
         return this.gateway;
     }
 
-    public static FileInfoE queryInstance () {
+    public static FileInfoE queryInstance() {
         return new FileInfoE();
     }
 
-    public static FileInfoE of (Object data) {
+    public static FileInfoE of(Object data) {
         return TransformationUtil.copyToDTO(data, FileInfoE.class);
     }
 
-    public List<FileInfoCO> selectByCon () {
+    public List<FileInfoCO> selectByCon() {
         FileInfoGateway gateway = this.getGateway();
         return gateway.selectByCon(this);
     }
 
-    public List<FileInfoCO> selectByConOrder (SortEnum sort) {
+    public List<FileInfoCO> selectByConOrder(SortEnum sort) {
         return this.getGateway().selectByConOrder(sort.getType(), this);
     }
 
-    public String save () {
+    public boolean save() {
         FileInfoGateway gateway = this.getGateway();
-        return gateway.save(this);
+        return gateway.insertOrUpdate(this);
     }
 
     /**
      * 根据id查询
      */
-    public FileInfoCO selectById () {
+    public FileInfoCO selectById() {
         return this.getGateway().selectById(this.getId());
     }
 
     /**
      * 更新
      */
-    public boolean update () {
+    public boolean update() {
         FileInfoGateway gateway = this.getGateway();
         return gateway.update(this);
     }
 
-    public static boolean batchCreate (List<FileInfoE> list) {
+    public FileInfoCO selectOne() {
+        FileInfoGateway gateway = this.getGateway();
+        return gateway.selectOne(this);
+    }
+
+    public static boolean batchCreate(List<FileInfoE> list) {
         return FileInfoE.queryInstance().getGateway().batchCreate(list);
     }
 }

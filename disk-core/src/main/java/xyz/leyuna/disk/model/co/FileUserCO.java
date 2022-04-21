@@ -8,25 +8,25 @@ import lombok.Setter;
 import java.io.Serializable;
 
 /**
- * (FileUpLog)出参
+ * (FileUser)出参
  *
  * @author pengli@asiainfo.com
- * @since 2022-04-21 15:26:52
+ * @since 2022-04-21 15:26:58
  */
 @Getter
 @Setter
-public class FileUpLogCO implements Serializable {
-    private static final long serialVersionUID = 960263911959678758L;
+public class FileUserCO implements Serializable {
+    private static final long serialVersionUID = -37130021088269140L;
 
     private String id;
 
+    private String fileId;
+
     private String userId;
 
-    private Integer upSign;
-
-    private Long upFileTotalSize;
-
-    private LocalDateTime updateDt;
+    private Integer deleted;
 
     private LocalDateTime createDt;
+
+    private LocalDateTime updateDt;
 }

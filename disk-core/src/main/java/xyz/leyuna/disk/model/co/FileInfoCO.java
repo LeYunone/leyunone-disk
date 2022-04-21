@@ -1,48 +1,55 @@
 package xyz.leyuna.disk.model.co;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.time.LocalDateTime;
+
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 /**
  * (FileInfo)出参
  *
- * @author pengli
- * @since 2022-02-10 10:19:51
+ * @author pengli@asiainfo.com
+ * @since 2022-04-21 15:53:42
  */
 @Getter
 @Setter
 public class FileInfoCO implements Serializable {
-    private static final long serialVersionUID = -33557261354917777L;
+    private static final long serialVersionUID = -53435262164526348L;
 
     private String id;
 
+    /**
+     * 文件名
+     */
     private String name;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private LocalDateTime createDt;
+    /**
+     * 文件大小
+     */
+    private Long fileSize;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
+    /**
+     * 文件类型
+     */
+    private Integer fileType;
+
+    /**
+     * 保存时间
+     */
+    private String saveDt;
+
     private LocalDateTime updateDt;
 
-    private String saveDt;
+    private LocalDateTime createDt;
 
     private Integer deleted;
 
-    private Double fileSize;
-
-    private String userId;
-
-    private String fileTypeName;
-
     /**
-     * 文件类型：1图片、2音视、3文档、4其他文件
+     * 文件路径
      */
-    private Integer fileType;
+    private String filePath;
     
-    //数组类型存储的文件
     private byte[] base64File;
 }

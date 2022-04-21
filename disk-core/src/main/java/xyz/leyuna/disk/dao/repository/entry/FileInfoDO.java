@@ -1,47 +1,58 @@
 package xyz.leyuna.disk.dao.repository.entry;
 
+import java.time.LocalDateTime;
+import java.io.Serializable;
+
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-
 /**
  * (FileInfo)表实体类
  *
- * @author pengli
- * @since 2021-12-28 09:45:22
+ * @author pengli@asiainfo.com
+ * @since 2022-04-21 15:53:42
  */
 @Getter
 @Setter
 @TableName("file_info")
 public class FileInfoDO implements Serializable {
-    private static final long serialVersionUID = 761022345317399509L;
-    @TableId(value = "id",type = IdType.ID_WORKER_STR)
+    private static final long serialVersionUID = 453704647660367353L;
+    @TableId(value = "id", type = IdType.ID_WORKER_STR)
     private String id;
 
+    /**
+     * 文件名
+     */
     private String name;
+
+    /**
+     * 文件大小
+     */
+    private Long fileSize;
+
+    /**
+     * 文件类型
+     */
+    private Integer fileType;
+
+    /**
+     * 保存时间
+     */
+    private String saveDt;
+
+    @TableField(value = "update_Dt", fill = FieldFill.INSERT)
+    private LocalDateTime updateDt;
 
     @TableField(value = "create_Dt", fill = FieldFill.INSERT)
     private LocalDateTime createDt;
 
-    @TableField(value = "update_Dt", fill = FieldFill.INSERT_UPDATE)
-    private LocalDateTime updateDt;
-
-    @TableField(value = "deleted" ,fill = FieldFill.INSERT)
+    @TableField(value = "deleted", fill = FieldFill.INSERT)
     private Integer deleted;
 
-    private Double fileSize;
-
-    private String fileTypeName;
-
-    private String userId;
-
     /**
-     * 文件类型：1图片、2音视、3文档、4其他文件
+     * 文件路径
      */
-    private Integer fileType;
+    private String filePath;
 
-    private String saveDt;
 }

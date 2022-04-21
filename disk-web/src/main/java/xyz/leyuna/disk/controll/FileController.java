@@ -10,6 +10,7 @@ import xyz.leyuna.disk.service.file.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import xyz.leyuna.disk.service.file.ValidatorService;
 
 /**
  * @author pengli
@@ -24,6 +25,9 @@ public class FileController {
     private FileQueryService fileQueryService;
     @Autowired
     private FileService fileService;
+    
+    @Autowired
+    private ValidatorService validatorService;
     /**
      * 查询服务器内文件[条件-分页]
      * @return
@@ -34,7 +38,7 @@ public class FileController {
     }
 
     @GetMapping("/selectAllFileSize")
-    public DataResponse<Double> selectAllFileSize(String userId){
+    public DataResponse<Long> selectAllFileSize(String userId){
         return fileQueryService.selectAllFileSizeByUserId(userId);
     }
 
@@ -43,25 +47,15 @@ public class FileController {
      * @return
      */
     @PostMapping("/requestSaveFile")
-    public DataResponse<Integer> requestSaveFile(@RequestParam("userId") String userId,
-                                                             @RequestPart MultipartFile file){
-        UpFileDTO upFileDTO=new UpFileDTO();
-        upFileDTO.setUserId(userId);
-        upFileDTO.setFile(file);
-        return fileService.judgeFile(upFileDTO);
+    public DataResponse<Integer> requestSaveFile(@RequestBody UpFileDTO upFileDTO){
+        return validatorService.judgeFile(upFileDTO);
     }
 
     /**
      * 存储文件
      */
     @PostMapping("/saveFile")
-    public DataResponse saveFile(@RequestParam("userId") String userId,
-                                 @RequestPart MultipartFile file,
-                                 @RequestParam(value = "saveTime", required = false) String saveTime){
-        UpFileDTO upFileDTO=new UpFileDTO();
-        upFileDTO.setUserId(userId);
-        upFileDTO.setFile(file);
-        upFileDTO.setSaveTime(saveTime);
+    public DataResponse saveFile(@RequestBody UpFileDTO upFileDTO){
         return fileService.savaFile(upFileDTO);
     }
 

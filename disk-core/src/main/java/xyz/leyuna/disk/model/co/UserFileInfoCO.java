@@ -17,7 +17,7 @@ public class UserFileInfoCO {
     /**
      * 用户内存总量
      */
-    private Double fileTotal;
+    private Long fileTotal;
 
     /**
      * 用户文件

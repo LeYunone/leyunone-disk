@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
+import org.springframework.web.multipart.MultipartFile;
 import xyz.leyuna.disk.model.dto.QueryPage;
 
 /**
@@ -26,6 +27,8 @@ public class FileDTO extends QueryPage {
     private String userId;
 
     private Integer type;
+    
+    private MultipartFile file;
 
     private Integer fileType;
 }
