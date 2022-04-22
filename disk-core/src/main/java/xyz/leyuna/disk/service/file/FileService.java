@@ -35,9 +35,8 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.locks.LockSupport;
 
 /**
  * @author LeYuna
@@ -63,7 +62,7 @@ public class FileService {
     @Autowired
     private HttpServletRequest request;
 
-    @Autowired
+    @Autowired(required = false)
     private HttpServletResponse response;
 
     /**
@@ -96,11 +95,24 @@ public class FileService {
                 //写入文件
                 IOUtils.copy(inputStream, fos);
 
+                //如果不是最终分片，则判断本次分片是否是上传的最后一个分片
+                if (!upFileDTO.getSliceIndex().equals(upFileDTO.getSliceAll()) &&
+                        sliceFile.getParentFile().listFiles().length == upFileDTO.getSliceAll()) {
+                    //打开阻塞中的最终分片
+                    LockSupport.unpark(ServerCode.threadUpload.get(fileMD5Value));
+                }
+
                 //判断本请求是否是最后的分片，如果是最后的分片则进行合并
-                Integer size = sliceFile.getParentFile().listFiles().length;
-                if (size.equals(upFileDTO.getSliceAll())) {
-                    //合并
+                if (upFileDTO.getSliceIndex().equals(upFileDTO.getSliceAll())) {
+
+                    //如果其他分片还没到达，则进挂起
+                    if (upFileDTO.getSliceAll() != sliceFile.getParentFile().listFiles().length) {
+                        ServerCode.threadUpload.put(fileMD5Value, Thread.currentThread());
+                        LockSupport.park();
+                    }
+                    //合并文件
                     String filePath = this.mergeSliceFile(tempPath, upFileDTO.getFileName());
+
                     //保存文件信息
                     String saveId = FileInfoE.queryInstance().setFilePath(filePath).
                             setFileSize(upFileDTO.getFileSize()).setFileType(upFileDTO.getFileType())
@@ -111,20 +123,23 @@ public class FileService {
 
                     //计算用户新内存
                     FileUpLogCO fileUpLogCO = FileUpLogE.queryInstance().setUserId(userId).selectOne();
-                    AssertUtil.isFalse(ObjectUtil.isEmpty(fileUpLogCO),ErrorEnum.FILE_UPLOAD_FILE.getName());
+                    AssertUtil.isFalse(ObjectUtil.isEmpty(fileUpLogCO), ErrorEnum.FILE_UPLOAD_FILE.getName());
                     FileUpLogE.queryInstance().setId(fileUpLogCO.getId())
-                            .setUpFileTotalSize(fileUpLogCO.getUpFileTotalSize()+upFileDTO.getFileSize()).update();
+                            .setUpFileTotalSize(fileUpLogCO.getUpFileTotalSize() + upFileDTO.getFileSize()).update();
 
                     //上传完成，删除临时目录
                     this.deleteSliceTemp(tempPath);
 
                     //删除成功，清除redis
-                    cacheExe.clearFileMD5(userId,fileKey);
+                    cacheExe.clearFileMD5(userId, fileKey);
 
                     //开启计时保存功能
-                    if(StrUtil.isNotBlank(upFileDTO.getSaveTime())){
-                        cacheExe.setSaveTimeFileCache(saveId,userId,upFileDTO.getSaveTime());
+                    if (StrUtil.isNotBlank(upFileDTO.getSaveTime())) {
+                        cacheExe.setSaveTimeFileCache(saveId, userId, upFileDTO.getSaveTime());
                     }
+
+                    //删除分片的记录
+                    ServerCode.threadUpload.remove(fileMD5Value);
                 }
             } catch (Exception e) {
                 if (fos != null) {

@@ -1,5 +1,8 @@
 package xyz.leyuna.disk.model.constant;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Handler;
+
 /**
  * @author LeYuna
  * @email 365627310@qq.com
@@ -14,5 +17,7 @@ public class ServerCode {
 
     //临时目录
     public static String TEMP_PATH = "C:/diskTemp/";
+
+    public static ConcurrentHashMap<String,Thread> threadUpload = new ConcurrentHashMap();
 
 }
