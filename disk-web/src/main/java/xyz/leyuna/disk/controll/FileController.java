@@ -58,7 +58,12 @@ public class FileController {
      */
     @PostMapping("/saveFile")
     public DataResponse saveFile(@RequestBody UpFileDTO upFileDTO){
-        return fileService.savaFile(upFileDTO);
+        Integer resoleType = upFileDTO.getResoleType();
+        if(resoleType == 1){
+            return fileService.sliceUploadFile(upFileDTO);
+        }else {
+            return fileService.savaFile(upFileDTO);
+        }
     }
 
     /**

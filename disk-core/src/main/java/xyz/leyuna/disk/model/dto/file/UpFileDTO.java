@@ -25,6 +25,11 @@ public class UpFileDTO implements Serializable {
     private String userId;
 
     /**
+     * 处理模式
+     */
+    private Integer resoleType;
+
+    /**
      * 文件
      */
     private MultipartFile file;
