@@ -1,11 +1,11 @@
 package xyz.leyuna.disk.dao.repository.entry;
 
-import java.time.LocalDateTime;
-import java.io.Serializable;
-
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * (FileUser)表实体类
@@ -17,7 +17,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @TableName("file_user")
-public class FileUserDO implements Serializable {
+public class    FileUserDO implements Serializable {
     private static final long serialVersionUID = -92939058208505262L;
     @TableId(value = "id", type = IdType.ID_WORKER_STR)
     private String id;

@@ -49,8 +49,8 @@ public class FileController {
      * @return
      */
     @PostMapping("/requestSaveFile")
-    public DataResponse<FileValidatorCO> requestSaveFile(@RequestBody UpFileDTO upFileDTO){
-        return validatorService.judgeFile(upFileDTO);
+    public DataResponse<FileValidatorCO> requestSaveFile(@RequestParam(value = "userId",required = true) String userId,@RequestPart MultipartFile file){
+        return validatorService.judgeFile(userId,file);
     }
 
     /**
@@ -58,6 +58,7 @@ public class FileController {
      */
     @PostMapping("/saveFile")
     public DataResponse saveFile(@RequestBody UpFileDTO upFileDTO){
+        upFileDTO.setUserId(String.valueOf(upFileDTO.getSaTokenInfo().getLoginId()));
         Integer resoleType = upFileDTO.getResoleType();
         if(resoleType == 1){
             return fileService.sliceUploadFile(upFileDTO);

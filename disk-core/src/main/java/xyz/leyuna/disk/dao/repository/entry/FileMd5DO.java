@@ -1,11 +1,11 @@
 package xyz.leyuna.disk.dao.repository.entry;
 
-import java.time.LocalDateTime;
-import java.io.Serializable;
-
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * (FileMd5)表实体类
@@ -32,7 +32,8 @@ public class FileMd5DO implements Serializable {
     /**
      * 存在状态 0 1
      */
-    private Integer delete;
+    @TableField(value = "deleted", fill = FieldFill.INSERT)
+    private Integer deleted;
 
     @TableField(value = "create_Dt", fill = FieldFill.INSERT)
     private LocalDateTime createDt;

@@ -1,10 +1,10 @@
 package xyz.leyuna.disk.model.dto.file;
 
+import cn.dev33.satoken.stp.SaTokenInfo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 
@@ -24,15 +24,12 @@ public class UpFileDTO implements Serializable {
      */
     private String userId;
 
+    private SaTokenInfo saTokenInfo;
+
     /**
      * 处理模式
      */
     private Integer resoleType;
-
-    /**
-     * 文件
-     */
-    private MultipartFile file;
 
     /**
      * 文件类型

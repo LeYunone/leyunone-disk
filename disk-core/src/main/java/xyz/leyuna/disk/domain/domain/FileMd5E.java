@@ -39,7 +39,7 @@ public class FileMd5E implements Serializable {
     /**
      * 存在状态 0 1
      */
-    private Integer delete;
+    private Integer deleted;
 
     private LocalDateTime createDt;
 

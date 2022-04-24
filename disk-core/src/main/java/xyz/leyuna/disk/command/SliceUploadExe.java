@@ -57,7 +57,7 @@ public class SliceUploadExe {
             try {
                 fos = new FileOutputStream(sliceFile);
                 //本次上传文件
-                inputStream = upFileDTO.getFile().getInputStream();
+                inputStream = null;
                 //写入文件
                 IOUtils.copy(inputStream, fos);
 

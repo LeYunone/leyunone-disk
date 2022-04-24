@@ -1,11 +1,10 @@
 package xyz.leyuna.disk.model.co;
 
-import java.time.LocalDateTime;
-
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * (FileMd5)出参
@@ -31,7 +30,7 @@ public class FileMd5CO implements Serializable {
     /**
      * 存在状态 0 1
      */
-    private Integer delete;
+    private Integer deleted;
 
     private LocalDateTime createDt;
 

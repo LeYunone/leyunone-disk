@@ -2,30 +2,22 @@ package xyz.leyuna.disk.service.file;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import sun.security.provider.MD5;
 import xyz.leyuna.disk.command.CacheExe;
-import xyz.leyuna.disk.domain.domain.FileInfoE;
 import xyz.leyuna.disk.domain.domain.FileMd5E;
 import xyz.leyuna.disk.domain.domain.FileUserE;
 import xyz.leyuna.disk.model.DataResponse;
-import xyz.leyuna.disk.model.co.FileInfoCO;
 import xyz.leyuna.disk.model.co.FileMd5CO;
 import xyz.leyuna.disk.model.co.FileValidatorCO;
-import xyz.leyuna.disk.model.constant.ServerCode;
-import xyz.leyuna.disk.model.dto.file.UpFileDTO;
-import xyz.leyuna.disk.util.FileUtil;
 import xyz.leyuna.disk.util.MD5Util;
 import xyz.leyuna.disk.validator.FileValidator;
 import xyz.leyuna.disk.validator.UserValidator;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -35,6 +27,8 @@ import java.util.UUID;
  */
 @Service
 public class ValidatorService {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private UserValidator userValidator;
@@ -48,26 +42,22 @@ public class ValidatorService {
     /**
      * 校验本次文件上传请求是否合法
      *
-     * @param upFileDTO
+     * @param
      * @return
      */
-    public DataResponse<FileValidatorCO> judgeFile (UpFileDTO upFileDTO){
+    public DataResponse<FileValidatorCO> judgeFile (String userId,MultipartFile multipartFile){
         FileValidatorCO result = new FileValidatorCO();
-        String userId = upFileDTO.getUserId();
         //首先看这个用户是否符合上传文件规则
         userValidator.validator(userId);
 
-        MultipartFile multipartFile = upFileDTO.getFile();
         if (ObjectUtil.isEmpty(multipartFile)) {
             return DataResponse.buildFailure();
         }
         //MultipartFile 转化为File
-        File file = new File("temp");
         Integer resultType = 1;
         try {
-            FileUtils.copyInputStreamToFile(multipartFile.getInputStream(), file);
 
-            String md5 = MD5Util.fileToMD5(file);
+            String md5 = MD5Util.fileToMD5(multipartFile.getBytes());
             List<FileMd5CO> fileMd5COS = FileMd5E.queryInstance().setMd5Code(md5).selectByCon();
 
             //说明改文件在服务器中已经有备份
@@ -85,12 +75,10 @@ public class ValidatorService {
                 cacheExe.setFileMD5Key(userId,uuid.toString(),md5);
             }
 
-        } catch (IOException e) {
+        } catch (Exception e) {
             //如果发生转化异常，本次校验视为通过，上传文件
+            logger.error(e.getMessage());
         }finally {
-            if(file.exists()){
-                file.delete();
-            }
             //封装结果集
             result.setResponseType(resultType);
             return DataResponse.of(result);

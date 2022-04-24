@@ -6,7 +6,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -31,13 +30,13 @@ import xyz.leyuna.disk.util.FileUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.concurrent.locks.LockSupport;
+import java.util.List;
 
 /**
  * @author LeYuna
@@ -89,7 +88,7 @@ public class FileService {
         //上传用户编号
         String userId = upFileDTO.getUserId();
         try {
-            MultipartFile file = upFileDTO.getFile();
+            MultipartFile file = null;
             String name = file.getOriginalFilename();
             String type = name.substring(name.lastIndexOf('.') + 1);
             //文件类型
