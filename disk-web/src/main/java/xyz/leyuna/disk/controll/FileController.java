@@ -57,8 +57,7 @@ public class FileController {
      * 存储文件
      */
     @PostMapping("/saveFile")
-    public DataResponse saveFile(@RequestBody UpFileDTO upFileDTO){
-        upFileDTO.setUserId(String.valueOf(upFileDTO.getSaTokenInfo().getLoginId()));
+    public DataResponse saveFile(UpFileDTO upFileDTO){
         Integer resoleType = upFileDTO.getResoleType();
         if(resoleType == 1){
             return fileService.sliceUploadFile(upFileDTO);

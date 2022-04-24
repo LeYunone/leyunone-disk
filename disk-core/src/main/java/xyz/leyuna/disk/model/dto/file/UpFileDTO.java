@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.Serializable;
 
@@ -24,7 +25,7 @@ public class UpFileDTO implements Serializable {
      */
     private String userId;
 
-    private SaTokenInfo saTokenInfo;
+    private MultipartFile file;
 
     /**
      * 处理模式
