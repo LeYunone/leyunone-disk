@@ -1,5 +1,6 @@
 package xyz.leyuna.disk.validator;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import xyz.leyuna.disk.domain.domain.FileUpLogE;
 import xyz.leyuna.disk.model.co.FileUpLogCO;
@@ -30,7 +31,6 @@ public class UserValidator {
      * @param userId
      */
     public void validator(String userId){
-
         //跳过站长用户
         if(AdminCode.ADMIN_USER_ID.equals(userId)){
             return;
@@ -38,13 +38,12 @@ public class UserValidator {
         //用户是否在黑名单中
         AssertUtil.isFalse(stringRedisTemplate.hasKey(userId), ErrorEnum.USER_BLACK.getName());
 
-        //根据用户id查询最后一次上传记录
-        List<FileUpLogCO> fileUpLogCOS = FileUpLogE.queryInstance().
-                selectByConOrder(SortEnum.CREATE_DESC);
-        if(CollectionUtils.isNotEmpty(fileUpLogCOS)){
-            FileUpLogCO fileUpLogCO = fileUpLogCOS.get(0);
-            //如果最后一次上传记录，被记录不合法，则说明这个用户的云盘有一些问题[内存满了，账号异常等等]
-            AssertUtil.isFalse(fileUpLogCO.getUpSign()==1,ErrorEnum.USER_UPLOAD_FILE.getName());
+        //查询用户列表
+        FileUpLogCO fileUpLogCO = FileUpLogE.queryInstance().setUserId(userId).selectOne();
+        if(ObjectUtil.isEmpty(fileUpLogCO)){
+            FileUpLogE.queryInstance().setUserId(userId).setUpSign(1).setUpFileTotalSize(0L).save();
+        }else{
+            AssertUtil.isFalse(fileUpLogCO.getUpSign()==2,ErrorEnum.USER_BLACK.getName());
         }
     }
 }

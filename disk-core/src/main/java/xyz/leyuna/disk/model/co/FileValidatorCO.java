@@ -16,9 +16,9 @@ import lombok.ToString;
 public class FileValidatorCO {
 
     /**
-     * 文件钥匙
+     * 文件唯一标识
      */
-    private String fileKey;
+    private String identifier;
 
     /**
      * 返回编码

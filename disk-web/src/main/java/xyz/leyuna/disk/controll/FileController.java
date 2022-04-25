@@ -56,14 +56,19 @@ public class FileController {
     /**
      * 存储文件
      */
-    @PostMapping("/saveFile")
+    @PostMapping("/uploadFile")
     public DataResponse saveFile(UpFileDTO upFileDTO){
-        Integer resoleType = upFileDTO.getResoleType();
-        if(resoleType == 1){
-            return fileService.sliceUploadFile(upFileDTO);
-        }else {
-            return fileService.savaFile(upFileDTO);
-        }
+        return fileService.sliceUploadFile(upFileDTO);
+    }
+
+    /**
+     * 校验分片
+     * @param upFileDTO
+     * @return
+     */
+    @GetMapping("/uploadFile")
+    public DataResponse checkFile(UpFileDTO upFileDTO){
+        return validatorService.checkFile(upFileDTO);
     }
 
     /**

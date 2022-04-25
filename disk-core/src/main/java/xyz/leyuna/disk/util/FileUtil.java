@@ -5,9 +5,6 @@ import xyz.leyuna.disk.model.constant.ServerCode;
 import xyz.leyuna.disk.model.enums.ErrorEnum;
 
 import java.io.*;
-import java.nio.channels.FileChannel;
-import java.util.LinkedList;
-import java.util.Queue;
 
 /**
  * @author LeYuna
@@ -56,4 +53,19 @@ public class FileUtil {
         return buffer;
     }
 
+    /**
+     * 处理出临时目录
+     *
+     * @param fileMD5Value
+     * @return
+     */
+    public static String resoleFileTempPath(String fileMD5Value) {
+        String tempPath = ServerCode.TEMP_PATH + fileMD5Value + "/";
+        File tempFile = new File(tempPath);
+        if (tempFile.exists()) {
+            return tempPath;
+        }
+        boolean mkdirs = tempFile.mkdirs();
+        return mkdirs ? tempPath : null;
+    }
 }

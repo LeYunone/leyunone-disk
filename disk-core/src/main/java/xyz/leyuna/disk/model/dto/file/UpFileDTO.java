@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.SaTokenInfo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.annotation.Transient;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,12 +26,43 @@ public class UpFileDTO implements Serializable {
      */
     private String userId;
 
-    private MultipartFile file;
+    /**
+     * 当前分片下标
+     */
+    private Integer chunkNumber;
 
     /**
-     * 处理模式
+     * 分片大小
      */
-    private Integer resoleType;
+    private Integer chunkSize;
+
+    /**
+     * 当前分片大小
+     */
+    private Integer currentChunkSize;
+
+    /**
+     * 总文件大小
+     */
+    private Long totalSize;
+
+    /**
+     * 文件唯一标识
+     */
+    private String identifier;
+
+    /**
+     * 文件名
+     */
+    private String filename;
+
+    /**
+     * 总分片数
+     */
+    private Integer totalChunks;
+
+    @Transient
+    private MultipartFile file;
 
     /**
      * 文件类型
@@ -38,33 +70,13 @@ public class UpFileDTO implements Serializable {
     private Integer fileType;
 
     /**
-     * 文件大小 [和分片无关]
+     *
      */
-    private Long fileSize;
+    private String type;
 
     /**
      * 保存时间
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private String saveTime;
-
-    /**
-     * 文件钥匙
-     */
-    private String fileKey;
-
-    /**
-     * 文件名
-     */
-    private String fileName;
-
-    /**
-     * 当前分片索引
-     */
-    private Integer sliceIndex;
-
-    /**
-     * 总分片数
-     */
-    private Integer sliceAll;
 }
