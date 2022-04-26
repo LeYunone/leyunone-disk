@@ -82,8 +82,9 @@ public class SliceUploadExe {
                         LockSupport.park();
                     }
                     //合并文件
-                    String filePath = this.mergeSliceFile(tempPath, upFileDTO.getFile().getOriginalFilename());
-                    Integer fileType = FileEnum.loadType(upFileDTO.getFileType()).getValue();
+                    FileEnum fileEnum = FileEnum.loadType(upFileDTO.getFileType());
+                    String filePath = this.mergeSliceFile(tempPath, upFileDTO.getFile().getOriginalFilename(),fileEnum.getName());
+                    Integer fileType = fileEnum.getValue();
                     //保存文件信息
                     String fileId = FileInfoE.queryInstance().setFilePath(filePath).
                             setFileSize(upFileDTO.getTotalSize())
@@ -127,12 +128,10 @@ public class SliceUploadExe {
                         ioException.printStackTrace();
                     }
                 }
-
-                //上传完成，删除临时目录
-                this.deleteSliceTemp(tempPath);
             }
         }
-        return DataResponse.buildSuccess();
+        //上传成功，返回临时目录位置 等待删除
+        return DataResponse.of(tempPath);
     }
 
     /**
@@ -140,9 +139,16 @@ public class SliceUploadExe {
      *
      * @param tempPath
      */
-    private void deleteSliceTemp(String tempPath) {
+    public void deleteSliceTemp(String tempPath) {
         File file = new File(tempPath);
         AssertUtil.isFalse(ObjectUtil.isEmpty(file), ErrorEnum.FILE_UPLOAD_FILE.getName());
+        //2022-4-26版本 临时目录下文件夹设计为单一
+        if(file.exists()){
+            File[] files = file.listFiles();
+            for(File cfile : files){
+                cfile.delete();
+            }
+        }
         AssertUtil.isFalse(!file.delete(),ErrorEnum.FILE_UPLOAD_FILE.getName());
     }
 
@@ -152,11 +158,11 @@ public class SliceUploadExe {
      * @param tempPath
      * @param fileName
      */
-    private String mergeSliceFile(String tempPath, String fileName) {
+    private String mergeSliceFile(String tempPath, String fileName,String fileType) {
         //分片文件的临时目录
         File sliceFile = new File(tempPath);
         //本次文件的保存位置
-        String savePath = ServerCode.FILE_ADDRESS + fileName;
+        String savePath = ServerCode.FILE_ADDRESS +fileType+"/"+fileName;
         File thisFile = new File(savePath);
         //所有分片
         File[] files = sliceFile.listFiles();
@@ -177,7 +183,7 @@ public class SliceUploadExe {
                 }
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }finally {
             if (randomAccessFile != null) {
                 try {

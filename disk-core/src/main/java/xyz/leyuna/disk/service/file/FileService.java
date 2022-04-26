@@ -77,6 +77,11 @@ public class FileService {
         return sliceUploadExe.sliceUpload(upFileDTO);
     }
 
+    public DataResponse deleteTempFile(String tempPath){
+        sliceUploadExe.deleteSliceTemp(tempPath);
+        return DataResponse.buildSuccess();
+    }
+
     /**
      * 上传文件 【最普通模式】
      *

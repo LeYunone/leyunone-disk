@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.leyuna.disk.service.file.ValidatorService;
 
+import java.lang.reflect.Proxy;
+
 /**
  * @author LeYuna
  * @email 365627310@qq.com
@@ -39,8 +41,8 @@ public class FileController {
         return fileQueryService.selectFile(file);
     }
 
-    @GetMapping("/selectAllFileSize")
-    public DataResponse<Long> selectAllFileSize(String userId){
+    @GetMapping("/selectUserFileSize")
+    public DataResponse<Long> selectUserFileSize(String userId){
         return fileQueryService.selectAllFileSizeByUserId(userId);
     }
 
@@ -59,6 +61,11 @@ public class FileController {
     @PostMapping("/uploadFile")
     public DataResponse saveFile(UpFileDTO upFileDTO){
         return fileService.sliceUploadFile(upFileDTO);
+    }
+
+    @PostMapping("/deleteTempFile")
+    public DataResponse deleteTempFile(String tempPath){
+        return fileService.deleteTempFile(tempPath);
     }
 
     /**
