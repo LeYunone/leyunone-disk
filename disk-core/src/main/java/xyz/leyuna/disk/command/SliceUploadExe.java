@@ -5,6 +5,7 @@ import cn.hutool.core.util.StrUtil;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import xyz.leyuna.disk.domain.domain.FileInfoE;
 import xyz.leyuna.disk.domain.domain.FileMd5E;
 import xyz.leyuna.disk.domain.domain.FileUpLogE;
@@ -14,6 +15,7 @@ import xyz.leyuna.disk.model.co.FileUpLogCO;
 import xyz.leyuna.disk.model.constant.ServerCode;
 import xyz.leyuna.disk.model.dto.file.UpFileDTO;
 import xyz.leyuna.disk.model.enums.ErrorEnum;
+import xyz.leyuna.disk.model.enums.FileEnum;
 import xyz.leyuna.disk.util.AssertUtil;
 import xyz.leyuna.disk.util.FileUtil;
 
@@ -38,6 +40,7 @@ public class SliceUploadExe {
      *
      * @return
      */
+    @Transactional(rollbackFor = Exception.class)
     public DataResponse sliceUpload(UpFileDTO upFileDTO) {
         String userId = upFileDTO.getUserId();
         //本次文件的MD5码
@@ -80,10 +83,11 @@ public class SliceUploadExe {
                     }
                     //合并文件
                     String filePath = this.mergeSliceFile(tempPath, upFileDTO.getFile().getOriginalFilename());
-
+                    Integer fileType = FileEnum.loadType(upFileDTO.getFileType()).getValue();
                     //保存文件信息
                     String fileId = FileInfoE.queryInstance().setFilePath(filePath).
-                            setFileSize(upFileDTO.getTotalSize()).setFileType(upFileDTO.getFileType())
+                            setFileSize(upFileDTO.getTotalSize())
+                            .setFileType(fileType)
                             .setName(upFileDTO.getFilename())
                             .setSaveDt(StrUtil.isEmpty(upFileDTO.getSaveTime()) ? "永久保存" : upFileDTO.getSaveTime()).save();
                     //加载到用户文件列表上
@@ -98,9 +102,6 @@ public class SliceUploadExe {
                     FileUpLogE.queryInstance().setId(fileUpLogCO.getId())
                             .setUpFileTotalSize(fileUpLogCO.getUpFileTotalSize() + upFileDTO.getTotalSize()).update();
 
-                    //上传完成，删除临时目录
-                    this.deleteSliceTemp(tempPath);
-
                     //开启计时保存功能
                     if (StrUtil.isNotBlank(upFileDTO.getSaveTime())) {
                         cacheExe.setSaveTimeFileCache(fileId, userId, upFileDTO.getSaveTime());
@@ -110,6 +111,7 @@ public class SliceUploadExe {
                     ServerCode.threadUpload.remove(fileMD5Value);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
             }finally {
                 if (fos != null) {
                     try {
@@ -125,6 +127,9 @@ public class SliceUploadExe {
                         ioException.printStackTrace();
                     }
                 }
+
+                //上传完成，删除临时目录
+                this.deleteSliceTemp(tempPath);
             }
         }
         return DataResponse.buildSuccess();
@@ -138,7 +143,7 @@ public class SliceUploadExe {
     private void deleteSliceTemp(String tempPath) {
         File file = new File(tempPath);
         AssertUtil.isFalse(ObjectUtil.isEmpty(file), ErrorEnum.FILE_UPLOAD_FILE.getName());
-        file.delete();
+        AssertUtil.isFalse(!file.delete(),ErrorEnum.FILE_UPLOAD_FILE.getName());
     }
 
     /**

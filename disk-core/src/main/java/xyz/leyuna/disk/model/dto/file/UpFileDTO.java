@@ -1,6 +1,5 @@
 package xyz.leyuna.disk.model.dto.file;
 
-import cn.dev33.satoken.stp.SaTokenInfo;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -67,7 +66,7 @@ public class UpFileDTO implements Serializable {
     /**
      * 文件类型
      */
-    private Integer fileType;
+    private String fileType;
 
     /**
      *

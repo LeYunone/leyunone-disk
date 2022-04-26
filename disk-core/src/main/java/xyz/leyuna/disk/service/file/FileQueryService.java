@@ -10,6 +10,7 @@ import xyz.leyuna.disk.model.co.FileInfoCO;
 import xyz.leyuna.disk.model.co.FileUpLogCO;
 import xyz.leyuna.disk.model.co.UserFileInfoCO;
 import xyz.leyuna.disk.model.dto.file.FileDTO;
+import xyz.leyuna.disk.model.enums.FileEnum;
 
 import java.util.List;
 
@@ -38,6 +39,10 @@ public class FileQueryService {
         }else{
             userFileInfCO.setFileTotal(0L);
         }
+        //翻译文件类型
+        fileInfoCOPage.getRecords().stream().forEach(co -> {
+            co.setFileTypeText(FileEnum.loadName(co.getFileType()).getName());
+        });
         userFileInfCO.setFileinfos(fileInfoCOPage);
         return DataResponse.of(userFileInfCO);
     }

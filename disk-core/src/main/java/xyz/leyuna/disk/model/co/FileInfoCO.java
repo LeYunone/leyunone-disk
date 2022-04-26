@@ -1,11 +1,10 @@
 package xyz.leyuna.disk.model.co;
 
-import java.time.LocalDateTime;
-
 import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 /**
  * (FileInfo)出参
@@ -35,6 +34,8 @@ public class FileInfoCO implements Serializable {
      * 文件类型
      */
     private Integer fileType;
+
+    private String fileTypeText;
 
     /**
      * 保存时间
