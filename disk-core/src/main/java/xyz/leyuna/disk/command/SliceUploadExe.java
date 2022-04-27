@@ -146,7 +146,8 @@ public class SliceUploadExe {
         if(file.exists()){
             File[] files = file.listFiles();
             for(File cfile : files){
-                cfile.delete();
+                AssertUtil.isFalse(!cfile.delete(),ErrorEnum.FILE_UPLOAD_FILE.getName());
+
             }
         }
         AssertUtil.isFalse(!file.delete(),ErrorEnum.FILE_UPLOAD_FILE.getName());
@@ -169,18 +170,18 @@ public class SliceUploadExe {
         //按照1 2 3 4 排序，有序写入
         Arrays.stream(files).sorted(Comparator.comparing(o -> Integer.valueOf(o.getName())));
         RandomAccessFile randomAccessFile = null;
-        RandomAccessFile randomAccessFileReader = null;
         try {
             //使用RandomAccessFile 达到追加插入， 也可以使用Inputstream的Skip方法跳过已读过的
             randomAccessFile = new RandomAccessFile(thisFile, "rw");
             byte[] buffer = new byte[1024];
             for (File file : files) {
-                randomAccessFileReader = new RandomAccessFile(file, "r");
+                RandomAccessFile randomAccessFileReader = new RandomAccessFile(file, "r");
                 int len;
                 while ((len = randomAccessFileReader.read(buffer)) != -1) {
                     //追加写入
                     randomAccessFile.write(buffer, 0, len);
                 }
+                randomAccessFileReader.close();
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -188,13 +189,6 @@ public class SliceUploadExe {
             if (randomAccessFile != null) {
                 try {
                     randomAccessFile.close();
-                } catch (IOException ioException) {
-                    ioException.printStackTrace();
-                }
-            }
-            if (randomAccessFileReader != null) {
-                try {
-                    randomAccessFileReader.close();
                 } catch (IOException ioException) {
                     ioException.printStackTrace();
                 }
