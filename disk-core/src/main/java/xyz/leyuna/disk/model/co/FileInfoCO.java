@@ -1,5 +1,6 @@
 package xyz.leyuna.disk.model.co;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -47,9 +48,12 @@ public class FileInfoCO implements Serializable {
 
     private LocalDateTime updateDt;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDateTime createDt;
 
     private Integer deleted;
+
+    private String fileFolderId;
 
     /**
      * 文件路径

@@ -2,6 +2,9 @@ package xyz.leyuna.disk.domain.gateway;
 
 import xyz.leyuna.disk.domain.domain.FileInfoE;
 import xyz.leyuna.disk.model.co.FileInfoCO;
+import xyz.leyuna.disk.model.dto.file.FileDTO;
+
+import java.util.List;
 
 
 /**
@@ -14,4 +17,6 @@ import xyz.leyuna.disk.model.co.FileInfoCO;
 public interface FileInfoGateway extends BaseGateway<FileInfoCO> {
 
     String save(FileInfoE fileInfoE);
+
+    List<FileInfoCO> selectFileInfoByUser(FileDTO fileDTO);
 }

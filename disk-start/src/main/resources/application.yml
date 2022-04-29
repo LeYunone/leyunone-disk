@@ -25,5 +25,7 @@ spring:
 
 #sql语句日志
 mybatis-plus:
+  mapper-locations: classpath*:**/repository/mapper/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+

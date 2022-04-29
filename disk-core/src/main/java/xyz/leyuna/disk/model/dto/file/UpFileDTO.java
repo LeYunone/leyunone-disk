@@ -78,4 +78,9 @@ public class UpFileDTO implements Serializable {
      */
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private String saveTime;
+
+    /**
+     * 上一层文件夹id
+     */
+    private String fileFolderId;
 }

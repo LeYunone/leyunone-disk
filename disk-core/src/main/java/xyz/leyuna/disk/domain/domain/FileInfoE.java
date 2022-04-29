@@ -2,6 +2,7 @@ package xyz.leyuna.disk.domain.domain;
 
 import xyz.leyuna.disk.domain.gateway.FileInfoGateway;
 import xyz.leyuna.disk.model.co.FileInfoCO;
+import xyz.leyuna.disk.model.dto.file.FileDTO;
 import xyz.leyuna.disk.model.enums.SortEnum;
 import xyz.leyuna.disk.util.SpringContextUtil;
 import xyz.leyuna.disk.util.TransformationUtil;
@@ -18,16 +19,15 @@ import java.util.Objects;
 /**
  * (FileInfo) 工作台
  *
- * @author LeYuna
- * @email 365627310@qq.com
- * @since 2022-04-21 15:53:41
+ * @author pengli@asiainfo.com
+ * @since 2022-04-29 11:00:31
  */
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 public class FileInfoE implements Serializable {
-    private static final long serialVersionUID = 126836289499117137L;
+    private static final long serialVersionUID = 419928941342755505L;
 
     private String id;
     /**
@@ -35,7 +35,7 @@ public class FileInfoE implements Serializable {
      */
     private String name;
     /**
-     * 文件大小
+     * 文件大小 单位为B
      */
     private Long fileSize;
     /**
@@ -50,12 +50,18 @@ public class FileInfoE implements Serializable {
     private LocalDateTime updateDt;
 
     private LocalDateTime createDt;
-
+    /**
+     * 0存在 1 删除
+     */
     private Integer deleted;
     /**
      * 文件路径
      */
     private String filePath;
+    /**
+     * 上一层父类文件夹ID
+     */
+    private String fileFolderId;
 
     //===========自定义方法区==========
     private FileInfoGateway gateway;
@@ -111,5 +117,9 @@ public class FileInfoE implements Serializable {
 
     public static boolean batchCreate(List<FileInfoE> list) {
         return FileInfoE.queryInstance().getGateway().batchCreate(list);
+    }
+
+    public static List<FileInfoCO> selectInfoByUser(FileDTO fileDTO){
+        return FileInfoE.queryInstance().getGateway().selectFileInfoByUser(fileDTO);
     }
 }

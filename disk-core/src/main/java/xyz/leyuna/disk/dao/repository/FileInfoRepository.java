@@ -6,7 +6,10 @@ import xyz.leyuna.disk.dao.repository.mapper.FileInfoMapper;
 import xyz.leyuna.disk.domain.domain.FileInfoE;
 import xyz.leyuna.disk.domain.gateway.FileInfoGateway;
 import xyz.leyuna.disk.model.co.FileInfoCO;
+import xyz.leyuna.disk.model.dto.file.FileDTO;
 import xyz.leyuna.disk.util.TransformationUtil;
+
+import java.util.List;
 
 /**
  * (FileInfo)表服务实现类
@@ -23,5 +26,10 @@ public class FileInfoRepository extends BaseRepository<FileInfoMapper, FileInfoD
         FileInfoDO fileInfoDO = TransformationUtil.copyToDTO(fileInfoE, FileInfoDO.class);
         this.save(fileInfoDO);
         return fileInfoDO.getId();
+    }
+
+    @Override
+    public List<FileInfoCO> selectFileInfoByUser(FileDTO fileDTO) {
+        return this.baseMapper.selectFileInfoByUser(fileDTO);
     }
 }

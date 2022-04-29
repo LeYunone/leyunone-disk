@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 /**
  * @author LeYuna
  * @email 365627310@qq.com
@@ -23,5 +25,5 @@ public class UserFileInfoCO {
     /**
      * 用户文件
      */
-    private Page<FileInfoCO> fileinfos;
+    private List<FileInfoCO> fileinfos;
 }

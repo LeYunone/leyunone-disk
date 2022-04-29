@@ -29,7 +29,5 @@ public class FileDTO extends QueryPage {
 
     private Integer type;
 
-    private MultipartFile file;
-
     private Integer fileType;
 }

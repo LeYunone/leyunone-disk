@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="xyz.leyuna.disk.dao.repository.mapper.FileInfoMapper">
+    <select id="selectFileInfoByUser" resultType="xyz.leyuna.disk.model.co.FileInfoCO" parameterType="xyz.leyuna.disk.model.dto.file.FileDTO">
+        SELECT fi.name name ,
+        fi.file_size fileSize,
+        fi.file_type fileType,
+        fi.save_dt saveDt,
+        fi.update_dt updateDt,
+        fi.create_dt createDt,
+        fi.file_folder_id fileFolderId,
+        fi.file_path filePath,
+        fi.id id
+
+        FROM
+        FILE_INFO fi LEFT JOIN FILE_USER fu ON fi.id = fu.file_id
+        WHERE fu.user_Id = #{con.userId}
+    </select>
+</mapper>
+

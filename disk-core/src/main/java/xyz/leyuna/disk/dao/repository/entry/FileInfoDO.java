@@ -10,15 +10,14 @@ import lombok.Setter;
 /**
  * (FileInfo)表实体类
  *
- * @author LeYuna
- * @email 365627310@qq.com
- * @since 2022-04-21 15:53:42
+ * @author pengli@asiainfo.com
+ * @since 2022-04-29 11:00:13
  */
 @Getter
 @Setter
 @TableName("file_info")
 public class FileInfoDO implements Serializable {
-    private static final long serialVersionUID = 453704647660367353L;
+    private static final long serialVersionUID = 749605286640812056L;
     @TableId(value = "id", type = IdType.ID_WORKER_STR)
     private String id;
 
@@ -28,7 +27,7 @@ public class FileInfoDO implements Serializable {
     private String name;
 
     /**
-     * 文件大小
+     * 文件大小 单位为B
      */
     private Long fileSize;
 
@@ -48,6 +47,9 @@ public class FileInfoDO implements Serializable {
     @TableField(value = "create_Dt", fill = FieldFill.INSERT)
     private LocalDateTime createDt;
 
+    /**
+     * 0存在 1 删除
+     */
     @TableField(value = "deleted", fill = FieldFill.INSERT)
     private Integer deleted;
 
@@ -55,5 +57,10 @@ public class FileInfoDO implements Serializable {
      * 文件路径
      */
     private String filePath;
+
+    /**
+     * 上一层父类文件夹ID
+     */
+    private String fileFolderId;
 
 }

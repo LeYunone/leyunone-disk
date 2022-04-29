@@ -36,8 +36,8 @@ public class FileController {
      * 查询服务器内文件[条件-分页]
      * @return
      */
-    @PostMapping("/selectFile")
-    public DataResponse<UserFileInfoCO> selectFileList(@RequestBody FileDTO file){
+    @GetMapping("/selectFile")
+    public DataResponse<UserFileInfoCO> selectFileList(FileDTO file){
         return fileQueryService.selectFile(file);
     }
 
@@ -60,7 +60,7 @@ public class FileController {
      */
     @PostMapping("/uploadFile")
     public DataResponse saveFile(UpFileDTO upFileDTO){
-        return fileService.sliceUploadFile(upFileDTO);
+        return fileService.savaFile(upFileDTO);
     }
 
     @PostMapping("/deleteTempFile")
@@ -76,6 +76,11 @@ public class FileController {
     @GetMapping("/uploadFile")
     public DataResponse checkFile(UpFileDTO upFileDTO){
         return validatorService.checkFile(upFileDTO);
+    }
+
+    @PostMapping("/newFolder")
+    public DataResponse newFolder(@RequestBody UpFileDTO upFileDTO){
+        return fileService.savaFile(upFileDTO);
     }
 
     /**
