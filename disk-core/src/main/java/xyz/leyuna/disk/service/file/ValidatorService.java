@@ -51,7 +51,7 @@ public class ValidatorService {
      * @param
      * @return
      */
-    public DataResponse<FileValidatorCO> judgeFile (String userId,MultipartFile multipartFile){
+    public DataResponse<FileValidatorCO> judgeFile (String fileFolderId,String userId,MultipartFile multipartFile){
         FileValidatorCO result = new FileValidatorCO();
         //首先看这个用户是否符合上传文件规则
         userValidator.validator(userId);
@@ -70,7 +70,7 @@ public class ValidatorService {
             if(CollectionUtil.isNotEmpty(fileMd5COS)){
                 String fileId = fileMd5COS.get(0).getFileId();
                 //在本次用户下声明该文件
-                FileUserE.queryInstance().setUserId(userId).setFileId(fileId).save();
+                FileUserE.queryInstance().setUserId(userId).setFileId(fileId).setFileFolderId(fileFolderId).save();
                 //返回给前端：不用继续操作
                 resultType = 0;
             }else{

@@ -90,10 +90,10 @@ public class FileService {
 
     private DataResponse newFolder(UpFileDTO upFileDTO){
         //记录文件夹信息
-        String save = FileInfoE.queryInstance().setName(upFileDTO.getFilename()).setFileFolderId(upFileDTO.getFileFolderId()).save();
+        String save = FileInfoE.queryInstance().setName(upFileDTO.getFilename()).save();
 
         //绑定用户层
-        FileUserE.queryInstance().setUserId(upFileDTO.getUserId()).setFileId(save).save();
+        FileUserE.queryInstance().setUserId(upFileDTO.getUserId()).setFileId(save).setFileFolderId(upFileDTO.getFileFolderId()).save();
         return DataResponse.buildSuccess();
     }
 

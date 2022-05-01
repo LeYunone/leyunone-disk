@@ -1,5 +1,6 @@
 package xyz.leyuna.disk.service.file;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.stereotype.Service;
@@ -33,16 +34,28 @@ public class FileQueryService {
     public DataResponse<UserFileInfoCO> selectFile(FileDTO file) {
         List<FileInfoCO> fileInfoCOS = FileInfoE.selectInfoByUser(file);
         UserFileInfoCO userFileInfCO = new UserFileInfoCO();
-        List<FileUpLogCO> fileUpLogCOS = FileUpLogE.queryInstance().setUserId(file.getUserId()).selectByCon();
-        if (CollectionUtils.isNotEmpty(fileUpLogCOS)) {
-            userFileInfCO.setFileTotal(fileUpLogCOS.get(0).getUpFileTotalSize());
+        FileUpLogCO fileUpLogCO = FileUpLogE.queryInstance().setUserId(file.getUserId()).selectOne();
+        if (ObjectUtil.isNotEmpty(fileUpLogCO)) {
+            userFileInfCO.setFileTotal(fileUpLogCO.getUpFileTotalSize());
         } else {
             userFileInfCO.setFileTotal(0L);
         }
-        //翻译文件类型
+        //翻译属性
         fileInfoCOS.stream().forEach(co -> {
             if (null != co.getFileType()) {
                 co.setFileTypeText(FileEnum.loadName(co.getFileType()).getName());
+            }
+            Long fileSize = co.getFileSize();
+            if (null != fileSize) {
+                if (fileSize < 1024) {
+                    co.setFileSizeText(fileSize + "B");
+                } else if (fileSize < 1048576) {
+                    co.setFileSizeText(String.format("%.2f", fileSize / 1024.0) + "KB");
+                } else if (fileSize < 1073741824) {
+                    co.setFileSizeText(String.format("%.2f", fileSize / (1024 * 1024.0)) + "MB");
+                } else {
+                    co.setFileSizeText(String.format("%.2f", fileSize / (1024 * 1024 * 1024.0)) + "G");
+                }
             }
         });
         userFileInfCO.setFileinfos(fileInfoCOS);

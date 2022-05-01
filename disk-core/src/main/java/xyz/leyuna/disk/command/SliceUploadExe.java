@@ -92,7 +92,7 @@ public class SliceUploadExe {
                             .setName(upFileDTO.getFilename())
                             .setSaveDt(StrUtil.isEmpty(upFileDTO.getSaveTime()) ? "永久保存" : upFileDTO.getSaveTime()).save();
                     //加载到用户文件列表上
-                    FileUserE.queryInstance().setUserId(userId).setFileId(fileId).save();
+                    FileUserE.queryInstance().setUserId(userId).setFileId(fileId).setFileFolderId(upFileDTO.getFileFolderId()).save();
 
                     //保存改文件的MD5码记录
                     FileMd5E.queryInstance().setFileId(fileId).setMd5Code(fileMD5Value).save();

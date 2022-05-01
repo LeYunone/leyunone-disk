@@ -51,16 +51,10 @@ public class FileController {
      * @return
      */
     @PostMapping("/requestSaveFile")
-    public DataResponse<FileValidatorCO> requestSaveFile(@RequestParam(value = "userId",required = true) String userId,@RequestPart MultipartFile file){
-        return validatorService.judgeFile(userId,file);
-    }
-
-    /**
-     * 存储文件
-     */
-    @PostMapping("/uploadFile")
-    public DataResponse saveFile(UpFileDTO upFileDTO){
-        return fileService.savaFile(upFileDTO);
+    public DataResponse<FileValidatorCO> requestSaveFile(@RequestParam(value = "fileFolderId",required = false)String fileFolderId,
+                                                         @RequestParam(value = "userId",required = true) String userId,
+                                                         @RequestPart MultipartFile file){
+        return validatorService.judgeFile(fileFolderId,userId,file);
     }
 
     @PostMapping("/deleteTempFile")
@@ -76,6 +70,14 @@ public class FileController {
     @GetMapping("/uploadFile")
     public DataResponse checkFile(UpFileDTO upFileDTO){
         return validatorService.checkFile(upFileDTO);
+    }
+
+    /**
+     * 存储文件
+     */
+    @PostMapping("/uploadFile")
+    public DataResponse saveFile(UpFileDTO upFileDTO){
+        return fileService.savaFile(upFileDTO);
     }
 
     @PostMapping("/newFolder")

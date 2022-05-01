@@ -31,6 +31,8 @@ public class FileInfoCO implements Serializable {
      */
     private Long fileSize;
 
+    private String fileSizeText;
+
     /**
      * 文件类型
      */

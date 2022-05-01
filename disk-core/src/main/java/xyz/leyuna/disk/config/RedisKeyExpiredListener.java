@@ -14,8 +14,6 @@ import xyz.leyuna.disk.domain.domain.FileUserE;
 import xyz.leyuna.disk.model.co.FileInfoCO;
 import xyz.leyuna.disk.model.co.FileUpLogCO;
 import xyz.leyuna.disk.model.co.FileUserCO;
-import xyz.leyuna.disk.model.constant.ServerCode;
-import xyz.leyuna.disk.model.enums.FileEnum;
 
 import java.io.File;
 import java.util.List;

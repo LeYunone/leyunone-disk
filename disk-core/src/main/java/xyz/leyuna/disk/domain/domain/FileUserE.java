@@ -35,6 +35,8 @@ public class FileUserE implements Serializable {
 
     private String userId;
 
+    private String fileFolderId;
+
     private Integer deleted;
 
     private LocalDateTime createDt;

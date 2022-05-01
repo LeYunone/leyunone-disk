@@ -58,9 +58,4 @@ public class FileInfoDO implements Serializable {
      */
     private String filePath;
 
-    /**
-     * 上一层父类文件夹ID
-     */
-    private String fileFolderId;
-
 }

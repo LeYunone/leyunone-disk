@@ -23,6 +23,8 @@ public class FileUserCO implements Serializable {
 
     private String fileId;
 
+    private String fileFolderId;
+
     private String userId;
 
     private Integer deleted;

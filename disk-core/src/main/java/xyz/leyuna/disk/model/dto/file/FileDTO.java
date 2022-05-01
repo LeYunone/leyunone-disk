@@ -30,4 +30,6 @@ public class FileDTO extends QueryPage {
     private Integer type;
 
     private Integer fileType;
+
+    private String fileFolderId;
 }

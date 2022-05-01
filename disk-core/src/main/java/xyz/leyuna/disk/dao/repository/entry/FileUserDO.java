@@ -26,6 +26,8 @@ public class    FileUserDO implements Serializable {
 
     private String userId;
 
+    private String fileFolderId;
+
     @TableField(value = "deleted", fill = FieldFill.INSERT)
     private Integer deleted;
 

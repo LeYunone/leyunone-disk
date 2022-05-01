@@ -8,7 +8,7 @@
     <packaging>pom</packaging>
     <name>disk</name>
     <description>Demo project for Spring Boot</description>
-    
+
     <modules>
         <module>disk-start</module>
         <module>disk-web</module>
@@ -21,7 +21,7 @@
         <lucene.version>7.6.0</lucene.version>
         <sa-token.verison>1.25.0</sa-token.verison>
         <mybatis-plus.version>3.1.0</mybatis-plus.version>
-
+        <dubbo.version>2.7.8</dubbo.version>
         <spring-boot.version>2.4.2</spring-boot.version>
         <spring-cloud.version>2020.0.0</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
@@ -90,6 +90,14 @@
                 <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-alibaba-dependencies</artifactId>
                 <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Apache Dubbo  -->
+            <dependency>
+                <groupId>org.apache.dubbo</groupId>
+                <artifactId>dubbo-dependencies-bom</artifactId>
+                <version>${dubbo.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

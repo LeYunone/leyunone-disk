@@ -58,10 +58,6 @@ public class FileInfoE implements Serializable {
      * 文件路径
      */
     private String filePath;
-    /**
-     * 上一层父类文件夹ID
-     */
-    private String fileFolderId;
 
     //===========自定义方法区==========
     private FileInfoGateway gateway;
