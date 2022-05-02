@@ -91,8 +91,8 @@ public class FileController {
      * @return
      */
     @PostMapping("/deleteFile")
-    public DataResponse deleteFile(String id,String userId){
-        return fileService.deleteFile(id,userId);
+    public DataResponse deleteFile(@RequestBody FileDTO fileDTO){
+        return fileService.deleteFile(fileDTO);
     }
 
     /**

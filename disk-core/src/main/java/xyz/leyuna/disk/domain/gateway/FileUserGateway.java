@@ -11,4 +11,6 @@ import xyz.leyuna.disk.model.co.FileUserCO;
  * @since 2022-04-21 15:26:57
  */
 public interface FileUserGateway extends BaseGateway<FileUserCO> {
+
+    boolean deleteFolderCFile(String userId,String fileFolderId);
 }

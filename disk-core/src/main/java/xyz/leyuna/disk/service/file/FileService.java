@@ -3,6 +3,7 @@ package xyz.leyuna.disk.service.file;
 
 import cn.hutool.core.util.ObjectUtil;
 import lombok.extern.log4j.Log4j2;
+import org.apache.dubbo.common.utils.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import xyz.leyuna.disk.model.DataResponse;
 import xyz.leyuna.disk.model.co.FileInfoCO;
 import xyz.leyuna.disk.model.co.FileUpLogCO;
 import xyz.leyuna.disk.model.co.FileUserCO;
+import xyz.leyuna.disk.model.dto.file.FileDTO;
 import xyz.leyuna.disk.model.dto.file.UpFileDTO;
 import xyz.leyuna.disk.model.enums.ErrorEnum;
 import xyz.leyuna.disk.util.AssertUtil;
@@ -59,14 +61,15 @@ public class FileService {
 
     /**
      * 分片上传
+     *
      * @param upFileDTO
      * @return
      */
-    private DataResponse sliceUploadFile(UpFileDTO upFileDTO){
+    private DataResponse sliceUploadFile(UpFileDTO upFileDTO) {
         return sliceUploadExe.sliceUpload(upFileDTO);
     }
 
-    public DataResponse deleteTempFile(String tempPath){
+    public DataResponse deleteTempFile(String tempPath) {
         sliceUploadExe.deleteSliceTemp(tempPath);
         return DataResponse.buildSuccess();
     }
@@ -80,7 +83,7 @@ public class FileService {
     @Transactional(rollbackFor = Exception.class)
     public DataResponse savaFile(UpFileDTO upFileDTO) {
         MultipartFile file = upFileDTO.getFile();
-        if(ObjectUtil.isEmpty(file)){
+        if (ObjectUtil.isEmpty(file)) {
             //没有文件 新增文件夹
             return this.newFolder(upFileDTO);
         }
@@ -88,7 +91,7 @@ public class FileService {
         return this.sliceUploadFile(upFileDTO);
     }
 
-    private DataResponse newFolder(UpFileDTO upFileDTO){
+    private DataResponse newFolder(UpFileDTO upFileDTO) {
         //记录文件夹信息
         String save = FileInfoE.queryInstance().setName(upFileDTO.getFilename()).save();
 
@@ -104,8 +107,10 @@ public class FileService {
      * @return
      */
     @Transactional(rollbackFor = Exception.class)
-    public DataResponse deleteFile(String fileId, String userId) {
+    public DataResponse deleteFile(FileDTO fileDTO) {
 
+        String fileId = fileDTO.getId();
+        String userId = fileDTO.getUserId();
         //检查本文件是否属于操作用户
         FileUserCO fileUserCO = FileUserE.queryInstance().setFileId(fileId).setUserId(userId).selectOne();
         AssertUtil.isFalse(ObjectUtil.isEmpty(fileUserCO), ErrorEnum.USER_INFO_ERROR.getName());
@@ -117,19 +122,42 @@ public class FileService {
         //逻辑删除数据条
         FileUserE.queryInstance().setId(fileUserCO.getId()).setDeleted(1).update();
 
-        //物理删除文件:先检查这个文件是否除了自己 所有用户都不可用了
+        //如果这个文件是文件夹 则需要删除其下的所有文件 逻辑与物理
+        List<FileUserCO> fileFolders = FileUserE.queryInstance().setUserId(userId).setFileFolderId(fileId).selectByCon();
+        Long deleteSize = 0L;
+        if (CollectionUtils.isNotEmpty(fileFolders)) {
+            //说明是文件夹
+            for (FileUserCO cFile : fileFolders) {
+                deleteSize += signDeleteFile(cFile.getFileId());
+            }
+            //可能  逻辑删除该文件夹下的所有文件
+            FileUserE.deleteFolderCFile(userId,fileId);
+        } else {
+            //单个文件
+            deleteSize = signDeleteFile(fileId);
+        }
+
+        //计算用户的新内存总值
+        Long newSize = fileUpLogCO.getUpFileTotalSize() - deleteSize;
+        FileUpLogE.queryInstance().setId(fileUpLogCO.getId()).setUpFileTotalSize(newSize).update();
+        //删除完成
+        return DataResponse.buildSuccess();
+    }
+
+    /**
+     * 删除文件额外操作 返回涉及删除的文件大小
+     * @param fileId
+     * @return
+     */
+    private Long signDeleteFile(String fileId) {
+        //物理删除文件:先检查这个文件是否除了自己这一条 所有用户都不可用了
         List<FileUserCO> fileUserCOS = FileUserE.queryInstance().setFileId(fileId).selectByCon();
         FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(fileId).selectById();
         if (fileUserCOS.size() == 1) {
             //删除本文件
             FileUtil.deleteFile(fileInfoCO.getFilePath());
         }
-
-        //计算用户的新内存总值
-        Long newSize = fileUpLogCO.getUpFileTotalSize() - fileInfoCO.getFileSize();
-        FileUpLogE.queryInstance().setId(fileUpLogCO.getId()).setUpFileTotalSize(newSize).update();
-        //删除完成
-        return DataResponse.buildSuccess();
+        return fileInfoCO.getFileSize();
     }
 
     /**
@@ -160,7 +188,7 @@ public class FileService {
     /**
      * 获取文件 断点下载
      */
-    public void continueDownload(){
+    public void continueDownload() {
 
     }
 }

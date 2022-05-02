@@ -98,4 +98,8 @@ public class FileUserE implements Serializable {
     public static boolean batchCreate(List<FileUserE> list) {
         return FileUserE.queryInstance().getGateway().batchCreate(list);
     }
+
+    public static boolean deleteFolderCFile(String userId,String fileFolderId){
+        return FileUserE.queryInstance().getGateway().deleteFolderCFile(userId,fileFolderId);
+    }
 }

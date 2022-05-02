@@ -16,7 +16,7 @@
 
         FROM
         FILE_INFO fi LEFT JOIN FILE_USER fu ON fi.id = fu.file_id
-        WHERE fu.user_Id = #{con.userId}
+        WHERE fu.user_Id = #{con.userId} AND fu.deleted = 0
         <choose>
             <when test="con.fileFolderId !=null and con.fileFolderId != ''">
                 AND fu.file_folder_id = #{con.fileFolderId}

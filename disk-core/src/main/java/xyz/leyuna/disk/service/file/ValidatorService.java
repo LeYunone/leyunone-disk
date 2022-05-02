@@ -9,10 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.leyuna.disk.command.CacheExe;
+import xyz.leyuna.disk.domain.domain.FileInfoE;
 import xyz.leyuna.disk.domain.domain.FileMd5E;
+import xyz.leyuna.disk.domain.domain.FileUpLogE;
 import xyz.leyuna.disk.domain.domain.FileUserE;
 import xyz.leyuna.disk.model.DataResponse;
+import xyz.leyuna.disk.model.co.FileInfoCO;
 import xyz.leyuna.disk.model.co.FileMd5CO;
+import xyz.leyuna.disk.model.co.FileUpLogCO;
 import xyz.leyuna.disk.model.co.FileValidatorCO;
 import xyz.leyuna.disk.model.dto.file.UpFileDTO;
 import xyz.leyuna.disk.model.enums.ErrorEnum;
@@ -69,8 +73,15 @@ public class ValidatorService {
             //说明改文件在服务器中已经有备份
             if(CollectionUtil.isNotEmpty(fileMd5COS)){
                 String fileId = fileMd5COS.get(0).getFileId();
+                FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(fileId).selectById();
+                AssertUtil.isFalse(ObjectUtil.isEmpty(fileInfoCO),ErrorEnum.FILE_UPLOAD_FILE.getName());
                 //在本次用户下声明该文件
                 FileUserE.queryInstance().setUserId(userId).setFileId(fileId).setFileFolderId(fileFolderId).save();
+                //更新用户内存
+                FileUpLogCO fileUpLogCO = FileUpLogE.queryInstance().setUserId(userId).selectOne();
+                AssertUtil.isFalse(ObjectUtil.isEmpty(fileUpLogCO),ErrorEnum.FILE_UPLOAD_FILE.getName());
+                FileUpLogE.queryInstance().setId(fileUpLogCO.getId())
+                        .setUpFileTotalSize(fileUpLogCO.getUpFileTotalSize()+fileInfoCO.getFileSize()).update();
                 //返回给前端：不用继续操作
                 resultType = 0;
             }else{

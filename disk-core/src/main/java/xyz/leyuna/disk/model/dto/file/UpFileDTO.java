@@ -83,4 +83,6 @@ public class UpFileDTO implements Serializable {
      * 上一层文件夹id
      */
     private String fileFolderId;
+
+    private String uniqueIdentifier;
 }
