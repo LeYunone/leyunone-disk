@@ -12,10 +12,12 @@ import org.springframework.web.multipart.MultipartFile;
 import xyz.leyuna.disk.command.CacheExe;
 import xyz.leyuna.disk.command.SliceUploadExe;
 import xyz.leyuna.disk.domain.domain.FileInfoE;
+import xyz.leyuna.disk.domain.domain.FileMd5E;
 import xyz.leyuna.disk.domain.domain.FileUpLogE;
 import xyz.leyuna.disk.domain.domain.FileUserE;
 import xyz.leyuna.disk.model.DataResponse;
 import xyz.leyuna.disk.model.co.FileInfoCO;
+import xyz.leyuna.disk.model.co.FileMd5CO;
 import xyz.leyuna.disk.model.co.FileUpLogCO;
 import xyz.leyuna.disk.model.co.FileUserCO;
 import xyz.leyuna.disk.model.dto.file.FileDTO;
@@ -53,7 +55,7 @@ public class FileService {
     @Autowired
     private HttpServletRequest request;
 
-    @Autowired
+    @Autowired(required = false)
     private HttpServletResponse response;
 
     @Autowired
@@ -127,6 +129,7 @@ public class FileService {
         Long deleteSize = 0L;
         if (CollectionUtils.isNotEmpty(fileFolders)) {
             //说明是文件夹
+            FileInfoE.queryInstance().setId(fileId).setDeleted(1).update();
             for (FileUserCO cFile : fileFolders) {
                 deleteSize += signDeleteFile(cFile.getFileId());
             }
@@ -156,6 +159,11 @@ public class FileService {
         if (fileUserCOS.size() == 1) {
             //删除本文件
             FileUtil.deleteFile(fileInfoCO.getFilePath());
+            //逻辑删除文件
+            FileInfoE.queryInstance().setId(fileInfoCO.getId()).setDeleted(1).update();
+            FileMd5CO fileMd5CO = FileMd5E.queryInstance().setFileId(fileInfoCO.getId()).selectOne();
+            AssertUtil.isFalse(ObjectUtil.isEmpty(fileMd5CO),ErrorEnum.FILE_UPLOAD_FILE.getName());
+            FileMd5E.queryInstance().setId(fileMd5CO.getId()).setDeleted(1).update();
         }
         return fileInfoCO.getFileSize();
     }
