@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.File;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -62,5 +63,13 @@ public class FileInfoCO implements Serializable {
      */
     private String filePath;
 
+    /**
+     * 文件base64流
+     */
     private byte[] base64File;
+
+    /**
+     * 文件
+     */
+    private File file;
 }

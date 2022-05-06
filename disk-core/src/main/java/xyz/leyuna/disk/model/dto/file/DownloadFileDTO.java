@@ -18,4 +18,7 @@ import java.io.Serializable;
 @ToString
 public class DownloadFileDTO implements Serializable {
 
+    private String fileId;
+
+    private String userId;
 }

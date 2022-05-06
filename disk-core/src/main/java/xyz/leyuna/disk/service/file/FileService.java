@@ -20,6 +20,7 @@ import xyz.leyuna.disk.model.co.FileInfoCO;
 import xyz.leyuna.disk.model.co.FileMd5CO;
 import xyz.leyuna.disk.model.co.FileUpLogCO;
 import xyz.leyuna.disk.model.co.FileUserCO;
+import xyz.leyuna.disk.model.dto.file.DownloadFileDTO;
 import xyz.leyuna.disk.model.dto.file.FileDTO;
 import xyz.leyuna.disk.model.dto.file.UpFileDTO;
 import xyz.leyuna.disk.model.enums.ErrorEnum;
@@ -28,7 +29,8 @@ import xyz.leyuna.disk.util.FileUtil;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.File;
+import java.io.*;
+import java.net.URLEncoder;
 import java.util.List;
 
 /**
@@ -55,11 +57,11 @@ public class FileService {
     @Autowired
     private HttpServletRequest request;
 
-    @Autowired(required = false)
-    private HttpServletResponse response;
-
     @Autowired
     private SliceUploadExe sliceUploadExe;
+
+    @Autowired(required = false)
+    private HttpServletResponse response;
 
     /**
      * 分片上传
@@ -174,13 +176,59 @@ public class FileService {
         return fileInfoCO.getFileSize();
     }
 
+    public void downloadFile(DownloadFileDTO fileDTO){
+        ptDownload(fileDTO);
+    }
+
     /**
-     * 获取文件 普通下载
+     *  普通下载
+     * @param fileDTO
+     */
+    private void ptDownload(DownloadFileDTO fileDTO){
+        FileInfoCO file = this.getFile(fileDTO.getFileId(), fileDTO.getUserId());
+        //文件转换成数组byte
+        byte[] bytes = FileUtil.FiletoByte(file.getFile());
+
+        byte[] buffer = new byte[1024];
+        BufferedInputStream bis = null;
+        //输出流
+        OutputStream os = null;
+        try {
+            //设置返回文件信息
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(file.getName(), "UTF-8"));
+            response.setContentType("application/octet-stream");
+            response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
+            os = response.getOutputStream();
+            bis = new BufferedInputStream(new ByteArrayInputStream(bytes));
+            //写入文件
+            while(bis.read(buffer) != -1){
+                os.write(buffer);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            //关流了
+            try {
+                if(bis != null) {
+                    bis.close();
+                }
+                if(os != null) {
+                    os.flush();
+                    os.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 获取文件
      *
      * @param fileId 文件id
      * @return
      */
-    public FileInfoCO getFile(String fileId, String userId) {
+    private FileInfoCO getFile(String fileId, String userId) {
 
         //检查本文件是否属于操作用户
         FileUserCO fileUserCO = FileUserE.queryInstance().setFileId(fileId).setUserId(userId).selectOne();
@@ -192,17 +240,14 @@ public class FileService {
 
         File file = FileUtil.getFile(fileInfoCO.getFilePath());
         AssertUtil.isFalse(ObjectUtil.isEmpty(file), ErrorEnum.SELECT_NOT_FOUND.getName());
-
-        //文件转换成数组byte
-        byte[] bytes = FileUtil.FiletoByte(file);
-        fileInfoCO.setBase64File(bytes);
+        fileInfoCO.setFile(file);
         return fileInfoCO;
     }
 
     /**
      * 获取文件 断点下载
      */
-    public void continueDownload() {
+    private void continueDownload() {
 
     }
 }

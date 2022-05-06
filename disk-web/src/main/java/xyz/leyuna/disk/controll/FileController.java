@@ -4,6 +4,7 @@ import xyz.leyuna.disk.model.DataResponse;
 import xyz.leyuna.disk.model.co.FileInfoCO;
 import xyz.leyuna.disk.model.co.FileValidatorCO;
 import xyz.leyuna.disk.model.co.UserFileInfoCO;
+import xyz.leyuna.disk.model.dto.file.DownloadFileDTO;
 import xyz.leyuna.disk.model.dto.file.FileDTO;
 import xyz.leyuna.disk.model.dto.file.UpFileDTO;
 import xyz.leyuna.disk.service.file.FileQueryService;
@@ -13,7 +14,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import xyz.leyuna.disk.service.file.ValidatorService;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Proxy;
+import java.net.URLEncoder;
 
 /**
  * @author LeYuna
@@ -32,6 +39,7 @@ public class FileController {
 
     @Autowired
     private ValidatorService validatorService;
+
     /**
      * 查询服务器内文件[条件-分页]
      * @return
@@ -87,7 +95,7 @@ public class FileController {
 
     /**
      * 删除指定文件
-     * @param id
+     * @param
      * @return
      */
     @PostMapping("/deleteFile")
@@ -97,11 +105,11 @@ public class FileController {
 
     /**
      * 下载文件
-     * @param id
+     * @param
      * @return
      */
     @PostMapping("/downloadFile")
-    public DataResponse<FileInfoCO> downloadFile(String id, String userId){
-        return DataResponse.of(fileService.getFile(id,userId));
+    public void downloadFile(@RequestBody DownloadFileDTO fileDTO){
+        fileService.downloadFile(fileDTO);
     }
 }
