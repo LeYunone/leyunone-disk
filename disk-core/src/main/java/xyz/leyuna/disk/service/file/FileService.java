@@ -93,6 +93,11 @@ public class FileService {
         return this.sliceUploadFile(upFileDTO);
     }
 
+    /**
+     * 新建文件夹
+     * @param upFileDTO
+     * @return
+     */
     private DataResponse newFolder(UpFileDTO upFileDTO) {
         //记录文件夹信息
         String save = FileInfoE.queryInstance().setName(upFileDTO.getFilename()).save();
@@ -152,7 +157,8 @@ public class FileService {
      * @param fileId
      * @return
      */
-    private Long signDeleteFile(String fileId) {
+    @Transactional(rollbackFor = Exception.class)
+    public Long signDeleteFile(String fileId) {
         //物理删除文件:先检查这个文件是否除了自己这一条 所有用户都不可用了
         List<FileUserCO> fileUserCOS = FileUserE.queryInstance().setFileId(fileId).selectByCon();
         FileInfoCO fileInfoCO = FileInfoE.queryInstance().setId(fileId).selectById();
