@@ -97,6 +97,7 @@ public class FileService {
 
     /**
      * 新建文件夹
+     *
      * @param upFileDTO
      * @return
      */
@@ -141,7 +142,7 @@ public class FileService {
                 deleteSize += signDeleteFile(cFile.getFileId());
             }
             //可能  逻辑删除该文件夹下的所有文件
-            FileUserE.deleteFolderCFile(userId,fileId);
+            FileUserE.deleteFolderCFile(userId, fileId);
         } else {
             //单个文件
             deleteSize = signDeleteFile(fileId);
@@ -156,6 +157,7 @@ public class FileService {
 
     /**
      * 删除文件额外操作 返回涉及删除的文件大小
+     *
      * @param fileId
      * @return
      */
@@ -170,21 +172,81 @@ public class FileService {
             //逻辑删除文件
             FileInfoE.queryInstance().setId(fileInfoCO.getId()).setDeleted(1).update();
             FileMd5CO fileMd5CO = FileMd5E.queryInstance().setFileId(fileInfoCO.getId()).selectOne();
-            AssertUtil.isFalse(ObjectUtil.isEmpty(fileMd5CO),ErrorEnum.FILE_UPLOAD_FILE.getName());
+            AssertUtil.isFalse(ObjectUtil.isEmpty(fileMd5CO), ErrorEnum.FILE_UPLOAD_FILE.getName());
             FileMd5E.queryInstance().setId(fileMd5CO.getId()).setDeleted(1).update();
         }
         return fileInfoCO.getFileSize();
     }
 
-    public void downloadFile(DownloadFileDTO fileDTO){
-        ptDownload(fileDTO);
+    public void downloadFile(DownloadFileDTO fileDTO) {
+        ddDownload(fileDTO);
+        //        ptDownload(fileDTO);
     }
 
     /**
-     *  普通下载
+     * 断点下载
+     *
      * @param fileDTO
      */
-    private void ptDownload(DownloadFileDTO fileDTO){
+    private void ddDownload(DownloadFileDTO fileDTO) {
+        OutputStream os = null;
+        InputStream is = null;
+        FileInfoCO file = getFile(fileDTO.getFileId(), fileDTO.getUserId());
+        try {
+            Long fileSize = file.getFileSize();
+            //设置请求头
+            response.setContentType("application/x-download");
+            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(file.getName(), "UTF-8"));
+            response.setHeader("Accept-Range", "bytes");
+            response.setHeader("FileName", file.getName());
+            response.setHeader("FileSize", String.valueOf(fileSize));
+            response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+
+            String range = request.getHeader("Range").replace("bytes=", "");
+            String[] split = range.split("-");
+            Long start = 0L;
+            Long end = fileSize;
+            if (split.length == 2) {
+                start = Long.valueOf(split[0]);
+                end = Long.valueOf(split[1]);
+                if (end > fileSize) {
+                    end = fileSize;
+                }
+            } else {
+                start = Long.valueOf(range.replace("-", "").trim());
+            }
+
+            //下载
+            Long currentDownLen = end - start - 1;
+            String contentRange = new StringBuffer("bytes ").append(start).append("-").append(end).append("/").append(fileSize).toString();
+            response.setHeader("Content-Range", contentRange);
+            response.setHeader("Content-Length", String.valueOf(currentDownLen));
+
+            os = response.getOutputStream();
+            is = new BufferedInputStream(new FileInputStream(file.getFile()));
+
+            is.skip(start);
+            byte[] bf = new byte[1024];
+            int len = 0;
+            int sum = 0;
+            while (sum < currentDownLen) {
+                int temp = (currentDownLen - sum) > bf.length ? bf.length : (int) (currentDownLen - sum);
+                len = is.read(bf, 0, temp);
+                sum += len;
+                os.write(bf, 0, len);
+            }
+        } catch (Exception e) {
+
+        }
+
+    }
+
+    /**
+     * 普通下载
+     *
+     * @param fileDTO
+     */
+    private void ptDownload(DownloadFileDTO fileDTO) {
         FileInfoCO file = this.getFile(fileDTO.getFileId(), fileDTO.getUserId());
         //文件转换成数组byte
         byte[] bytes = FileUtil.FiletoByte(file.getFile());
@@ -201,7 +263,7 @@ public class FileService {
             os = response.getOutputStream();
             bis = new BufferedInputStream(new ByteArrayInputStream(bytes));
             //写入文件
-            while(bis.read(buffer) != -1){
+            while (bis.read(buffer) != -1) {
                 os.write(buffer);
             }
         } catch (Exception e) {
@@ -209,10 +271,10 @@ public class FileService {
         } finally {
             //关流了
             try {
-                if(bis != null) {
+                if (bis != null) {
                     bis.close();
                 }
-                if(os != null) {
+                if (os != null) {
                     os.flush();
                     os.close();
                 }
