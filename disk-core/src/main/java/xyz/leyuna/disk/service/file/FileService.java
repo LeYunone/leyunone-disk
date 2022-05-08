@@ -2,6 +2,7 @@ package xyz.leyuna.disk.service.file;
 
 
 import cn.hutool.core.util.ObjectUtil;
+import com.alibaba.cloud.commons.lang.StringUtils;
 import lombok.extern.log4j.Log4j2;
 import org.apache.dubbo.common.utils.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -184,6 +185,56 @@ public class FileService {
     }
 
     /**
+     * 多线程快速下载
+     *
+     * @param fileDTO
+     */
+    private void threadDownload(DownloadFileDTO fileDTO) {
+        FileInfoCO file = getFile(fileDTO.getFileId(), fileDTO.getUserId());
+
+        String fileName = null;
+        Long fileSize = file.getFileSize();
+        try {
+            fileName = URLEncoder.encode(file.getName(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+        }
+        //设置下载请求头
+        response.setContentType("application/x-download");
+        response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
+
+        Long start = 0L;
+        Long end = fileSize;
+        OutputStream os = response.getOutputStream();
+        //开启多线程下载
+        Long threadSize = fileSize / FileService.downloadThreadCount;
+        int threadCount = 0;
+        while (threadCount <= FileService.downloadThreadCount) {
+            start = threadSize * threadCount;
+            end = (threadCount + 1) * threadSize;
+            threadCount++;
+            new Thread().start();
+        }
+    }
+
+    class DownloadThread implements Runnable {
+
+        private Long start;
+        private Long end;
+        private OutputStream os;
+
+        public DownloadThread(Long start,Long end,OutputStream os){
+
+        }
+
+        @Override
+        public void run() {
+
+        }
+    }
+
+    private static int downloadThreadCount = 5;
+
+    /**
      * 断点下载
      *
      * @param fileDTO
@@ -194,31 +245,35 @@ public class FileService {
         FileInfoCO file = getFile(fileDTO.getFileId(), fileDTO.getUserId());
         try {
             Long fileSize = file.getFileSize();
+            String fileName = URLEncoder.encode(file.getName(), "UTF-8");
             //设置请求头
             response.setContentType("application/x-download");
-            response.setHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(file.getName(), "UTF-8"));
+            response.setHeader("Content-Disposition", "attachment;filename=" + fileName);
             response.setHeader("Accept-Range", "bytes");
-            response.setHeader("FileName", file.getName());
+            response.setHeader("FileName", fileName);
             response.setHeader("FileSize", String.valueOf(fileSize));
             response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
 
-            String range = request.getHeader("Range").replace("bytes=", "");
-            String[] split = range.split("-");
+            String range = request.getHeader("Range");
             Long start = 0L;
             Long end = fileSize;
-            if (split.length == 2) {
-                start = Long.valueOf(split[0]);
-                end = Long.valueOf(split[1]);
-                if (end > fileSize) {
-                    end = fileSize;
+            if (StringUtils.isNotBlank(range)) {
+                range = range.replace("bytes=", "").trim();
+                String[] split = range.split("-");
+                if (split.length == 2) {
+                    start = Long.valueOf(split[0]);
+                    end = Long.valueOf(split[1]);
+                    if (end > fileSize) {
+                        end = fileSize;
+                    }
+                } else {
+                    start = Long.valueOf(range.replace("-", "").trim());
                 }
-            } else {
-                start = Long.valueOf(range.replace("-", "").trim());
             }
 
             //下载
-            Long currentDownLen = end - start - 1;
-            String contentRange = new StringBuffer("bytes ").append(start).append("-").append(end).append("/").append(fileSize).toString();
+            Long currentDownLen = end - start;
+            String contentRange = new StringBuffer("bytes=").append(start).append("-").append(end).append("/").append(fileSize).toString();
             response.setHeader("Content-Range", contentRange);
             response.setHeader("Content-Length", String.valueOf(currentDownLen));
 
@@ -233,10 +288,23 @@ public class FileService {
                 int temp = (currentDownLen - sum) > bf.length ? bf.length : (int) (currentDownLen - sum);
                 len = is.read(bf, 0, temp);
                 sum += len;
-                os.write(bf, 0, len);
+                os.write(bf);
             }
+
         } catch (Exception e) {
 
+        } finally {
+            try {
+                if (is != null) {
+                    is.close();
+                }
+                if (os != null) {
+                    os.flush();
+                    os.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }
