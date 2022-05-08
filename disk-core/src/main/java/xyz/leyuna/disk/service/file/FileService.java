@@ -180,8 +180,9 @@ public class FileService {
     }
 
     public void downloadFile(DownloadFileDTO fileDTO) {
-        ddDownload(fileDTO);
-        //        ptDownload(fileDTO);
+        threadDownload(fileDTO);
+//        ddDownload(fileDTO);
+//        ptDownload(fileDTO);
     }
 
     /**
@@ -204,7 +205,12 @@ public class FileService {
 
         Long start = 0L;
         Long end = fileSize;
-        OutputStream os = response.getOutputStream();
+        OutputStream os = null;
+        try {
+            os = response.getOutputStream();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         //开启多线程下载
         Long threadSize = fileSize / FileService.downloadThreadCount;
         int threadCount = 0;
@@ -212,8 +218,19 @@ public class FileService {
             start = threadSize * threadCount;
             end = (threadCount + 1) * threadSize;
             threadCount++;
-            new Thread().start();
+            //开启下载
+            new Thread(new DownloadThread(start, end, os, file.getFile())).start();
         }
+        //让步下载线程
+        Thread.yield();
+        if (os != null) {
+            try {
+                os.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     class DownloadThread implements Runnable {
@@ -221,14 +238,41 @@ public class FileService {
         private Long start;
         private Long end;
         private OutputStream os;
+        private File file;
 
-        public DownloadThread(Long start,Long end,OutputStream os){
-
+        public DownloadThread(Long start, Long end, OutputStream os, File file) {
+            this.start = start;
+            this.end = end;
+            this.os = os;
+            this.file = file;
         }
 
         @Override
         public void run() {
+            if (start == null || end == null || os == null || !file.exists()) {
+                return;
+            }
+            RandomAccessFile randomAccessFile = null;
+            try {
+                byte[] bf = new byte[1024];
+                randomAccessFile = new RandomAccessFile(file, "r");
+                randomAccessFile.seek(start);
+                Long sum = 0L;
+                while (sum <= end - start) {
+                    int len = randomAccessFile.read(bf);
+                    os.write(len);
+                    sum += len;
+                }
+            } catch (Exception e) {
+            } finally {
+                if (randomAccessFile != null) {
+                    try {
+                        randomAccessFile.close();
+                    } catch (IOException e) {
 
+                    }
+                }
+            }
         }
     }
 
