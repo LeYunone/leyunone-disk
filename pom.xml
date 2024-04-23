@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>xyz.leyuna</groupId>
+    <groupId>com.leyunone</groupId>
     <artifactId>disk</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -10,7 +10,6 @@
     <description>Demo project for Spring Boot</description>
 
     <modules>
-        <module>disk-start</module>
         <module>disk-web</module>
         <module>disk-core</module>
     </modules>
@@ -20,7 +19,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <lucene.version>7.6.0</lucene.version>
         <sa-token.verison>1.25.0</sa-token.verison>
-        <mybatis-plus.version>3.1.0</mybatis-plus.version>
+        <mybatis-plus.version>3.5.0</mybatis-plus.version>
         <dubbo.version>2.7.8</dubbo.version>
         <spring-boot.version>2.4.2</spring-boot.version>
         <spring-cloud.version>2020.0.0</spring-cloud.version>
@@ -34,7 +33,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>1.3.0.RELEASE</version>
                 <configuration><!-- 指定该Main Class为全局的唯一入口 -->
-                    <mainClass>xyz.leyuna.disk.start.DiskStartApplication</mainClass>
+                    <mainClass>DiskStartApplication</mainClass>
                     <layout>ZIP</layout>
                 </configuration>
                 <executions>
@@ -54,18 +53,13 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>xyz.leyuna</groupId>
+                <groupId>com.leyunone</groupId>
                 <artifactId>disk-web</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>xyz.leyuna</groupId>
+                <groupId>com.leyunone</groupId>
                 <artifactId>disk-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>xyz.leyuna</groupId>
-                <artifactId>disk-start</artifactId>
                 <version>${project.version}</version>
             </dependency>
 

@@ -2,20 +2,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>xyz.leyuna</groupId>
+    <groupId>com.leyunone</groupId>
     <artifactId>disk-web</artifactId>
     <name>disk-web</name>
     <description>Demo project for Spring Boot</description>
 
     <parent>
-        <groupId>xyz.leyuna</groupId>
+        <groupId>com.leyunone</groupId>
         <artifactId>disk</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
         <dependency>
-            <groupId>xyz.leyuna</groupId>
+            <groupId>com.leyunone</groupId>
             <artifactId>disk-core</artifactId>
         </dependency>
     </dependencies>
