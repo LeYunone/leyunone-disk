@@ -13,9 +13,11 @@ public interface FileService {
 
     void upload(UpFileDTO upFileDTO);
 
-    void down(Integer fileId);
+    String down(String fileId);
 
-    void delete(Integer fileId);
+    void delete(String fileId);
 
     void createFolder(FileFolderDTO fileFolderDTO);
+    
+    String requestUpload(String fileName);
 }

@@ -1,5 +1,7 @@
 package com.leyunone.disk.model.vo;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.leyunone.disk.model.dto.FileFolderDTO;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -24,5 +26,5 @@ public class UserFileInfoVO {
     /**
      * 用户文件
      */
-    private List<FileInfoVO> fileinfos;
+    private Page<FileFolderVO> infos;
 }

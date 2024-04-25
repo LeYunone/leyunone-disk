@@ -43,12 +43,6 @@ public class FileInfoDO implements Serializable {
     private LocalDateTime createDt;
 
     /**
-     * 0存在 1 删除
-     */
-    @TableField(value = "deleted", fill = FieldFill.INSERT)
-    private Integer deleted;
-
-    /**
      * 文件路径
      */
     private String filePath;

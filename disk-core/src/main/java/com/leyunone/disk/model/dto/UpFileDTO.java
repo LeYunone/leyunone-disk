@@ -24,6 +24,8 @@ public class UpFileDTO implements Serializable {
      * 当前分片下标
      */
     private Integer chunkNumber;
+    
+    private String uploadId;
 
     /**
      * 分片大小

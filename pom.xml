@@ -24,6 +24,7 @@
         <spring-boot.version>2.4.2</spring-boot.version>
         <spring-cloud.version>2020.0.0</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.1</spring-cloud-alibaba.version>
+        <alyoss.version>3.10.2</alyoss.version>
     </properties>
     <build>
         <plugins>

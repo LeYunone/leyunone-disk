@@ -17,9 +17,9 @@ public enum ResponseCode {
     /**
      * 10001001文件
      */
-
-
-
+    UPLOAD_FAIL(10001001,"上传失败"),
+    
+    FILE_NOT_EXIST(10001002,"文件不存在")
 
     ;
 

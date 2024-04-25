@@ -1,5 +1,12 @@
-  ## 数据库配置
+server:
+  port: 9001
+  servlet:
+    context-path: /disk/api
 spring:
+  servlet:
+    multipart:
+      max-file-size: 1
+      max-request-size: 1
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/disk?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
     username: root
@@ -18,14 +25,9 @@ spring:
     poolPreparedStatements: true
     maxOpenPreparedStatements: 20
     driver-class-name: com.mysql.jdbc.Driver
-  #eureka:
-#  client:
-#    serviceUrl:
-#      defaultZone: http://localhost:8001/eureka/
 
 #sql语句日志
 mybatis-plus:
   mapper-locations: classpath*:**/repository/mapper/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-

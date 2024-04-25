@@ -13,7 +13,9 @@ import lombok.Setter;
 @Setter
 public class FileQuery extends QueryPage {
     
-    private String fileName;
+    private String nameCondition;
     
     private Integer fileType;
+    
+    private Integer fileFolderId;
 }

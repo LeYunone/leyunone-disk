@@ -1,21 +1,16 @@
 package com.leyunone.disk.service.file;
 
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.leyunone.disk.dao.entry.FileInfoDO;
-import com.leyunone.disk.dao.repository.FileInfoDao;
+import com.leyunone.disk.dao.repository.FileFolderDao;
 import com.leyunone.disk.model.query.FileQuery;
-import com.leyunone.disk.model.vo.FileInfoVO;
+import com.leyunone.disk.model.vo.FileFolderVO;
 import com.leyunone.disk.model.vo.UserFileInfoVO;
 import com.leyunone.disk.service.FileQueryService;
 import com.leyunone.disk.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.leyunone.disk.model.DataResponse;
-import com.leyunone.disk.common.enums.FileTypeEnum;
 
-import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.Collectors;
 
 
 /**
@@ -28,7 +23,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class FileQueryServiceImpl implements FileQueryService {
 
-    private final FileInfoDao fileInfoDao;
+    private final FileFolderDao fileFolderDao;
 
     /**
      * 分页查询文件
@@ -37,25 +32,21 @@ public class FileQueryServiceImpl implements FileQueryService {
      * @return
      */
     @Override
-    public UserFileInfoVO selectFile(FileQuery query) {
-        Page<FileInfoDO> fileInfoDOPage = fileInfoDao.selectByConPage(query);
-        List<FileInfoDO> records = fileInfoDOPage.getRecords();
+    public UserFileInfoVO getFiles(FileQuery query) {
         UserFileInfoVO userFileInfVO = new UserFileInfoVO();
-        //翻译属性
-        AtomicLong sum = new AtomicLong();
-        List<FileInfoVO> files = records.stream().map(fileInfoDO -> {
-            sum.addAndGet(fileInfoDO.getFileSize());
-            FileInfoVO fileInfoVO = new FileInfoVO();
-            fileInfoVO.setFileId(fileInfoDO.getFileId());
-            fileInfoVO.setFileName(fileInfoDO.getFileName());
-            fileInfoVO.setFileSize(FileUtil.sizeText(fileInfoDO.getFileSize()));
-            fileInfoVO.setFileType(FileTypeEnum.loadName(fileInfoDO.getFileType()));
-            fileInfoVO.setUpdateDt(fileInfoDO.getUpdateDt());
-            fileInfoVO.setCreateDt(fileInfoDO.getCreateDt());
-            return fileInfoVO;
-        }).collect(Collectors.toList());
-        userFileInfVO.setFileinfos(files);
-        userFileInfVO.setFileTotal(FileUtil.sizeText(sum.get()));
+
+        if (StringUtils.isNotBlank(query.getNameCondition())) {
+            //文件/文件夹名前缀模糊搜索
+
+        } else {
+            Page<FileFolderVO> fileFolderVOPage = fileFolderDao.selectPage(query);
+            fileFolderVOPage.getRecords().forEach(fileFolderVO -> {
+                if (StringUtils.isNotBlank(fileFolderVO.getFileSize())) {
+                    fileFolderVO.setFileSize(FileUtil.sizeText(Long.parseLong(fileFolderVO.getFileSize())));
+                }
+            });
+            userFileInfVO.setInfos(fileFolderVOPage);
+        }
         return userFileInfVO;
     }
 

@@ -47,9 +47,4 @@ public class FileInfoVO {
      * 文件路径
      */
     private String filePath;
-
-    /**
-     * 文件base64流
-     */
-    private byte[] base64File;
 }

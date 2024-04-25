@@ -11,5 +11,5 @@ import com.leyunone.disk.model.vo.UserFileInfoVO;
  */
 public interface FileQueryService {
 
-    UserFileInfoVO selectFile(FileQuery query);
+    UserFileInfoVO getFiles(FileQuery query);
 }

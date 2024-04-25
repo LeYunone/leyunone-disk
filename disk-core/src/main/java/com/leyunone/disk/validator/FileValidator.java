@@ -1,6 +1,6 @@
 package com.leyunone.disk.validator;
 
-import com.alibaba.nacos.api.utils.StringUtils;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.leyunone.disk.util.AssertUtil;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.stereotype.Component;

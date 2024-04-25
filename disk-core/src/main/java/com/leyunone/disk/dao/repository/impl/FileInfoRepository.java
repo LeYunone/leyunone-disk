@@ -1,6 +1,6 @@
 package com.leyunone.disk.dao.repository.impl;
 
-import com.alibaba.cloud.commons.lang.StringUtils;
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -25,7 +25,6 @@ public class FileInfoRepository extends BaseRepository<FileInfoMapper, FileInfoD
     @Override
     public Page<FileInfoDO> selectByConPage(FileQuery query) {
         LambdaQueryWrapper<FileInfoDO> lambda = new QueryWrapper<FileInfoDO>().lambda();
-        lambda.like(StringUtils.isNotBlank(query.getFileName()), FileInfoDO::getFileName, query.getFileName());
         lambda.eq(ObjectUtil.isNotNull(query.getFileType()), FileInfoDO::getFileType, query.getFileType());
         Page<FileInfoDO> page = new Page<>(query.getIndex(), query.getSize());
         return this.baseMapper.selectPage(page, lambda);

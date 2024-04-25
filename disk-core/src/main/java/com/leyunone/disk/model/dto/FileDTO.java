@@ -19,11 +19,9 @@ import lombok.experimental.Accessors;
 @EqualsAndHashCode(callSuper = false)
 public class FileDTO  {
 
-    private String id;
+    private String fileId;
 
-    private String name;
-
-    private String userId;
+    private String fileName;
 
     private Integer type;
 

@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface UploadPreService {
 
-    FileValidatorVO judgeFile(MultipartFile multipartFile);
+    FileValidatorVO judgeFile(String md5);
 
     void checkFile(UpFileDTO upFileDTO);
 }

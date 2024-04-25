@@ -1,16 +1,17 @@
 package com.leyunone.disk.controll;
 
 import com.leyunone.disk.model.DataResponse;
-import com.leyunone.disk.model.co.FileValidatorCO;
-import com.leyunone.disk.model.co.UserFileInfoCO;
-import com.leyunone.disk.model.dto.DownloadFileDTO;
 import com.leyunone.disk.model.dto.FileDTO;
+import com.leyunone.disk.model.dto.FileFolderDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
-import com.leyunone.disk.service.file.FileQueryService;
-import com.leyunone.disk.service.file.FileService2;
+import com.leyunone.disk.model.query.FileQuery;
+import com.leyunone.disk.model.vo.UserFileInfoVO;
+import com.leyunone.disk.service.FileQueryService;
+import com.leyunone.disk.service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
+
+import javax.annotation.Resource;
 
 /**
  * @author LeYunone
@@ -24,80 +25,56 @@ public class FileController {
 
     @Autowired
     private FileQueryService fileQueryService;
-    @Autowired
-    private FileService2 fileService2;
-
-    @Autowired
-    private ValidatorService validatorService;
+    @Resource
+    private FileService fileService;
 
     /**
      * 查询服务器内文件[条件-分页]
+     *
      * @return
      */
-    @GetMapping("/selectFile")
-    public DataResponse<UserFileInfoCO> selectFileList(FileDTO file){
-        return fileQueryService.selectFile(file);
-    }
-
-    @GetMapping("/selectUserFileSize")
-    public DataResponse<Long> selectUserFileSize(String userId){
-        return fileQueryService.selectAllFileSizeByUserId(userId);
-    }
-
-    /**
-     * 请求存储文件 >存储文件的前提
-     * @return
-     */
-    @PostMapping("/requestSaveFile")
-    public DataResponse<FileValidatorCO> requestSaveFile(@RequestPart MultipartFile file){
-        return validatorService.judgeFile(fileFolderId,userId,file);
-    }
-
-    @PostMapping("/deleteTempFile")
-    public DataResponse deleteTempFile(String tempPath){
-        return fileService2.deleteTempFile(tempPath);
-    }
-
-    /**
-     * 校验分片
-     * @param upFileDTO
-     * @return
-     */
-    @GetMapping("/uploadFile")
-    public DataResponse checkFile(UpFileDTO upFileDTO){
-        return validatorService.checkFile(upFileDTO);
+    @GetMapping("/getFiles")
+    public DataResponse<UserFileInfoVO> getFiles(FileQuery query) {
+        UserFileInfoVO files = fileQueryService.getFiles(query);
+        return DataResponse.of(files);
     }
 
     /**
      * 存储文件
      */
-    @PostMapping("/uploadFile")
-    public DataResponse saveFile(UpFileDTO upFileDTO){
-        return fileService2.savaFile(upFileDTO);
+    @PostMapping("/upload")
+    public DataResponse<?> uploadFile(UpFileDTO upFileDTO) {
+        fileService.upload(upFileDTO);
+        return DataResponse.of();
     }
 
     @PostMapping("/newFolder")
-    public DataResponse newFolder(@RequestBody UpFileDTO upFileDTO){
-        return fileService2.savaFile(upFileDTO);
+    public DataResponse<?> newFolder(@RequestBody FileFolderDTO fileFolderDTO) {
+        fileService.createFolder(fileFolderDTO);
+        return DataResponse.of();
     }
 
     /**
      * 删除指定文件
+     *
      * @param
      * @return
      */
-    @PostMapping("/deleteFile")
-    public DataResponse deleteFile(@RequestBody FileDTO fileDTO){
-        return fileService2.deleteFile(fileDTO);
+    @PostMapping("/delete")
+    public DataResponse<?> deleteFile(@RequestBody FileDTO fileDTO) {
+        fileService.delete(fileDTO.getFileId());
+        return DataResponse.of();
     }
 
     /**
      * 下载文件
+     *
      * @param
      * @return
      */
-    @PostMapping("/downloadFile")
-    public void downloadFile(@RequestBody DownloadFileDTO fileDTO){
-        fileService2.downloadFile(fileDTO);
+    @PostMapping("/download")
+    public DataResponse<String> downloadFile(@RequestBody FileDTO fileDTO) {
+        String down = fileService.down(fileDTO.getFileId());
+        return DataResponse.of(down);
     }
 }

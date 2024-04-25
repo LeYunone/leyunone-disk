@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.leyunone.disk.dao.mapper.FileFolderMapper">
+    <select id="selectPage" resultType="com.leyunone.disk.model.vo.FileFolderVO">
+        SELECT ff.folder_id, ff.folder_name, ff.is_folder, ff.parent_id, ff.file_id, ff.update_dt, f.file_name,f.file_size
+        FROM file_folder ff
+        LEFT JOIN file_info f ON ff.file_id = f.file_id
+        WHERE 1 = 1
+        <if test="con.fileFolderId==null">
+            AND ff.parent_id is NULL
+        </if>
+        <if test="con.fileFolderId!=null">
+            AND ff.parent_id = #{con.fileFolderId}
+        </if>
+        ORDER BY ff.is_folder DESC
+    </select>
+</mapper>

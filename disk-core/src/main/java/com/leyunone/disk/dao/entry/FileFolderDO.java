@@ -20,6 +20,8 @@ public class FileFolderDO {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer folderId;
 
+    private String folderName;
+
     private boolean isFolder;
 
     private Integer parentId;

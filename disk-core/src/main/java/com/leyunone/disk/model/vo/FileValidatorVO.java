@@ -25,4 +25,10 @@ public class FileValidatorVO {
      */
     private Integer responseType;
 
+    /**
+     * 上传id
+     */
+    private String uploadId;
+    
+    private String filePath;
 }

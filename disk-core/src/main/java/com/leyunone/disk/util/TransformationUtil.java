@@ -1,6 +1,7 @@
 package com.leyunone.disk.util;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import org.springframework.beans.BeanUtils;
@@ -44,7 +45,7 @@ public class TransformationUtil {
             // 恢复访问控制权限
             field.setAccessible(accessFlag);
 
-            if (null != value && StringUtil.isNotBanks(value.toString())) {
+            if (null != value && StrUtil.isNotBlank(value.toString())) {
                 //将名字转换成大小写下划线
                 String s = StringUtil.underscoreName(name);
                 resultMap.put(s, value);
