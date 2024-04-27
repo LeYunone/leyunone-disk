@@ -2,6 +2,7 @@ package com.leyunone.disk.system.config;
 
 import com.baomidou.mybatisplus.core.handlers.MetaObjectHandler;
 import org.apache.ibatis.reflection.MetaObject;
+import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
  * @author
  * @date
  */
+@Configuration
 public class DiskMetaObjectHandler implements MetaObjectHandler {
 
     @Override

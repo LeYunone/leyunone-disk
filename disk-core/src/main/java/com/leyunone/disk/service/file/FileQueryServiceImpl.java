@@ -2,6 +2,7 @@ package com.leyunone.disk.service.file;
 
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.leyunone.disk.dao.entry.FileFolderDO;
 import com.leyunone.disk.dao.repository.FileFolderDao;
 import com.leyunone.disk.model.query.FileQuery;
 import com.leyunone.disk.model.vo.FileFolderVO;
@@ -40,7 +41,9 @@ public class FileQueryServiceImpl implements FileQueryService {
 
         } else {
             Page<FileFolderVO> fileFolderVOPage = fileFolderDao.selectPage(query);
-            fileFolderVOPage.getRecords().forEach(fileFolderVO -> {
+
+            fileFolderVOPage.getRecords().forEach(fileFolderDO -> {
+                FileFolderVO fileFolderVO = new FileFolderVO();
                 if (StringUtils.isNotBlank(fileFolderVO.getFileSize())) {
                     fileFolderVO.setFileSize(FileUtil.sizeText(Long.parseLong(fileFolderVO.getFileSize())));
                 }

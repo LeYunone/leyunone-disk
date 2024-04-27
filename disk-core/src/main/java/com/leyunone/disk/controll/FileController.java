@@ -8,6 +8,8 @@ import com.leyunone.disk.model.query.FileQuery;
 import com.leyunone.disk.model.vo.UserFileInfoVO;
 import com.leyunone.disk.service.FileQueryService;
 import com.leyunone.disk.service.FileService;
+import com.leyunone.disk.service.UploadPreService;
+import com.leyunone.disk.service.front.UploadPreServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +29,8 @@ public class FileController {
     private FileQueryService fileQueryService;
     @Resource
     private FileService fileService;
+    @Autowired
+    private UploadPreService uploadPreService;
 
     /**
      * 查询服务器内文件[条件-分页]
@@ -45,6 +49,19 @@ public class FileController {
     @PostMapping("/upload")
     public DataResponse<?> uploadFile(UpFileDTO upFileDTO) {
         fileService.upload(upFileDTO);
+        return DataResponse.of();
+    }
+
+
+    /**
+     * 校验分片
+     *
+     * @param upFileDTO
+     * @return
+     */
+    @GetMapping("/upload")
+    public DataResponse<?> checkFile(UpFileDTO upFileDTO) {
+        uploadPreService.checkFile(upFileDTO);
         return DataResponse.of();
     }
 

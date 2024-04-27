@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 /**
  * :)
  *
- * @Author pengli
+ * @Author LeYunone
  * @Date 2024/4/25 14:10
  */
 @Getter
@@ -19,7 +19,7 @@ public class FileFolderVO {
 
     private Integer size;
 
-    private LocalDateTime updateTime;
+    private LocalDateTime updateDt;
 
     private String fileName;
     

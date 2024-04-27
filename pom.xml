@@ -10,7 +10,6 @@
     <description>Demo project for Spring Boot</description>
 
     <modules>
-        <module>disk-web</module>
         <module>disk-core</module>
     </modules>
     <!--控制依赖版本-->
@@ -19,7 +18,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <lucene.version>7.6.0</lucene.version>
         <sa-token.verison>1.25.0</sa-token.verison>
-        <mybatis-plus.version>3.5.0</mybatis-plus.version>
+        <mybatis-plus.version>3.3.0</mybatis-plus.version>
         <dubbo.version>2.7.8</dubbo.version>
         <spring-boot.version>2.4.2</spring-boot.version>
         <spring-cloud.version>2020.0.0</spring-cloud.version>
@@ -53,11 +52,6 @@
     </build>
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.leyunone</groupId>
-                <artifactId>disk-web</artifactId>
-                <version>${project.version}</version>
-            </dependency>
             <dependency>
                 <groupId>com.leyunone</groupId>
                 <artifactId>disk-core</artifactId>

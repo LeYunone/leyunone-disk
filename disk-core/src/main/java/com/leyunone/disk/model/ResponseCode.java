@@ -3,7 +3,7 @@ package com.leyunone.disk.model;
 /**
  * :)
  *
- * @Author pengli
+ * @Author LeYunone
  * @Date 2024/4/22 16:17
  */
 public enum ResponseCode {
@@ -19,7 +19,9 @@ public enum ResponseCode {
      */
     UPLOAD_FAIL(10001001,"上传失败"),
     
-    FILE_NOT_EXIST(10001002,"文件不存在")
+    FILE_NOT_EXIST(10001002,"文件不存在"),
+    
+    JOB_NOE_EXIST(10001003,"任务不存在"),
 
     ;
 

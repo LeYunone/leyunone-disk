@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * :)
  *
- * @Author pengli
+ * @Author LeYunone
  * @Date 2024/4/25 11:22
  */
 public class UploadContext {
@@ -33,6 +33,6 @@ public class UploadContext {
     @Setter
     public static class Content {
 
-        private Map<Integer, PartETag> partETags;
+        private Map<Integer, PartETag> partETags = new ConcurrentHashMap<>();
     }
 }

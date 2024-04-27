@@ -29,4 +29,11 @@ public class FileInfoRepository extends BaseRepository<FileInfoMapper, FileInfoD
         Page<FileInfoDO> page = new Page<>(query.getIndex(), query.getSize());
         return this.baseMapper.selectPage(page, lambda);
     }
+
+    @Override
+    public FileInfoDO selectByMd5(String md5) {
+        LambdaQueryWrapper<FileInfoDO> lambda = new QueryWrapper<FileInfoDO>().lambda();
+        lambda.eq(FileInfoDO::getFileMd5,md5);
+        return this.baseMapper.selectOne(lambda);
+    }
 }

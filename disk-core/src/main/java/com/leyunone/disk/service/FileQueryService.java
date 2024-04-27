@@ -6,7 +6,7 @@ import com.leyunone.disk.model.vo.UserFileInfoVO;
 /**
  * :)
  *
- * @Author pengli
+ * @Author LeYunone
  * @Date 2024/4/22 17:27
  */
 public interface FileQueryService {

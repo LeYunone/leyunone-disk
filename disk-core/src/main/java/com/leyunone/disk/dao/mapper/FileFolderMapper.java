@@ -3,7 +3,6 @@ package com.leyunone.disk.dao.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.leyunone.disk.dao.entry.FileFolderDO;
-import com.leyunone.disk.dao.entry.FileInfoDO;
 import com.leyunone.disk.model.query.FileQuery;
 import com.leyunone.disk.model.vo.FileFolderVO;
 import org.apache.ibatis.annotations.Param;
@@ -18,6 +17,6 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface FileFolderMapper extends BaseMapper<FileFolderDO> {
 
-    Page<FileFolderVO> selectPage(@Param("con") FileQuery query);
+    Page<FileFolderVO> selectFolderPage(@Param("con") FileQuery query,Page page);
 }
 

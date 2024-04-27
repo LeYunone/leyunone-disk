@@ -24,7 +24,10 @@ public class UpFileDTO implements Serializable {
      * 当前分片下标
      */
     private Integer chunkNumber;
-    
+
+    /**
+     * 上传id
+     */
     private String uploadId;
 
     /**
@@ -63,12 +66,7 @@ public class UpFileDTO implements Serializable {
     /**
      * 文件类型
      */
-    private Integer fileType;
+    private String fileType;
 
-    /**
-     *
-     */
-    private String type;
-
-    private String uniqueIdentifier;
+    private Integer fileFolderId;
 }

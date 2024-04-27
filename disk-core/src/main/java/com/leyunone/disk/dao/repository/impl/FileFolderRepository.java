@@ -31,7 +31,7 @@ public class FileFolderRepository extends BaseRepository<FileFolderMapper, FileF
 
     @Override
     public Page<FileFolderVO> selectPage(FileQuery query) {
-        Page<FileFolderVO> page = new Page<>(query.getIndex(),query.getSize());
-        return this.baseMapper.selectPage(query);
+        Page page = new Page<>(query.getIndex(),query.getSize());
+        return this.baseMapper.selectFolderPage(query,page);
     }
 }

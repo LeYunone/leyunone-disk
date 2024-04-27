@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
  * :)
  * 阿里云oss服务
  *
- * @Author pengli
+ * @Author LeYunone
  * @Date 2024/4/22 17:42
  */
 @Service

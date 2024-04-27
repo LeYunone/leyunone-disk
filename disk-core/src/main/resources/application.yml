@@ -5,8 +5,8 @@ server:
 spring:
   servlet:
     multipart:
-      max-file-size: 1
-      max-request-size: 1
+      max-file-size: -1
+      max-request-size: -1
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/disk?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC&useSSL=false&allowPublicKeyRetrieval=true
     username: root
@@ -28,6 +28,7 @@ spring:
 
 #sql语句日志
 mybatis-plus:
-  mapper-locations: classpath*:**/repository/mapper/*.xml
+  mapper-locations: classpath:**/mapper/*.xml
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+

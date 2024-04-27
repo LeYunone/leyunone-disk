@@ -16,4 +16,6 @@ import com.leyunone.disk.model.query.FileQuery;
 public interface FileInfoDao extends IBaseRepository<FileInfoDO> {
 
     Page<FileInfoDO> selectByConPage(FileQuery query);
+    
+    FileInfoDO selectByMd5(String md5);
 }

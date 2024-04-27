@@ -10,7 +10,7 @@ import lombok.Setter;
 /**
  * (FileInfo)表实体类
  *
- * @author pengli@asiainfo.com
+ * @author LeYunone@asiainfo.com
  * @since 2022-04-29 11:00:13
  */
 @Getter
@@ -35,6 +35,8 @@ public class FileInfoDO implements Serializable {
      * 文件类型
      */
     private Integer fileType;
+    
+    private String fileMd5;
 
     @TableField(value = "update_Dt", fill = FieldFill.INSERT)
     private LocalDateTime updateDt;

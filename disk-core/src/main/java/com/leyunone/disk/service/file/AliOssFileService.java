@@ -32,7 +32,7 @@ import java.util.concurrent.locks.LockSupport;
  * :)
  * 阿里云oss服务
  *
- * @Author pengli
+ * @Author LeYunone
  * @Date 2024/4/22 17:42
  */
 public class AliOssFileService extends AbstractFileService {
@@ -106,6 +106,7 @@ public class AliOssFileService extends AbstractFileService {
         String uploadId = ossManager.getUploadId(fileName);
         UploadContext.Content content = new UploadContext.Content();
         content.setPartETags(new HashMap<>());
+        UploadContext.set(uploadId,content);
         return uploadId;
     }
 }

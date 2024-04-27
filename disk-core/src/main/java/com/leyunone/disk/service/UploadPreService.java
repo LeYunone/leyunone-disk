@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * :)
  *
- * @Author pengli
+ * @Author LeYunone
  * @Date 2024/4/22 17:26
  */
 public interface UploadPreService {

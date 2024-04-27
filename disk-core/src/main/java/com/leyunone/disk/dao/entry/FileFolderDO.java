@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 /**
  * :)
  *
- * @Author pengli
+ * @Author LeYunone
  * @Date 2024/4/22 17:29
  */
 @Getter
@@ -30,4 +30,11 @@ public class FileFolderDO {
 
     @TableField(value = "update_Dt", fill = FieldFill.INSERT)
     private LocalDateTime updateDt;
+    
+    @TableField(exist = false)
+    private String fileName;
+    @TableField(exist = false)
+    private Integer fileSize;
+    @TableField(exist = false)
+    private Integer fileType;
 }

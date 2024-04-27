@@ -6,7 +6,7 @@ import com.leyunone.disk.model.dto.UpFileDTO;
 /**
  * :)
  *
- * @Author pengli
+ * @Author LeYunone
  * @Date 2024/4/22 17:33
  */
 public interface FileService {
