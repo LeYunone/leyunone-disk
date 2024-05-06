@@ -8,8 +8,10 @@ import com.leyunone.disk.dao.repository.FileFolderDao;
 import com.leyunone.disk.dao.repository.FileInfoDao;
 import com.leyunone.disk.model.ResponseCode;
 import com.leyunone.disk.model.bo.UploadBO;
+import com.leyunone.disk.model.dto.FileDTO;
 import com.leyunone.disk.model.dto.FileFolderDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
+import com.leyunone.disk.model.vo.DownloadFileVO;
 import com.leyunone.disk.service.FileService;
 import com.leyunone.disk.util.AssertUtil;
 
@@ -41,6 +43,7 @@ public abstract class AbstractFileService implements FileService {
             fileInfoDO.setFileSize(upFileDTO.getTotalSize());
             fileInfoDO.setFileType(FileTypeEnum.loadType(upFileDTO.getFileType()));
             fileInfoDO.setFilePath(uploadBO.getFilePath());
+            fileInfoDO.setFileMd5(upFileDTO.getIdentifier());
             fileInfoDao.save(fileInfoDO);
             FileFolderDO fileFolderDO = new FileFolderDO();
             fileFolderDO.setFolder(false);
@@ -51,27 +54,37 @@ public abstract class AbstractFileService implements FileService {
     }
 
     @Override
-    public String down(String fileId) {
+    public DownloadFileVO down(String fileId) {
         FileInfoDO fileInfoDO = fileInfoDao.selectById(fileId);
         AssertUtil.isFalse(ObjectUtil.isNull(fileInfoDO), ResponseCode.FILE_NOT_EXIST);
         return this.downFile(fileInfoDO);
     }
 
     @Override
-    public void delete(String fileId) {
-        fileFolderDao.deleteByFileId(fileId);
-        fileInfoDao.deleteById(fileId);
-        this.deleteFile(fileId);
+    public void delete(FileDTO fileDTO) {
+        if (!fileDTO.isFolder()) {
+            this.deleteFile(fileDTO.getFileId());
+            FileInfoDO fileInfoDO = fileInfoDao.selectById(fileDTO.getFileId());
+            AssertUtil.isFalse(ObjectUtil.isNull(fileInfoDO), ResponseCode.FILE_NOT_EXIST);
+            fileInfoDao.deleteById(fileDTO.getFileId());
+            fileFolderDao.deleteByFileId(fileDTO.getFileId());
+        }else{
+            fileFolderDao.deleteById(fileDTO.getFolderId());
+        }
     }
 
     protected abstract void deleteFile(String fileId);
 
     protected abstract UploadBO uploadFile(UpFileDTO upFileDTO);
 
-    protected abstract String downFile(FileInfoDO fileInfo);
+    protected abstract DownloadFileVO downFile(FileInfoDO fileInfo);
 
     @Override
     public void createFolder(FileFolderDTO fileFolderDTO) {
-
+        FileFolderDO fileFolderDO = new FileFolderDO();
+        fileFolderDO.setFolderName(fileFolderDTO.getNewFolderName() + "/");
+        fileFolderDO.setFolder(true);
+        fileFolderDO.setParentId(fileFolderDTO.getParentId());
+        fileFolderDao.save(fileFolderDO);
     }
 }

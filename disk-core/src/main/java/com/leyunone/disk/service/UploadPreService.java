@@ -1,5 +1,6 @@
 package com.leyunone.disk.service;
 
+import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.vo.FileValidatorVO;
 import org.springframework.web.multipart.MultipartFile;
@@ -12,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface UploadPreService {
 
-    FileValidatorVO judgeFile(String md5);
+    FileValidatorVO judgeFile(RequestUploadDTO requestUpload);
 
     void checkFile(UpFileDTO upFileDTO);
 }

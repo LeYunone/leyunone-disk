@@ -42,8 +42,7 @@ public class FileQueryServiceImpl implements FileQueryService {
         } else {
             Page<FileFolderVO> fileFolderVOPage = fileFolderDao.selectPage(query);
 
-            fileFolderVOPage.getRecords().forEach(fileFolderDO -> {
-                FileFolderVO fileFolderVO = new FileFolderVO();
+            fileFolderVOPage.getRecords().forEach(fileFolderVO -> {
                 if (StringUtils.isNotBlank(fileFolderVO.getFileSize())) {
                     fileFolderVO.setFileSize(FileUtil.sizeText(Long.parseLong(fileFolderVO.getFileSize())));
                 }

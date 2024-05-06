@@ -1,32 +1,29 @@
 package com.leyunone.disk.service.file;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.aliyun.oss.model.PartETag;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.leyunone.disk.common.UploadContext;
-import com.leyunone.disk.common.constant.ServerCode;
 import com.leyunone.disk.common.enums.FileTypeEnum;
+import com.leyunone.disk.dao.entry.FileFolderDO;
 import com.leyunone.disk.dao.entry.FileInfoDO;
 import com.leyunone.disk.dao.repository.FileFolderDao;
 import com.leyunone.disk.dao.repository.FileInfoDao;
 import com.leyunone.disk.manager.OssManager;
-import com.leyunone.disk.model.DataResponse;
 import com.leyunone.disk.model.ResponseCode;
 import com.leyunone.disk.model.bo.UploadBO;
-import com.leyunone.disk.model.co.FileUpLogCO;
+import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
+import com.leyunone.disk.model.vo.DownloadFileVO;
 import com.leyunone.disk.util.AssertUtil;
-import com.leyunone.disk.util.FileUtil;
-import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.locks.LockSupport;
+import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 /**
  * :)
@@ -64,13 +61,13 @@ public class AliOssFileService extends AbstractFileService {
         //分片上传
         try {
             //每次上传分片之后，OSS的返回结果会包含一个PartETag
-            PartETag partETag = ossManager.partUploadFile(upFileDTO.getIdentifier(), file.getInputStream(), ossSlicesId,
+            PartETag partETag = ossManager.partUploadFile(content.getFileKey(), file.getInputStream(), ossSlicesId,
                     upFileDTO.getIdentifier(), currentChunkNo, file.getSize());
             partETags.put(currentChunkNo, partETag);
             //分片编号等于总片数的时候合并文件,如果符合条件则合并文件，否则继续等待
             if (currentChunkNo == totalChunks) {
                 //合并文件，注意：partETags必须是所有分片的所以必须存入redis，然后取出放入集合
-                String url = ossManager.completePartUploadFile(upFileDTO.getIdentifier(), ossSlicesId, new ArrayList<>(partETags.values()));
+                String url = ossManager.completePartUploadFile(content.getFileKey(), ossSlicesId, new ArrayList<>(partETags.values()));
                 //oss地址返回后存入并清除redis
                 UploadContext.remove(ossSlicesId);
                 uploadBO.setSuccess(true);
@@ -81,32 +78,85 @@ public class AliOssFileService extends AbstractFileService {
                 UploadContext.set(upFileDTO.getUploadId(), content);
             }
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return uploadBO;
     }
 
     @Override
-    protected String downFile(FileInfoDO fileInfo) {
-        return fileInfo.getFilePath();
+    protected DownloadFileVO downFile(FileInfoDO fileInfo) {
+        String urlName = this.dfsGenerateFileName(fileInfo);
+        DownloadFileVO downloadFileVO = new DownloadFileVO();
+        /**
+         * 图片永久
+         */
+        Long time = null;
+        switch (FileTypeEnum.load(fileInfo.getFileType())) {
+            case FILE_IMG:
+                time = -1L;
+                break;
+        }
+        downloadFileVO.setFilePath(ossManager.getFileUrl(urlName, null));
+        downloadFileVO.setFileName(fileInfo.getFileName());
+        return downloadFileVO;
     }
 
     @Override
     protected void deleteFile(String fileId) {
-        
+        FileInfoDO fileInfoDO = fileInfoDao.selectById(fileId);
+        if (ObjectUtil.isNull(fileInfoDO)) {
+            return;
+        }
+        String fileName = this.dfsGenerateFileName(fileInfoDO);
+        ossManager.deleteFile(fileName);
+    }
+
+    private String dfsGenerateFileName(FileInfoDO fileInfoDO) {
+        FileFolderDO fileFolderDO = fileFolderDao.selectByFileId(fileInfoDO.getFileId());
+        Stack<FileFolderDO> stack = new Stack<>();
+        stack.add(fileFolderDO);
+        while (true) {
+            FileFolderDO poll = stack.peek();
+            if (ObjectUtil.isNotNull(poll)) {
+                if (ObjectUtil.isNotNull(poll.getParentId())) {
+                    FileFolderDO parentFolder = fileFolderDao.selectById(poll.getParentId());
+                    stack.add(parentFolder);
+                } else {
+                    break;
+                }
+            }
+            break;
+        }
+        String perfix = "";
+        if (CollectionUtil.isNotEmpty(stack)) {
+            perfix = CollectionUtil.join(stack.stream().filter(f -> StringUtils.isNotBlank(fileFolderDO.getFolderName())).map(FileFolderDO::getFolderName).collect(Collectors.toList()), "");
+        }
+        return perfix + fileInfoDO.getFileName();
     }
 
     /**
      * 请求oss分片上传id
      *
-     * @param fileName
+     * @param requestUpload
      * @return
      */
     @Override
-    public String requestUpload(String fileName) {
+    public String requestUpload(RequestUploadDTO requestUpload) {
+        Integer folderId = requestUpload.getFolderId();
+        String prefix = "";
+        if (ObjectUtil.isNotNull(folderId)) {
+            //拼接前缀
+            FileFolderDO fileFolderDO = fileFolderDao.selectById(folderId);
+            if (ObjectUtil.isNotNull(fileFolderDO)) {
+                prefix = fileFolderDO.getFolderName();
+            }
+        }
+        String fileName = prefix + requestUpload.getFileName();
         String uploadId = ossManager.getUploadId(fileName);
         UploadContext.Content content = new UploadContext.Content();
         content.setPartETags(new HashMap<>());
-        UploadContext.set(uploadId,content);
+        content.setFileKey(fileName);
+        UploadContext.set(uploadId, content);
         return uploadId;
     }
 }

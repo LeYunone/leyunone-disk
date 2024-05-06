@@ -27,5 +27,7 @@ public class FileDTO  {
 
     private Integer fileType;
 
-    private String fileFolderId;
+    private String folderId;
+    
+    private boolean isFolder;
 }

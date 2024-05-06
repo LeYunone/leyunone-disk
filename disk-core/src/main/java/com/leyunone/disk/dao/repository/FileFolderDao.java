@@ -19,4 +19,6 @@ public interface FileFolderDao extends IBaseRepository<FileFolderDO> {
     void deleteByFileId(String fileId);
     
     Page<FileFolderVO> selectPage(FileQuery query);
+    
+    FileFolderDO selectByFileId(String fileId);
 }

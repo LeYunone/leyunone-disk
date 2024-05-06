@@ -31,7 +31,14 @@ public class FileFolderRepository extends BaseRepository<FileFolderMapper, FileF
 
     @Override
     public Page<FileFolderVO> selectPage(FileQuery query) {
-        Page page = new Page<>(query.getIndex(),query.getSize());
-        return this.baseMapper.selectFolderPage(query,page);
+        Page page = new Page<>(query.getIndex(), query.getSize());
+        return this.baseMapper.selectFolderPage(query, page);
+    }
+
+    @Override
+    public FileFolderDO selectByFileId(String fileId) {
+        LambdaQueryWrapper<FileFolderDO> lambda = new QueryWrapper<FileFolderDO>().lambda();
+        lambda.eq(FileFolderDO::getFileId, fileId);
+        return this.baseMapper.selectOne(lambda);
     }
 }
