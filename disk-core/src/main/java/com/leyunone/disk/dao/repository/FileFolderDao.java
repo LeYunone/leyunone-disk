@@ -6,6 +6,8 @@ import com.leyunone.disk.dao.entry.FileFolderDO;
 import com.leyunone.disk.model.query.FileQuery;
 import com.leyunone.disk.model.vo.FileFolderVO;
 
+import java.util.List;
+
 
 /**
  * (FileInfo)表服务接口
@@ -17,6 +19,12 @@ import com.leyunone.disk.model.vo.FileFolderVO;
 public interface FileFolderDao extends IBaseRepository<FileFolderDO> {
 
     void deleteByFileId(String fileId);
-    
+
     Page<FileFolderVO> selectPage(FileQuery query);
+
+    List<FileFolderDO> selectByFileId(String fileId);
+
+    List<FileFolderDO> selectFolder();
+
+    FileFolderDO selectByNameAndParentId(String folderName, Integer parentId);
 }

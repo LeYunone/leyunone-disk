@@ -1,7 +1,10 @@
 package com.leyunone.disk.service;
 
+import com.leyunone.disk.model.dto.FileDTO;
 import com.leyunone.disk.model.dto.FileFolderDTO;
+import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
+import com.leyunone.disk.model.vo.DownloadFileVO;
 
 /**
  * :)
@@ -13,11 +16,11 @@ public interface FileService {
 
     void upload(UpFileDTO upFileDTO);
 
-    String down(String fileId);
+    DownloadFileVO down(Integer folderId);
 
-    void delete(String fileId);
+    void delete(FileDTO fileDTO);
 
     void createFolder(FileFolderDTO fileFolderDTO);
     
-    String requestUpload(String fileName);
+    String requestUpload(RequestUploadDTO requestUpload);
 }

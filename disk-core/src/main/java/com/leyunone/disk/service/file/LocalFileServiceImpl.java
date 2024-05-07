@@ -1,13 +1,12 @@
 package com.leyunone.disk.service.file;
 
-import com.leyunone.disk.dao.entry.FileInfoDO;
+import com.leyunone.disk.dao.entry.FileFolderDO;
 import com.leyunone.disk.dao.repository.FileFolderDao;
 import com.leyunone.disk.dao.repository.FileInfoDao;
 import com.leyunone.disk.model.bo.UploadBO;
-import com.leyunone.disk.model.dto.FileFolderDTO;
+import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
-import com.leyunone.disk.service.FileService;
-import org.springframework.stereotype.Service;
+import com.leyunone.disk.model.vo.DownloadFileVO;
 
 /**
  * :)
@@ -22,22 +21,28 @@ public class LocalFileServiceImpl extends AbstractFileService {
     }
 
     @Override
-    protected UploadBO uploadFile(UpFileDTO upFileDTO) {
+    protected boolean deleteFile(Integer folderId) {
+        return false;
+    }
+
+    @Override
+    protected UploadBO shardUpload(UpFileDTO upFileDTO) {
         return null;
     }
 
     @Override
-    protected String downFile(FileInfoDO fileInfo) {
+    protected UploadBO easyUpload(UpFileDTO upFileDTO) {
         return null;
     }
 
     @Override
-    protected void deleteFile(String fileId) {
-        
+    protected DownloadFileVO downFile(FileFolderDO fileFolderDO) {
+        return null;
     }
 
+
     @Override
-    public String requestUpload(String fileName) {
+    public String requestUpload(RequestUploadDTO requestUpload) {
         return null;
     }
 }

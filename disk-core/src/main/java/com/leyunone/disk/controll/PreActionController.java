@@ -1,6 +1,8 @@
 package com.leyunone.disk.controll;
 
 import com.leyunone.disk.model.DataResponse;
+import com.leyunone.disk.model.dto.RequestUploadDTO;
+import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.vo.FileValidatorVO;
 import com.leyunone.disk.service.UploadPreService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +25,20 @@ public class PreActionController {
     private UploadPreService uploadPreService;
 
     @PostMapping("/requestUploadFile")
-    public DataResponse<FileValidatorVO> requestUploadFile(@RequestBody String uniqueIdentifier) {
-        FileValidatorVO fileValidatorVO = uploadPreService.judgeFile(uniqueIdentifier);
+    public DataResponse<FileValidatorVO> requestUploadFile(@RequestBody RequestUploadDTO uploadDTO) {
+        FileValidatorVO fileValidatorVO = uploadPreService.judgeFile(uploadDTO);
         return DataResponse.of(fileValidatorVO);
+    }
+
+    /**
+     * 校验上传
+     *
+     * @param upFileDTO
+     * @return
+     */
+    @PostMapping("/checkUpload")
+    public DataResponse checkUpload(@RequestBody UpFileDTO upFileDTO) {
+        uploadPreService.checkFile(upFileDTO);
+        return DataResponse.of();
     }
 }

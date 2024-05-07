@@ -5,11 +5,13 @@ import cn.hutool.core.util.StrUtil;
 import com.aliyun.oss.model.PartETag;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.leyunone.disk.common.UploadContext;
+import com.leyunone.disk.dao.entry.FileFolderDO;
 import com.leyunone.disk.dao.entry.FileInfoDO;
 import com.leyunone.disk.dao.entry.FileMd5DO;
 import com.leyunone.disk.dao.repository.FileInfoDao;
 import com.leyunone.disk.dao.repository.FileMd5Dao;
 import com.leyunone.disk.model.ResponseCode;
+import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.vo.FileValidatorVO;
 import com.leyunone.disk.service.FileService;
@@ -49,27 +51,32 @@ public class UploadPreServiceImpl implements UploadPreService {
      * @return
      */
     @Override
-    public FileValidatorVO judgeFile(String md5) {
+    public FileValidatorVO judgeFile(RequestUploadDTO requestUpload) {
         FileValidatorVO result = new FileValidatorVO();
-        AssertUtil.isFalse(StringUtils.isBlank(md5), "file is empty");
+        AssertUtil.isFalse(StringUtils.isBlank(requestUpload.getUniqueIdentifier()), "file is empty");
         //MultipartFile 转化为File
         int resultType = 1;
         try {
-            FileInfoDO fileInfoDO = fileInfoDao.selectByMd5(md5);
+            FileInfoDO fileInfoDO = fileInfoDao.selectByMd5(requestUpload.getUniqueIdentifier());
 
             //说明改文件在服务器中已经有备份
             if (ObjectUtil.isNotNull(fileInfoDO)) {
                 //返回给前端：0不用继续操作
                 resultType = 0;
+                FileFolderDO fileFolderDO = new FileFolderDO();
+                fileFolderDO.setParentId(requestUpload.getFolderId());
+                fileFolderDO.setFileId(fileInfoDO.getFileId());
+
                 result.setFilePath(fileInfoDO.getFilePath());
             } else {
                 //继续操作，上传文件，交给前端本次文件标识key
-                String uploadId = fileService.requestUpload(md5);
+                String uploadId = fileService.requestUpload(requestUpload);
                 result.setUploadId(uploadId);
-                result.setIdentifier(md5);
             }
+            result.setIdentifier(requestUpload.getUniqueIdentifier());
         } catch (Exception e) {
             //如果发生转化异常，本次校验视为通过，上传文件
+            e.printStackTrace();
             logger.error(e.getMessage());
         } finally {
             result.setResponseType(resultType);
@@ -89,6 +96,6 @@ public class UploadPreServiceImpl implements UploadPreService {
         AssertUtil.isFalse(ObjectUtil.isNull(content), ResponseCode.JOB_NOE_EXIST);
         Map<Integer, PartETag> partETags =
                 content.getPartETags();
-        AssertUtil.isFalse(partETags.containsKey(upFileDTO.getChunkNumber()),"skip...");
+        AssertUtil.isFalse(partETags.containsKey(upFileDTO.getChunkNumber()), "skip...");
     }
 }

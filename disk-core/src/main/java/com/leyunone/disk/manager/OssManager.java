@@ -18,4 +18,11 @@ public interface OssManager {
     PartETag partUploadFile(String fileName, InputStream is, String uploadId, String fileMd5, int partNum, long partSize);
 
     String getUploadId(String fileName);
+
+    String getFileUrl(String name, Long expireTime);
+
+    void deleteFile(String fileName);
+    
+    String uploadFile(String name, InputStream stream);
+    
 }

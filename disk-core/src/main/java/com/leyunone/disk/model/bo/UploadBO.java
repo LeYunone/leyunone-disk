@@ -18,4 +18,17 @@ public class UploadBO {
     private String filePath;
     
     private String fileName;
+    
+    private String fileId;
+    
+    private boolean noNewFile;
+
+    private String identifier;
+
+    private Long totalSize;
+
+    /**
+     * 文件类型
+     */
+    private String fileType;
 }

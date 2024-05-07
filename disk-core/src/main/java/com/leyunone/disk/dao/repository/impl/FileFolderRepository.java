@@ -11,6 +11,8 @@ import com.leyunone.disk.model.query.FileQuery;
 import com.leyunone.disk.model.vo.FileFolderVO;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * (FileFolderDO)表服务实现类
  *
@@ -31,7 +33,30 @@ public class FileFolderRepository extends BaseRepository<FileFolderMapper, FileF
 
     @Override
     public Page<FileFolderVO> selectPage(FileQuery query) {
-        Page page = new Page<>(query.getIndex(),query.getSize());
-        return this.baseMapper.selectFolderPage(query,page);
+        Page page = new Page<>(query.getIndex(), query.getSize());
+        return this.baseMapper.selectFolderPage(query, page);
+    }
+
+    @Override
+    public List<FileFolderDO> selectByFileId(String fileId) {
+        LambdaQueryWrapper<FileFolderDO> lambda = new QueryWrapper<FileFolderDO>().lambda();
+        lambda.eq(FileFolderDO::getFileId, fileId);
+        return this.baseMapper.selectList(lambda);
+    }
+
+    @Override
+    public List<FileFolderDO> selectFolder() {
+        LambdaQueryWrapper<FileFolderDO> lambda = new QueryWrapper<FileFolderDO>()
+                .eq("is_folder",1)
+                .lambda();
+        return this.baseMapper.selectList(lambda);
+    }
+
+    @Override
+    public FileFolderDO selectByNameAndParentId(String folderName, Integer parentId) {
+        LambdaQueryWrapper<FileFolderDO> lambda = new QueryWrapper<FileFolderDO>().lambda();
+        lambda.eq(FileFolderDO::getFolderName, folderName);
+        lambda.eq(FileFolderDO::getParentId, parentId);
+        return this.baseMapper.selectOne(lambda);
     }
 }

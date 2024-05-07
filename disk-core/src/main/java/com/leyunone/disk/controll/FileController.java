@@ -5,6 +5,7 @@ import com.leyunone.disk.model.dto.FileDTO;
 import com.leyunone.disk.model.dto.FileFolderDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.query.FileQuery;
+import com.leyunone.disk.model.vo.DownloadFileVO;
 import com.leyunone.disk.model.vo.UserFileInfoVO;
 import com.leyunone.disk.service.FileQueryService;
 import com.leyunone.disk.service.FileService;
@@ -79,7 +80,7 @@ public class FileController {
      */
     @PostMapping("/delete")
     public DataResponse<?> deleteFile(@RequestBody FileDTO fileDTO) {
-        fileService.delete(fileDTO.getFileId());
+        fileService.delete(fileDTO);
         return DataResponse.of();
     }
 
@@ -90,8 +91,8 @@ public class FileController {
      * @return
      */
     @PostMapping("/download")
-    public DataResponse<String> downloadFile(@RequestBody FileDTO fileDTO) {
-        String down = fileService.down(fileDTO.getFileId());
+    public DataResponse<DownloadFileVO> downloadFile(@RequestBody FileDTO fileDTO) {
+        DownloadFileVO down = fileService.down(fileDTO.getFolderId());
         return DataResponse.of(down);
     }
 }

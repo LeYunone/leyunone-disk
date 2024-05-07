@@ -1,7 +1,10 @@
 package com.leyunone.disk.service;
 
 import com.leyunone.disk.model.query.FileQuery;
+import com.leyunone.disk.model.vo.SelectTreeVO;
 import com.leyunone.disk.model.vo.UserFileInfoVO;
+
+import java.util.List;
 
 /**
  * :)
@@ -12,4 +15,6 @@ import com.leyunone.disk.model.vo.UserFileInfoVO;
 public interface FileQueryService {
 
     UserFileInfoVO getFiles(FileQuery query);
+
+    List<SelectTreeVO> getFolderTree();
 }

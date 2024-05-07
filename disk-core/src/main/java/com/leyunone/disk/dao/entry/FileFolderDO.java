@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @TableName("file_folder")
 public class FileFolderDO {
 
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(value = "folder_id", type = IdType.AUTO)
     private Integer folderId;
 
     private String folderName;

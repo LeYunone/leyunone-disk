@@ -46,13 +46,13 @@ public enum FileTypeEnum {
         return FileTypeEnum.FILE_OTHER.getValue();
     }
 
-    public static String loadName(Integer value) {
+    public static FileTypeEnum load(Integer value) {
         FileTypeEnum[] values = values();
         for (FileTypeEnum enums : values) {
             if (enums.getValue().equals(value)) {
-                return enums.name;
+                return enums;
             }
         }
-        return UNKNOWN.name;
+        return UNKNOWN;
     }
 }

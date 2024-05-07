@@ -16,16 +16,13 @@ public class DiskMetaObjectHandler implements MetaObjectHandler {
     @Override
     public void insertFill(MetaObject metaObject) {
 
-        this.setFieldValByName("updateDt", LocalDateTime.now(), metaObject);
-
-        this.setFieldValByName("createDt", LocalDateTime.now(), metaObject);
-
-        this.setFieldValByName("deleted", 0, metaObject);
+        this.strictInsertFill(metaObject, "updateDt", LocalDateTime.class, LocalDateTime.now());
+        this.strictInsertFill(metaObject, "createDt", LocalDateTime.class, LocalDateTime.now());
+        this.strictInsertFill(metaObject, "isDeleted", Integer.class, metaObject);
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
-
-        this.setFieldValByName("updateDt", LocalDateTime.now(), metaObject);
+        this.strictInsertFill(metaObject, "updateDt", LocalDateTime.class, LocalDateTime.now());
     }
 }

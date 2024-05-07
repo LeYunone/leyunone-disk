@@ -68,5 +68,9 @@ public class UpFileDTO implements Serializable {
      */
     private String fileType;
 
-    private Integer fileFolderId;
+    private boolean easyUpload;
+
+    private Integer parentId;
+
+    private boolean hasDate;
 }

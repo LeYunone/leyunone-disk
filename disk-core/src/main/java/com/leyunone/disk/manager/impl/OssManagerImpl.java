@@ -1,5 +1,6 @@
 package com.leyunone.disk.manager.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.model.*;
@@ -13,6 +14,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,7 +56,7 @@ public class OssManagerImpl implements OssManager {
         CompleteMultipartUploadRequest request = new CompleteMultipartUploadRequest(bucketName, fileName, uploadId,
                 partETags);
         ossClient.completeMultipartUpload(request);
-        return getDownloadUrl(fileName, bucketName);
+        return getDownloadUrl(fileName);
     }
 
 
@@ -75,7 +78,7 @@ public class OssManagerImpl implements OssManager {
         uploadPartRequest.setPartSize(partSize);
         uploadPartRequest.setInputStream(is);
         uploadPartRequest.setKey(fileKey);
-        uploadPartRequest.setMd5Digest(fileMd5);
+//        uploadPartRequest.setMd5Digest(fileMd5);
         UploadPartResult uploadPartResult = ossClient.uploadPart(uploadPartRequest);
         return uploadPartResult.getPartETag();
     }
@@ -92,16 +95,48 @@ public class OssManagerImpl implements OssManager {
         return unrest.getUploadId();
     }
 
+
+    @Override
+    public String getFileUrl(String name, Long expireTime) {
+        if (ObjectUtil.isNull(expireTime)) {
+            return this.getDownloadUrl(name);
+        }
+        // 创建OSSClient实例。
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        // 设置URL过期时间为1小时。
+        Date expiration = new Date(System.currentTimeMillis() + expireTime);
+        // 生成以GET方法访问的签名URL，访客可以直接通过浏览器访问相关内容。
+        URL url = ossClient.generatePresignedUrl(bucketName, name, expiration);
+        // 关闭OSSClient。
+        ossClient.shutdown();
+        return url.toString();
+    }
+
+    @Override
+    public void deleteFile(String fileName) {
+        // 删除文件。如需删除文件夹，请将ObjectName设置为对应的文件夹名称。如果文件夹非空，则需要将文件夹下的所有object删除后才能删除该文件夹。
+        ossClient.deleteObject(bucketName, fileName);
+        // 关闭OSSClient。
+        ossClient.shutdown();
+    }
+
+    @Override
+    public String uploadFile(String name, InputStream stream) {
+        // 创建OSSClient实例。
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        // 上传文件到指定的存储空间（bucketName）并将其保存为指定的文件名称（objectName）。
+        ossClient.putObject(bucketName, name, stream);
+        // 关闭OSSClient。
+        ossClient.shutdown();
+        return getDownloadUrl(name);
+    }
+
     /**
      * 获取bucket文件的下载链接
-     *
-     * @param fileName   首字母不带/的路径和文件
-     * @param bucketName
-     * @return 上报返回null, 成功返回地址
      */
-    private String getDownloadUrl(String fileName, String bucketName) {
+    private String getDownloadUrl(String fileName) {
         StringBuilder url = new StringBuilder();
-        url.append("http://").append(bucketName).append(endpoint).append("/");
+        url.append("https://").append(bucketUrl).append("/");
         if (fileName != null && !"".equals(fileName)) {
             url.append(fileName);
         }
