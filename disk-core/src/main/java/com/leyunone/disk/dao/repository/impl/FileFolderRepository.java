@@ -1,5 +1,6 @@
 package com.leyunone.disk.dao.repository.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -47,7 +48,7 @@ public class FileFolderRepository extends BaseRepository<FileFolderMapper, FileF
     @Override
     public List<FileFolderDO> selectFolder() {
         LambdaQueryWrapper<FileFolderDO> lambda = new QueryWrapper<FileFolderDO>()
-                .eq("is_folder",1)
+                .eq("is_folder", 1)
                 .lambda();
         return this.baseMapper.selectList(lambda);
     }
@@ -56,7 +57,11 @@ public class FileFolderRepository extends BaseRepository<FileFolderMapper, FileF
     public FileFolderDO selectByNameAndParentId(String folderName, Integer parentId) {
         LambdaQueryWrapper<FileFolderDO> lambda = new QueryWrapper<FileFolderDO>().lambda();
         lambda.eq(FileFolderDO::getFolderName, folderName);
-        lambda.eq(FileFolderDO::getParentId, parentId);
+        if (ObjectUtil.isNull(parentId)) {
+            lambda.isNull(FileFolderDO::getParentId);
+        } else {
+            lambda.eq(FileFolderDO::getParentId, parentId);
+        }
         return this.baseMapper.selectOne(lambda);
     }
 }

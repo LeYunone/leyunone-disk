@@ -21,6 +21,7 @@ import com.leyunone.disk.model.vo.DownloadFileVO;
 import com.leyunone.disk.util.AssertUtil;
 import com.leyunone.disk.util.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -44,6 +45,7 @@ public class AliOssFileService extends AbstractFileService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public UploadBO shardUpload(UpFileDTO upFileDTO) {
         UploadBO uploadBO = new UploadBO();
         uploadBO.setSuccess(false);
@@ -75,6 +77,7 @@ public class AliOssFileService extends AbstractFileService {
                 uploadBO.setSuccess(true);
                 uploadBO.setFilePath(url);
                 uploadBO.setFileName(file.getOriginalFilename());
+                uploadBO.setIdentifier(md5);
             } else {
                 content.setPartETags(partETags);
                 UploadContext.set(upFileDTO.getUploadId(), content);
@@ -92,12 +95,15 @@ public class AliOssFileService extends AbstractFileService {
      * @return
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     protected UploadBO easyUpload(UpFileDTO upFileDTO) {
         UploadBO uploadBO = new UploadBO();
         uploadBO.setSuccess(true);
         AssertUtil.isFalse(ObjectUtil.isNull(upFileDTO.getFile()), "file is empty");
+        MultipartFile file = upFileDTO.getFile();
         try {
             String md5 = MD5Util.fileToMD5(upFileDTO.getFile().getBytes());
+            uploadBO.setIdentifier(md5);
             FileInfoDO fileInfoDO = fileInfoDao.selectByMd5(md5);
             if (ObjectUtil.isNotNull(fileInfoDO)) {
                 uploadBO.setNoNewFile(true);
@@ -109,22 +115,23 @@ public class AliOssFileService extends AbstractFileService {
         }
 
         if (upFileDTO.isHasDate()) {
-            FileFolderDO fileFolderDO = fileFolderDao.selectByNameAndParentId(DateUtil.today(), upFileDTO.getParentId());
+            FileFolderDO fileFolderDO = fileFolderDao.selectByNameAndParentId(DateUtil.today() + "/", upFileDTO.getParentId());
             if (ObjectUtil.isNull(fileFolderDO)) {
                 fileFolderDO = new FileFolderDO();
-                fileFolderDO.setFolderName(DateUtil.today());
+                fileFolderDO.setFolderName(DateUtil.today() + "/");
                 fileFolderDO.setParentId(upFileDTO.getParentId());
                 fileFolderDO.setFolder(true);
                 fileFolderDao.save(fileFolderDO);
             }
-            upFileDTO.setParentId(fileFolderDO.getParentId());
+            upFileDTO.setParentId(fileFolderDO.getFolderId());
         }
         FileFolderDO fileFolderDO = fileFolderDao.selectById(upFileDTO.getParentId());
         String prefix = this.dfsGenerateFolderPrefix(fileFolderDO);
         try {
-            String url = ossManager.uploadFile(prefix + upFileDTO.getFile().getOriginalFilename(), upFileDTO.getFile().getInputStream());
-            uploadBO.setFileName(upFileDTO.getFile().getOriginalFilename());
+            String url = ossManager.uploadFile(prefix + file.getOriginalFilename(), file.getInputStream());
+            uploadBO.setFileName(file.getOriginalFilename());
             uploadBO.setFilePath(url);
+            uploadBO.setTotalSize(file.getSize());
         } catch (Exception e) {
             uploadBO.setSuccess(false);
         }
@@ -184,7 +191,7 @@ public class AliOssFileService extends AbstractFileService {
         }
         String perfix = "";
         if (CollectionUtil.isNotEmpty(stack)) {
-            perfix = CollectionUtil.join(stack.stream().filter(f -> StringUtils.isNotBlank(f.getFolderName())).map(FileFolderDO::getFolderName).collect(Collectors.toList()), "");
+            perfix = CollectionUtil.join(stack.stream().filter(f -> ObjectUtil.isNotNull(f) && StringUtils.isNotBlank(f.getFolderName())).map(FileFolderDO::getFolderName).collect(Collectors.toList()), "");
         }
         return perfix;
     }

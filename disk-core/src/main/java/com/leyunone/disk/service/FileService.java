@@ -1,5 +1,6 @@
 package com.leyunone.disk.service;
 
+import com.leyunone.disk.model.bo.UploadBO;
 import com.leyunone.disk.model.dto.FileDTO;
 import com.leyunone.disk.model.dto.FileFolderDTO;
 import com.leyunone.disk.model.dto.RequestUploadDTO;
@@ -14,7 +15,7 @@ import com.leyunone.disk.model.vo.DownloadFileVO;
  */
 public interface FileService {
 
-    void upload(UpFileDTO upFileDTO);
+    UploadBO upload(UpFileDTO upFileDTO);
 
     DownloadFileVO down(Integer folderId);
 

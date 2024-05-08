@@ -1,5 +1,6 @@
 package com.leyunone.disk.service.file;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.leyunone.disk.dao.entry.FileFolderDO;
@@ -13,10 +14,8 @@ import com.leyunone.disk.util.FileUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 /**
@@ -83,10 +82,39 @@ public class FileQueryServiceImpl implements FileQueryService {
                 tree.add(node);
             } else {
                 SelectTreeVO parent = nodeMap.get(fileFolder.getParentId());
-                parent.getChildren().add(node);
+                if (ObjectUtil.isNotNull(parent)) {
+                    parent.getChildren().add(node);
+                }
             }
         }
         return tree;
+    }
+
+    @Override
+    public List<FileFolderVO> getPreFolder(Integer folderId) {
+        if (ObjectUtil.isNull(folderId)) {
+            return new ArrayList<>();
+        }
+        FileFolderDO fileFolderDO = fileFolderDao.selectById(folderId);
+        Stack<FileFolderDO> stack = new Stack<>();
+        stack.add(fileFolderDO);
+        while (ObjectUtil.isNotNull(fileFolderDO.getParentId())) {
+            FileFolderDO peek = stack.peek();
+            if (ObjectUtil.isNotNull(peek.getParentId())) {
+                FileFolderDO parentFolderDO = fileFolderDao.selectById(peek.getParentId());
+                stack.add(parentFolderDO);
+                fileFolderDO = parentFolderDO;
+            }
+        }
+        List<FileFolderVO> result = new ArrayList<>();
+        while (!stack.empty()) {
+            FileFolderDO st = stack.pop();
+            FileFolderVO fileFolderVO = new FileFolderVO();
+            fileFolderVO.setFolderId(st.getFolderId());
+            fileFolderVO.setFolderName(st.getFolderName());
+            result.add(fileFolderVO);
+        }
+        return result;
     }
 
 }

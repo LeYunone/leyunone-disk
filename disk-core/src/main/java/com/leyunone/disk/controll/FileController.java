@@ -1,6 +1,7 @@
 package com.leyunone.disk.controll;
 
 import com.leyunone.disk.model.DataResponse;
+import com.leyunone.disk.model.bo.UploadBO;
 import com.leyunone.disk.model.dto.FileDTO;
 import com.leyunone.disk.model.dto.FileFolderDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
@@ -48,9 +49,9 @@ public class FileController {
      * 存储文件
      */
     @PostMapping("/upload")
-    public DataResponse<?> uploadFile(UpFileDTO upFileDTO) {
-        fileService.upload(upFileDTO);
-        return DataResponse.of();
+    public DataResponse<String> uploadFile(UpFileDTO upFileDTO) {
+        UploadBO upload = fileService.upload(upFileDTO);
+        return DataResponse.of(upload.getFilePath());
     }
 
 

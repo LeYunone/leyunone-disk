@@ -35,7 +35,8 @@ public abstract class AbstractFileService implements FileService {
     }
 
     @Override
-    public void upload(UpFileDTO upFileDTO) {
+    @Transactional(rollbackFor = Exception.class)
+    public UploadBO upload(UpFileDTO upFileDTO) {
         UploadBO uploadBO = null;
         if (upFileDTO.isEasyUpload()) {
             uploadBO = this.easyUpload(upFileDTO);
@@ -49,7 +50,7 @@ public abstract class AbstractFileService implements FileService {
                 fileInfoDO.setFileId(UUID.randomUUID().toString());
                 fileInfoDO.setFileName(uploadBO.getFileName());
                 fileInfoDO.setFileSize(uploadBO.getTotalSize());
-                fileInfoDO.setFileType(FileTypeEnum.loadType(uploadBO.getFileType()));
+                fileInfoDO.setFileType(FileTypeEnum.loadType(upFileDTO.getFileType()));
                 fileInfoDO.setFilePath(uploadBO.getFilePath());
                 fileInfoDO.setFileMd5(uploadBO.getIdentifier());
                 fileInfoDao.save(fileInfoDO);
@@ -61,6 +62,7 @@ public abstract class AbstractFileService implements FileService {
             fileFolderDO.setFileId(fileId);
             fileFolderDao.save(fileFolderDO);
         }
+        return uploadBO;
     }
 
     @Override
@@ -73,6 +75,7 @@ public abstract class AbstractFileService implements FileService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void delete(FileDTO fileDTO) {
         if (!fileDTO.isFolder()) {
             boolean delete = this.deleteFile(fileDTO.getFolderId());

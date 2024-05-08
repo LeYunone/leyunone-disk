@@ -1,6 +1,7 @@
 package com.leyunone.disk.controll;
 
 import com.leyunone.disk.model.DataResponse;
+import com.leyunone.disk.model.vo.FileFolderVO;
 import com.leyunone.disk.model.vo.SelectTreeVO;
 import com.leyunone.disk.service.FileQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,5 +33,11 @@ public class SystemController {
     public DataResponse<List<SelectTreeVO>> getFolderTree() {
         List<SelectTreeVO> folderTree = fileQueryService.getFolderTree();
         return DataResponse.of(folderTree);
+    }
+
+    @GetMapping("/currentFolder")
+    public DataResponse<List<FileFolderVO>> folders(Integer folderId) {
+        List<FileFolderVO> preFolder = fileQueryService.getPreFolder(folderId);
+        return DataResponse.of(preFolder);
     }
 }

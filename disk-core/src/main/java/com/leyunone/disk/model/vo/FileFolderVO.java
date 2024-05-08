@@ -1,5 +1,6 @@
 package com.leyunone.disk.model.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,7 @@ public class FileFolderVO {
 
     private Integer size;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateDt;
 
     private String fileName;
