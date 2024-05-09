@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Date;
@@ -38,24 +37,17 @@ public class OssManagerImpl implements OssManager {
     @Value("${oss.bucketUrl:}")
     private String bucketUrl;
 
-    private OSS ossClient;
-
-    @PostConstruct
-    public void init() {
-        if (StringUtils.isBlank(endpoint) || StringUtils.isBlank(accessKeyId) || StringUtils.isBlank(accessKeySecret)) {
-            return;
-        }
-        ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
-    }
 
     /**
      * 分块上传完成获取结果
      */
     @Override
     public String completePartUploadFile(String fileName, String uploadId, List<PartETag> partETags) {
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
         CompleteMultipartUploadRequest request = new CompleteMultipartUploadRequest(bucketName, fileName, uploadId,
                 partETags);
         ossClient.completeMultipartUpload(request);
+        ossClient.shutdown();
         return getDownloadUrl(fileName);
     }
 
@@ -71,6 +63,8 @@ public class OssManagerImpl implements OssManager {
      */
     @Override
     public PartETag partUploadFile(String fileKey, InputStream is, String uploadId, String fileMd5, int partNum, long partSize) {
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
         UploadPartRequest uploadPartRequest = new UploadPartRequest();
         uploadPartRequest.setBucketName(bucketName);
         uploadPartRequest.setUploadId(uploadId);
@@ -80,6 +74,7 @@ public class OssManagerImpl implements OssManager {
         uploadPartRequest.setKey(fileKey);
 //        uploadPartRequest.setMd5Digest(fileMd5);
         UploadPartResult uploadPartResult = ossClient.uploadPart(uploadPartRequest);
+        ossClient.shutdown();
         return uploadPartResult.getPartETag();
     }
 
@@ -88,9 +83,12 @@ public class OssManagerImpl implements OssManager {
      */
     @Override
     public String getUploadId(String fileName) {
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
         InitiateMultipartUploadRequest request = new InitiateMultipartUploadRequest(bucketName, fileName);
         // 初始化分片
         InitiateMultipartUploadResult unrest = ossClient.initiateMultipartUpload(request);
+        ossClient.shutdown();
         // 返回uploadId，它是分片上传事件的唯一标识，您可以根据这个ID来发起相关的操作，如取消分片上传、查询分片上传等。
         return unrest.getUploadId();
     }
@@ -101,8 +99,8 @@ public class OssManagerImpl implements OssManager {
         if (ObjectUtil.isNull(expireTime)) {
             return this.getDownloadUrl(name);
         }
-        // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
         // 设置URL过期时间为1小时。
         Date expiration = new Date(System.currentTimeMillis() + expireTime);
         // 生成以GET方法访问的签名URL，访客可以直接通过浏览器访问相关内容。
@@ -114,6 +112,8 @@ public class OssManagerImpl implements OssManager {
 
     @Override
     public void deleteFile(String fileName) {
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
         // 删除文件。如需删除文件夹，请将ObjectName设置为对应的文件夹名称。如果文件夹非空，则需要将文件夹下的所有object删除后才能删除该文件夹。
         ossClient.deleteObject(bucketName, fileName);
         // 关闭OSSClient。
@@ -122,8 +122,9 @@ public class OssManagerImpl implements OssManager {
 
     @Override
     public String uploadFile(String name, InputStream stream) {
-        // 创建OSSClient实例。
         OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+
+        // 创建OSSClient实例。
         // 上传文件到指定的存储空间（bucketName）并将其保存为指定的文件名称（objectName）。
         ossClient.putObject(bucketName, name, stream);
         // 关闭OSSClient。

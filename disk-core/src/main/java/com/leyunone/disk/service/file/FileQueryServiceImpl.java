@@ -1,5 +1,6 @@
 package com.leyunone.disk.service.file;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -39,20 +40,34 @@ public class FileQueryServiceImpl implements FileQueryService {
     @Override
     public UserFileInfoVO getFiles(FileQuery query) {
         UserFileInfoVO userFileInfVO = new UserFileInfoVO();
-
+        Page<FileFolderVO> fileFolderVOPage = new Page<>();
         if (StringUtils.isNotBlank(query.getNameCondition())) {
             //文件/文件夹名前缀模糊搜索
 
         } else {
-            Page<FileFolderVO> fileFolderVOPage = fileFolderDao.selectPage(query);
+            fileFolderVOPage = fileFolderDao.selectPage(query);
 
             fileFolderVOPage.getRecords().forEach(fileFolderVO -> {
                 if (StringUtils.isNotBlank(fileFolderVO.getFileSize())) {
                     fileFolderVO.setFileSize(FileUtil.sizeText(Long.parseLong(fileFolderVO.getFileSize())));
                 }
             });
-            userFileInfVO.setInfos(fileFolderVOPage);
         }
+        if (ObjectUtil.isNotNull(query.getFileFolderId())) {
+            /**
+             * 返回上一级
+             */
+            FileFolderDO fileFolderDO = fileFolderDao.selectById(query.getFileFolderId());
+            FileFolderVO fileFolderVO = new FileFolderVO();
+            fileFolderVO.setFolder(true);
+            fileFolderVO.setFolderName("../");
+            fileFolderVO.setFolderId(ObjectUtil.isNull(fileFolderDO.getParentId()) ? -1 : fileFolderDO.getParentId());
+            List<FileFolderVO> records = fileFolderVOPage.getRecords();
+            if (CollectionUtil.isNotEmpty(records)) {
+                records.add(0, fileFolderVO);
+            }
+        }
+        userFileInfVO.setInfos(fileFolderVOPage);
         return userFileInfVO;
     }
 

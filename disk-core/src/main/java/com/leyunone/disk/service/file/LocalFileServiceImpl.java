@@ -8,6 +8,8 @@ import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.vo.DownloadFileVO;
 
+import java.util.List;
+
 /**
  * :)
  *
@@ -16,12 +18,12 @@ import com.leyunone.disk.model.vo.DownloadFileVO;
  */
 public class LocalFileServiceImpl extends AbstractFileService {
 
-    public LocalFileServiceImpl(FileInfoDao fileInfoDao, FileFolderDao fileFolderDao) {
+        public LocalFileServiceImpl(FileInfoDao fileInfoDao, FileFolderDao fileFolderDao) {
         super(fileInfoDao, fileFolderDao);
     }
 
     @Override
-    protected boolean deleteFile(Integer folderId) {
+    protected boolean deleteFile(List<Integer> folderIds) {
         return false;
     }
 
@@ -39,7 +41,6 @@ public class LocalFileServiceImpl extends AbstractFileService {
     protected DownloadFileVO downFile(FileFolderDO fileFolderDO) {
         return null;
     }
-
 
     @Override
     public String requestUpload(RequestUploadDTO requestUpload) {

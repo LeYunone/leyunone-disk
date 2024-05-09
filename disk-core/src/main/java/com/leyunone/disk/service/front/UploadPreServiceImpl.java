@@ -8,6 +8,7 @@ import com.leyunone.disk.common.UploadContext;
 import com.leyunone.disk.dao.entry.FileFolderDO;
 import com.leyunone.disk.dao.entry.FileInfoDO;
 import com.leyunone.disk.dao.entry.FileMd5DO;
+import com.leyunone.disk.dao.repository.FileFolderDao;
 import com.leyunone.disk.dao.repository.FileInfoDao;
 import com.leyunone.disk.dao.repository.FileMd5Dao;
 import com.leyunone.disk.model.ResponseCode;
@@ -41,8 +42,8 @@ public class UploadPreServiceImpl implements UploadPreService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final FileInfoDao fileInfoDao;
-    @Autowired
     private final FileService fileService;
+    private final FileFolderDao fileFolderDao;
 
     /**
      * 校验本次文件上传请求是否合法或进行秒传操作
@@ -66,7 +67,7 @@ public class UploadPreServiceImpl implements UploadPreService {
                 FileFolderDO fileFolderDO = new FileFolderDO();
                 fileFolderDO.setParentId(requestUpload.getFolderId());
                 fileFolderDO.setFileId(fileInfoDO.getFileId());
-
+                fileFolderDao.save(fileFolderDO);
                 result.setFilePath(fileInfoDO.getFilePath());
             } else {
                 //继续操作，上传文件，交给前端本次文件标识key

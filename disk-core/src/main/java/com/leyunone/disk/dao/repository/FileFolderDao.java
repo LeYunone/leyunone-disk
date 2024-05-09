@@ -24,6 +24,8 @@ public interface FileFolderDao extends IBaseRepository<FileFolderDO> {
 
     List<FileFolderDO> selectByFileId(String fileId);
 
+    List<FileFolderDO> selectByFileIds(List<String> fileIds);
+
     List<FileFolderDO> selectFolder();
 
     FileFolderDO selectByNameAndParentId(String folderName, Integer parentId);

@@ -1,5 +1,6 @@
 package com.leyunone.disk.service.file;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.leyunone.disk.common.enums.FileTypeEnum;
 import com.leyunone.disk.dao.entry.FileFolderDO;
@@ -16,7 +17,9 @@ import com.leyunone.disk.service.FileService;
 import com.leyunone.disk.util.AssertUtil;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * :)
@@ -76,23 +79,22 @@ public abstract class AbstractFileService implements FileService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void delete(FileDTO fileDTO) {
-        if (!fileDTO.isFolder()) {
-            boolean delete = this.deleteFile(fileDTO.getFolderId());
-            if (delete) {
-                FileInfoDO fileInfoDO = fileInfoDao.selectById(fileDTO.getFileId());
-                AssertUtil.isFalse(ObjectUtil.isNull(fileInfoDO), ResponseCode.FILE_NOT_EXIST);
-                fileInfoDao.deleteById(fileDTO.getFileId());
-                fileFolderDao.deleteByFileId(fileDTO.getFileId());
-            }
-        } else {
-            fileFolderDao.deleteById(fileDTO.getFolderId());
+    public void delete(List<FileDTO> fileFolders) {
+        List<FileDTO> folders = fileFolders.stream().filter(FileDTO::isFolder).collect(Collectors.toList());
+        List<FileDTO> files = fileFolders.stream().filter(t -> !t.isFolder()).collect(Collectors.toList());
+        if (CollectionUtil.isNotEmpty(folders)) {
+            fileFolderDao.deleteByIds(folders.stream().map(FileDTO::getFolderId).collect(Collectors.toList()));
+        }
+        if (CollectionUtil.isNotEmpty(files)) {
+            this.deleteFile(files.stream().map(FileDTO::getFolderId).collect(Collectors.toList()));
         }
     }
 
-    protected abstract boolean deleteFile(Integer folderId);
+    protected abstract boolean deleteFile(List<Integer> folderIds);
+
     //分片上传
     protected abstract UploadBO shardUpload(UpFileDTO upFileDTO);
+
     //简单上传
     protected abstract UploadBO easyUpload(UpFileDTO upFileDTO);
 
@@ -102,6 +104,8 @@ public abstract class AbstractFileService implements FileService {
     public void createFolder(FileFolderDTO fileFolderDTO) {
         FileFolderDO fileFolderDO = new FileFolderDO();
         fileFolderDO.setFolderName(fileFolderDTO.getNewFolderName() + "/");
+        FileFolderDO exist = fileFolderDao.selectByNameAndParentId(fileFolderDO.getFolderName(), fileFolderDTO.getParentId());
+        AssertUtil.isFalse(ObjectUtil.isNotNull(exist), ResponseCode.FOLDER_EXIST);
         fileFolderDO.setFolder(true);
         fileFolderDO.setParentId(fileFolderDTO.getParentId());
         fileFolderDao.save(fileFolderDO);

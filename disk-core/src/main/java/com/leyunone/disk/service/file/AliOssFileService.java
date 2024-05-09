@@ -19,6 +19,7 @@ import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.vo.DownloadFileVO;
 import com.leyunone.disk.util.AssertUtil;
+import com.leyunone.disk.util.CollectionFunctionUtils;
 import com.leyunone.disk.util.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -76,11 +77,12 @@ public class AliOssFileService extends AbstractFileService {
                 UploadContext.remove(ossSlicesId);
                 uploadBO.setSuccess(true);
                 uploadBO.setFilePath(url);
+                uploadBO.setTotalSize(upFileDTO.getTotalSize());
                 uploadBO.setFileName(file.getOriginalFilename());
                 uploadBO.setIdentifier(md5);
             } else {
                 content.setPartETags(partETags);
-                UploadContext.set(upFileDTO.getUploadId(), content);
+                UploadContext.set(ossSlicesId, content);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -157,21 +159,35 @@ public class AliOssFileService extends AbstractFileService {
     }
 
     @Override
-    protected boolean deleteFile(Integer folderId) {
-        FileFolderDO fileFolderDO = fileFolderDao.selectById(folderId);
-
-        FileInfoDO fileInfoDO = fileInfoDao.selectById(fileFolderDO.getFileId());
-        if (ObjectUtil.isNull(fileInfoDO)) {
+    protected boolean deleteFile(List<Integer> folderIds) {
+        List<FileFolderDO> fileFolderDOS = fileFolderDao.selectByIds(folderIds);
+        if (CollectionUtil.isEmpty(fileFolderDOS)
+                || CollectionUtil.isEmpty(fileFolderDOS.stream().filter(t -> ObjectUtil.isNotNull(t.getFileId())).collect(Collectors.toList()))) {
             return false;
         }
-        List<FileFolderDO> fileFolderDOS = fileFolderDao.selectByFileId(fileFolderDO.getFileId());
-        if (fileFolderDOS.size() == 1) {
-            String prefix = this.dfsGenerateFolderPrefix(fileFolderDO);
-            ossManager.deleteFile(prefix + fileInfoDO.getFileName());
-            return true;
+
+
+        List<FileInfoDO> fileInfoDOS = fileInfoDao.selectByIds(fileFolderDOS.stream().filter(t -> ObjectUtil.isNotNull(t.getFileId()))
+                .map(FileFolderDO::getFileId).collect(Collectors.toList()));
+        if (CollectionUtil.isEmpty(fileInfoDOS)) {
+            return false;
         }
-        fileFolderDao.deleteById(folderId);
-        return false;
+        Map<String, FileInfoDO> fileMap = CollectionFunctionUtils.mapTo(fileInfoDOS, FileInfoDO::getFileId);
+        List<FileFolderDO> folderInfile = fileFolderDao.selectByFileIds(fileInfoDOS.stream().map(FileInfoDO::getFileId).collect(Collectors.toList()));
+        Map<String, List<FileFolderDO>> fileGroup = CollectionFunctionUtils.groupTo(folderInfile, FileFolderDO::getFileId);
+        List<String> deleteFileIds = new ArrayList<>();
+        fileGroup.entrySet().forEach(ety -> {
+            if (ety.getValue().size() == 1) {
+                String prefix = this.dfsGenerateFolderPrefix(ety.getValue().get(0));
+                ossManager.deleteFile(prefix + fileMap.get(ety.getKey()).getFileName());
+                deleteFileIds.add(ety.getKey());
+            }
+        });
+        if (CollectionUtil.isNotEmpty(deleteFileIds)) {
+            fileInfoDao.deleteByIds(deleteFileIds);
+        }
+        fileFolderDao.deleteByIds(folderIds);
+        return true;
     }
 
     private String dfsGenerateFolderPrefix(FileFolderDO fileFolderDO) {

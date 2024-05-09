@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author LeYunone
@@ -80,7 +81,7 @@ public class FileController {
      * @return
      */
     @PostMapping("/delete")
-    public DataResponse<?> deleteFile(@RequestBody FileDTO fileDTO) {
+    public DataResponse<?> deleteFile(@RequestBody List<FileDTO> fileDTO) {
         fileService.delete(fileDTO);
         return DataResponse.of();
     }

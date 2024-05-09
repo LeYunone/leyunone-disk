@@ -7,6 +7,8 @@ import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.vo.DownloadFileVO;
 
+import java.util.List;
+
 /**
  * :)
  *
@@ -19,7 +21,7 @@ public interface FileService {
 
     DownloadFileVO down(Integer folderId);
 
-    void delete(FileDTO fileDTO);
+    void delete(List<FileDTO> fileDTO);
 
     void createFolder(FileFolderDTO fileFolderDTO);
     

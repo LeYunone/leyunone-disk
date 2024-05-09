@@ -46,6 +46,13 @@ public class FileFolderRepository extends BaseRepository<FileFolderMapper, FileF
     }
 
     @Override
+    public List<FileFolderDO> selectByFileIds(List<String> fileIds) {
+        LambdaQueryWrapper<FileFolderDO> lambda = new QueryWrapper<FileFolderDO>().lambda();
+        lambda.in(FileFolderDO::getFileId, fileIds);
+        return this.baseMapper.selectList(lambda);
+    }
+
+    @Override
     public List<FileFolderDO> selectFolder() {
         LambdaQueryWrapper<FileFolderDO> lambda = new QueryWrapper<FileFolderDO>()
                 .eq("is_folder", 1)
