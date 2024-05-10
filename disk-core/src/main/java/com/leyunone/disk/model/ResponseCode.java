@@ -23,7 +23,9 @@ public enum ResponseCode {
     
     JOB_NOE_EXIST(10001003,"任务不存在"),
 
-    FOLDER_EXIST(10001004,"目录已存在")
+    FOLDER_EXIST(10001004,"目录已存在"),
+
+    FILE_EXIST(10001005,"文件已存在")
 
     ;
 

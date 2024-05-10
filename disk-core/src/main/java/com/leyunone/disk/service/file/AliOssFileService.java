@@ -108,6 +108,8 @@ public class AliOssFileService extends AbstractFileService {
             uploadBO.setIdentifier(md5);
             FileInfoDO fileInfoDO = fileInfoDao.selectByMd5(md5);
             if (ObjectUtil.isNotNull(fileInfoDO)) {
+                FileFolderDO existFileFolder = fileFolderDao.selectByFileIdParentId(fileInfoDO.getFileId(), upFileDTO.getParentId());
+                AssertUtil.isFalse(ObjectUtil.isNotNull(existFileFolder), ResponseCode.FILE_EXIST);
                 uploadBO.setNoNewFile(true);
                 uploadBO.setFileId(fileInfoDO.getFileId());
                 return uploadBO;

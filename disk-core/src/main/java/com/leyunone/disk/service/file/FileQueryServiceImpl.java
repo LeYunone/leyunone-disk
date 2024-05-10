@@ -62,9 +62,10 @@ public class FileQueryServiceImpl implements FileQueryService {
             fileFolderVO.setFolder(true);
             fileFolderVO.setFolderName("../");
             fileFolderVO.setFolderId(ObjectUtil.isNull(fileFolderDO.getParentId()) ? -1 : fileFolderDO.getParentId());
-            List<FileFolderVO> records = fileFolderVOPage.getRecords();
-            if (CollectionUtil.isNotEmpty(records)) {
-                records.add(0, fileFolderVO);
+            if (CollectionUtil.isNotEmpty(fileFolderVOPage.getRecords())) {
+                fileFolderVOPage.getRecords().add(0,fileFolderVO);
+            }else{
+                fileFolderVOPage.setRecords(CollectionUtil.newArrayList(fileFolderVO));
             }
         }
         userFileInfVO.setInfos(fileFolderVOPage);

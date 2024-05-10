@@ -57,31 +57,26 @@ public class UploadPreServiceImpl implements UploadPreService {
         AssertUtil.isFalse(StringUtils.isBlank(requestUpload.getUniqueIdentifier()), "file is empty");
         //MultipartFile 转化为File
         int resultType = 1;
-        try {
-            FileInfoDO fileInfoDO = fileInfoDao.selectByMd5(requestUpload.getUniqueIdentifier());
+        FileInfoDO fileInfoDO = fileInfoDao.selectByMd5(requestUpload.getUniqueIdentifier());
 
-            //说明改文件在服务器中已经有备份
-            if (ObjectUtil.isNotNull(fileInfoDO)) {
-                //返回给前端：0不用继续操作
-                resultType = 0;
-                FileFolderDO fileFolderDO = new FileFolderDO();
-                fileFolderDO.setParentId(requestUpload.getFolderId());
-                fileFolderDO.setFileId(fileInfoDO.getFileId());
-                fileFolderDao.save(fileFolderDO);
-                result.setFilePath(fileInfoDO.getFilePath());
-            } else {
-                //继续操作，上传文件，交给前端本次文件标识key
-                String uploadId = fileService.requestUpload(requestUpload);
-                result.setUploadId(uploadId);
-            }
-            result.setIdentifier(requestUpload.getUniqueIdentifier());
-        } catch (Exception e) {
-            //如果发生转化异常，本次校验视为通过，上传文件
-            e.printStackTrace();
-            logger.error(e.getMessage());
-        } finally {
-            result.setResponseType(resultType);
+        //说明改文件在服务器中已经有备份
+        if (ObjectUtil.isNotNull(fileInfoDO)) {
+            //返回给前端：0不用继续操作
+            resultType = 0;
+            FileFolderDO existFileFolder = fileFolderDao.selectByFileIdParentId(fileInfoDO.getFileId(), requestUpload.getFolderId());
+            AssertUtil.isFalse(ObjectUtil.isNotNull(existFileFolder),ResponseCode.FILE_EXIST);
+            FileFolderDO fileFolderDO = new FileFolderDO();
+            fileFolderDO.setParentId(requestUpload.getFolderId());
+            fileFolderDO.setFileId(fileInfoDO.getFileId());
+            fileFolderDao.save(fileFolderDO);
+            result.setFilePath(fileInfoDO.getFilePath());
+        } else {
+            //继续操作，上传文件，交给前端本次文件标识key
+            String uploadId = fileService.requestUpload(requestUpload);
+            result.setUploadId(uploadId);
         }
+        result.setIdentifier(requestUpload.getUniqueIdentifier());
+        result.setResponseType(resultType);
         return result;
     }
 

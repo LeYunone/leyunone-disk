@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author LeYunone
@@ -82,6 +83,7 @@ public class FileController {
      */
     @PostMapping("/delete")
     public DataResponse<?> deleteFile(@RequestBody List<FileDTO> fileDTO) {
+        fileDTO = fileDTO.stream().filter(f -> f.getFolderId() != -1).collect(Collectors.toList());
         fileService.delete(fileDTO);
         return DataResponse.of();
     }
