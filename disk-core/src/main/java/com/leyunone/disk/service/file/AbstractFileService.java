@@ -2,6 +2,7 @@ package com.leyunone.disk.service.file;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.leyunone.disk.common.UploadContext;
 import com.leyunone.disk.common.enums.FileTypeEnum;
 import com.leyunone.disk.dao.entry.FileFolderDO;
 import com.leyunone.disk.dao.entry.FileInfoDO;
@@ -47,22 +48,18 @@ public abstract class AbstractFileService implements FileService {
             uploadBO = this.shardUpload(upFileDTO);
         }
         if (uploadBO.isSuccess()) {
-            String fileId = uploadBO.getFileId();
-            if (!uploadBO.isNoNewFile()) {
-                FileInfoDO fileInfoDO = new FileInfoDO();
-                fileInfoDO.setFileId(UUID.randomUUID().toString());
-                fileInfoDO.setFileName(uploadBO.getFileName());
-                fileInfoDO.setFileSize(uploadBO.getTotalSize());
-                fileInfoDO.setFileType(FileTypeEnum.loadType(upFileDTO.getFileType()));
-                fileInfoDO.setFilePath(uploadBO.getFilePath());
-                fileInfoDO.setFileMd5(uploadBO.getIdentifier());
-                fileInfoDao.save(fileInfoDO);
-                fileId = fileInfoDO.getFileId();
-            }
+            FileInfoDO fileInfoDO = new FileInfoDO();
+            fileInfoDO.setFileId(UUID.randomUUID().toString());
+            fileInfoDO.setFileName(uploadBO.getFileName());
+            fileInfoDO.setFileSize(uploadBO.getTotalSize());
+            fileInfoDO.setFileType(FileTypeEnum.loadType(upFileDTO.getFileType()));
+            fileInfoDO.setFilePath(uploadBO.getFilePath());
+            fileInfoDO.setFileMd5(uploadBO.getIdentifier());
+            fileInfoDao.save(fileInfoDO);
             FileFolderDO fileFolderDO = new FileFolderDO();
             fileFolderDO.setFolder(false);
-            fileFolderDO.setParentId(upFileDTO.getParentId());
-            fileFolderDO.setFileId(fileId);
+            fileFolderDO.setParentId(uploadBO.getParentId());
+            fileFolderDO.setFileId(fileInfoDO.getFileId());
             fileFolderDao.save(fileFolderDO);
         }
         return uploadBO;
@@ -101,13 +98,15 @@ public abstract class AbstractFileService implements FileService {
     protected abstract DownloadFileVO downFile(FileFolderDO fileFolderDO);
 
     @Override
-    public void createFolder(FileFolderDTO fileFolderDTO) {
-        FileFolderDO fileFolderDO = new FileFolderDO();
-        fileFolderDO.setFolderName(fileFolderDTO.getNewFolderName() + "/");
-        FileFolderDO exist = fileFolderDao.selectByNameAndParentId(fileFolderDO.getFolderName(), fileFolderDTO.getParentId());
-        AssertUtil.isFalse(ObjectUtil.isNotNull(exist), ResponseCode.FOLDER_EXIST);
-        fileFolderDO.setFolder(true);
-        fileFolderDO.setParentId(fileFolderDTO.getParentId());
-        fileFolderDao.save(fileFolderDO);
+    public void cancelUpload(UpFileDTO upFileDTO) {
+        String uploadId = upFileDTO.getUploadId();
+        UploadContext.Content upload = UploadContext.getUpload(uploadId);
+        if (ObjectUtil.isNotNull(upload)) {
+            if (upload.getParentIds().size() == 1) {
+                //删除
+                UploadContext.removeCache(uploadId);
+                UploadContext.removeId(upFileDTO.getIdentifier());
+            }
+        }
     }
 }

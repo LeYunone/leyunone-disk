@@ -30,7 +30,7 @@ public class FileFolderDO {
 
     @TableField(value = "update_Dt", fill = FieldFill.INSERT)
     private LocalDateTime updateDt;
-    
+
     @TableField(exist = false)
     private String fileName;
     @TableField(exist = false)

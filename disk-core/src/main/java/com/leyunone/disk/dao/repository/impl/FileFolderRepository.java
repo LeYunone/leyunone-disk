@@ -26,34 +26,16 @@ public class FileFolderRepository extends BaseRepository<FileFolderMapper, FileF
         implements FileFolderDao {
 
     @Override
-    public void deleteByFileId(String fileId) {
-        LambdaQueryWrapper<FileFolderDO> lambda = new QueryWrapper<FileFolderDO>().lambda();
-        lambda.eq(FileFolderDO::getFileId, fileId);
-        this.baseMapper.delete(lambda);
-    }
-
-    @Override
     public Page<FileFolderVO> selectPage(FileQuery query) {
         Page page = new Page<>(query.getIndex(), query.getSize());
         return this.baseMapper.selectFolderPage(query, page);
     }
 
     @Override
-    public List<FileFolderDO> selectByFileId(String fileId) {
-        LambdaQueryWrapper<FileFolderDO> lambda = new QueryWrapper<FileFolderDO>().lambda();
-        lambda.eq(FileFolderDO::getFileId, fileId);
-        return this.baseMapper.selectList(lambda);
-    }
-
-    @Override
     public FileFolderDO selectByFileIdParentId(String fileId, Integer parentId) {
         LambdaQueryWrapper<FileFolderDO> lambda = new QueryWrapper<FileFolderDO>().lambda();
         lambda.eq(FileFolderDO::getFileId, fileId);
-        if(ObjectUtil.isNull(parentId)){
-            lambda.isNull(FileFolderDO::getParentId);
-        }else{
-            lambda.eq(FileFolderDO::getParentId, parentId);
-        }
+        lambda.eq(FileFolderDO::getParentId, parentId);
         return this.baseMapper.selectOne(lambda);
     }
 
@@ -76,11 +58,7 @@ public class FileFolderRepository extends BaseRepository<FileFolderMapper, FileF
     public FileFolderDO selectByNameAndParentId(String folderName, Integer parentId) {
         LambdaQueryWrapper<FileFolderDO> lambda = new QueryWrapper<FileFolderDO>().lambda();
         lambda.eq(FileFolderDO::getFolderName, folderName);
-        if (ObjectUtil.isNull(parentId)) {
-            lambda.isNull(FileFolderDO::getParentId);
-        } else {
-            lambda.eq(FileFolderDO::getParentId, parentId);
-        }
+        lambda.eq(FileFolderDO::getParentId, parentId);
         return this.baseMapper.selectOne(lambda);
     }
 }

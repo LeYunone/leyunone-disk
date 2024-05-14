@@ -22,8 +22,8 @@ public interface FileService {
     DownloadFileVO down(Integer folderId);
 
     void delete(List<FileDTO> fileDTO);
-
-    void createFolder(FileFolderDTO fileFolderDTO);
     
     String requestUpload(RequestUploadDTO requestUpload);
+    
+    void cancelUpload(UpFileDTO upFileDTO);
 }

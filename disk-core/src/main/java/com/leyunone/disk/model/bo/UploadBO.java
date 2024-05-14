@@ -3,6 +3,9 @@ package com.leyunone.disk.model.bo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * :)
  *  上传结果集
@@ -18,10 +21,6 @@ public class UploadBO {
     private String filePath;
     
     private String fileName;
-    
-    private String fileId;
-    
-    private boolean noNewFile;
 
     private String identifier;
 
@@ -31,4 +30,9 @@ public class UploadBO {
      * 文件类型
      */
     private String fileType;
+
+    /**
+     * 目标目录
+     */
+    private Integer parentId;
 }

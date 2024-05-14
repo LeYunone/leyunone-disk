@@ -8,6 +8,9 @@ package com.leyunone.disk.model;
  */
 public enum ResponseCode {
 
+    /**
+     * 系统响应
+     */
     SUCCESS(200, "request is success"),
 
     ERROR(500, "system fault"),
@@ -25,7 +28,12 @@ public enum ResponseCode {
 
     FOLDER_EXIST(10001004,"目录已存在"),
 
-    FILE_EXIST(10001005,"文件已存在")
+    FILE_EXIST(10001005,"文件已存在"),
+
+    /**
+     * 10002001上传
+     */
+    SKIP(10002001,"分片跳过")
 
     ;
 

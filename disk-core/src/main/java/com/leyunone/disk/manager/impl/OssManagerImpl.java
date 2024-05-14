@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -21,7 +22,7 @@ import java.util.List;
  * @author zhangtonghao
  * @create 2022-08-30 16:26
  */
-@Component
+@Service
 public class OssManagerImpl implements OssManager {
 
     private static final Logger logger = LoggerFactory.getLogger(OssManagerImpl.class);

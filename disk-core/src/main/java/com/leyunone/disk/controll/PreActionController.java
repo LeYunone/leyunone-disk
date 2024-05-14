@@ -1,5 +1,6 @@
 package com.leyunone.disk.controll;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.leyunone.disk.model.DataResponse;
 import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
@@ -26,19 +27,10 @@ public class PreActionController {
 
     @PostMapping("/requestUploadFile")
     public DataResponse<FileValidatorVO> requestUploadFile(@RequestBody RequestUploadDTO uploadDTO) {
+        if (ObjectUtil.isNull(uploadDTO.getFolderId())) {
+            uploadDTO.setFolderId(-1);
+        }
         FileValidatorVO fileValidatorVO = uploadPreService.judgeFile(uploadDTO);
         return DataResponse.of(fileValidatorVO);
-    }
-
-    /**
-     * 校验上传
-     *
-     * @param upFileDTO
-     * @return
-     */
-    @PostMapping("/checkUpload")
-    public DataResponse checkUpload(@RequestBody UpFileDTO upFileDTO) {
-        uploadPreService.checkFile(upFileDTO);
-        return DataResponse.of();
     }
 }

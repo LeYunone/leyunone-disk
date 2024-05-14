@@ -18,11 +18,7 @@ import java.util.List;
  */
 public interface FileFolderDao extends IBaseRepository<FileFolderDO> {
 
-    void deleteByFileId(String fileId);
-
     Page<FileFolderVO> selectPage(FileQuery query);
-
-    List<FileFolderDO> selectByFileId(String fileId);
 
     FileFolderDO selectByFileIdParentId(String fileId,Integer parentId);
 

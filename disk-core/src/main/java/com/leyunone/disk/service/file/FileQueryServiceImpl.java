@@ -42,7 +42,7 @@ public class FileQueryServiceImpl implements FileQueryService {
         UserFileInfoVO userFileInfVO = new UserFileInfoVO();
         Page<FileFolderVO> fileFolderVOPage = new Page<>();
         if (StringUtils.isNotBlank(query.getNameCondition())) {
-            //文件/文件夹名前缀模糊搜索
+            //文件/文件夹名模糊搜索
 
         } else {
             fileFolderVOPage = fileFolderDao.selectPage(query);
@@ -58,14 +58,17 @@ public class FileQueryServiceImpl implements FileQueryService {
              * 返回上一级
              */
             FileFolderDO fileFolderDO = fileFolderDao.selectById(query.getFileFolderId());
-            FileFolderVO fileFolderVO = new FileFolderVO();
-            fileFolderVO.setFolder(true);
-            fileFolderVO.setFolderName("../");
-            fileFolderVO.setFolderId(ObjectUtil.isNull(fileFolderDO.getParentId()) ? -1 : fileFolderDO.getParentId());
-            if (CollectionUtil.isNotEmpty(fileFolderVOPage.getRecords())) {
-                fileFolderVOPage.getRecords().add(0,fileFolderVO);
-            }else{
-                fileFolderVOPage.setRecords(CollectionUtil.newArrayList(fileFolderVO));
+            if (ObjectUtil.isNotNull(fileFolderDO)) {
+                FileFolderVO fileFolderVO = new FileFolderVO();
+                fileFolderVO.setFolderName("../");
+                fileFolderVO.setFolderId(fileFolderDO.getParentId());
+                fileFolderVO.setFolder(true);
+
+                if (CollectionUtil.isNotEmpty(fileFolderVOPage.getRecords())) {
+                    fileFolderVOPage.getRecords().add(0, fileFolderVO);
+                } else {
+                    fileFolderVOPage.setRecords(CollectionUtil.newArrayList(fileFolderVO));
+                }
             }
         }
         userFileInfVO.setInfos(fileFolderVOPage);
@@ -112,12 +115,17 @@ public class FileQueryServiceImpl implements FileQueryService {
             return new ArrayList<>();
         }
         FileFolderDO fileFolderDO = fileFolderDao.selectById(folderId);
+        if(ObjectUtil.isNull(fileFolderDO)) {
+            //首页
+            return new ArrayList<>();
+        }
         Stack<FileFolderDO> stack = new Stack<>();
         stack.add(fileFolderDO);
         while (ObjectUtil.isNotNull(fileFolderDO.getParentId())) {
             FileFolderDO peek = stack.peek();
             if (ObjectUtil.isNotNull(peek.getParentId())) {
                 FileFolderDO parentFolderDO = fileFolderDao.selectById(peek.getParentId());
+                if(ObjectUtil.isNull(parentFolderDO)) break;
                 stack.add(parentFolderDO);
                 fileFolderDO = parentFolderDO;
             }

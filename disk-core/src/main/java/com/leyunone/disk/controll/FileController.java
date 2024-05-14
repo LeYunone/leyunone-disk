@@ -1,15 +1,20 @@
 package com.leyunone.disk.controll;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.leyunone.disk.common.enums.CheckTypeEnum;
 import com.leyunone.disk.model.DataResponse;
+import com.leyunone.disk.model.ResponseCode;
 import com.leyunone.disk.model.bo.UploadBO;
 import com.leyunone.disk.model.dto.FileDTO;
 import com.leyunone.disk.model.dto.FileFolderDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.query.FileQuery;
+import com.leyunone.disk.model.vo.CheckFileVO;
 import com.leyunone.disk.model.vo.DownloadFileVO;
 import com.leyunone.disk.model.vo.UserFileInfoVO;
 import com.leyunone.disk.service.FileQueryService;
 import com.leyunone.disk.service.FileService;
+import com.leyunone.disk.service.FolderService;
 import com.leyunone.disk.service.UploadPreService;
 import com.leyunone.disk.service.front.UploadPreServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +40,8 @@ public class FileController {
     private FileService fileService;
     @Autowired
     private UploadPreService uploadPreService;
+    @Autowired
+    private FolderService folderService;
 
     /**
      * 查询服务器内文件[条件-分页]
@@ -52,6 +59,9 @@ public class FileController {
      */
     @PostMapping("/upload")
     public DataResponse<String> uploadFile(UpFileDTO upFileDTO) {
+        if(ObjectUtil.isNull(upFileDTO.getParentId())) {
+            upFileDTO.setParentId(-1);
+        }
         UploadBO upload = fileService.upload(upFileDTO);
         return DataResponse.of(upload.getFilePath());
     }
@@ -64,14 +74,14 @@ public class FileController {
      * @return
      */
     @GetMapping("/upload")
-    public DataResponse<?> checkFile(UpFileDTO upFileDTO) {
-        uploadPreService.checkFile(upFileDTO);
-        return DataResponse.of();
+    public DataResponse<CheckFileVO> checkUploadFile(UpFileDTO upFileDTO) {
+        CheckFileVO checkFileVO = uploadPreService.checkFile(upFileDTO);
+        return DataResponse.of(checkFileVO);
     }
 
     @PostMapping("/newFolder")
     public DataResponse<?> newFolder(@RequestBody FileFolderDTO fileFolderDTO) {
-        fileService.createFolder(fileFolderDTO);
+        folderService.createFolder(fileFolderDTO);
         return DataResponse.of();
     }
 
@@ -98,5 +108,17 @@ public class FileController {
     public DataResponse<DownloadFileVO> downloadFile(@RequestBody FileDTO fileDTO) {
         DownloadFileVO down = fileService.down(fileDTO.getFolderId());
         return DataResponse.of(down);
+    }
+
+    /**
+     * 取消下载
+     *
+     * @param upFileDTO
+     * @return
+     */
+    @PostMapping("/cancelUpload")
+    public DataResponse<?> cancelUpload(@RequestBody UpFileDTO upFileDTO) {
+        fileService.cancelUpload(upFileDTO);
+        return DataResponse.of();
     }
 }

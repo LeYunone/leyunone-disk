@@ -18,6 +18,7 @@ import com.leyunone.disk.model.bo.UploadBO;
 import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.vo.DownloadFileVO;
+import com.leyunone.disk.service.FileHelpService;
 import com.leyunone.disk.util.AssertUtil;
 import com.leyunone.disk.util.CollectionFunctionUtils;
 import com.leyunone.disk.util.MD5Util;
@@ -36,12 +37,14 @@ import java.util.stream.Collectors;
  * @Author LeYunone
  * @Date 2024/4/22 17:42
  */
-public class AliOssFileService extends AbstractFileService {
+public class AliOssFileServiceImpl extends AbstractFileService {
 
     @Autowired
     private OssManager ossManager;
+    @Autowired
+    private FileHelpService fileHelpService;
 
-    public AliOssFileService(FileInfoDao fileInfoDao, FileFolderDao fileFolderDao) {
+    public AliOssFileServiceImpl(FileInfoDao fileInfoDao, FileFolderDao fileFolderDao) {
         super(fileInfoDao, fileFolderDao);
     }
 
@@ -55,7 +58,7 @@ public class AliOssFileService extends AbstractFileService {
         AssertUtil.isFalse(StrUtil.isBlank(md5), "md5 is empty");
 
         //必须求出redis中的PartETags，在分片合成文件中需要以此为依据，合并文件返回最终地址
-        UploadContext.Content content = UploadContext.get(upFileDTO.getUploadId());
+        UploadContext.Content content = UploadContext.getUpload(upFileDTO.getUploadId());
         AssertUtil.isFalse(ObjectUtil.isNull(content), ResponseCode.UPLOAD_FAIL);
         MultipartFile file = upFileDTO.getFile();
         int currentChunkNo = upFileDTO.getChunkNumber();
@@ -65,24 +68,40 @@ public class AliOssFileService extends AbstractFileService {
         Map<Integer, PartETag> partETags = content.getPartETags();
         //分片上传
         try {
-            //每次上传分片之后，OSS的返回结果会包含一个PartETag
-            PartETag partETag = ossManager.partUploadFile(content.getFileKey(), file.getInputStream(), ossSlicesId,
-                    upFileDTO.getIdentifier(), currentChunkNo, file.getSize());
-            partETags.put(currentChunkNo, partETag);
+            if (!partETags.containsKey(currentChunkNo)) {
+                //每次上传分片之后，OSS的返回结果会包含一个PartETag
+                PartETag partETag = ossManager.partUploadFile(content.getFileKey(), file.getInputStream(), ossSlicesId,
+                        upFileDTO.getIdentifier(), currentChunkNo, file.getSize());
+                partETags.put(currentChunkNo, partETag);
+            }
             //分片编号等于总片数的时候合并文件,如果符合条件则合并文件，否则继续等待
             if (currentChunkNo == totalChunks) {
                 //合并文件，注意：partETags必须是所有分片的所以必须存入redis，然后取出放入集合
-                String url = ossManager.completePartUploadFile(content.getFileKey(), ossSlicesId, new ArrayList<>(partETags.values()));
-                //oss地址返回后存入并清除redis
-                UploadContext.remove(ossSlicesId);
-                uploadBO.setSuccess(true);
-                uploadBO.setFilePath(url);
-                uploadBO.setTotalSize(upFileDTO.getTotalSize());
-                uploadBO.setFileName(file.getOriginalFilename());
-                uploadBO.setIdentifier(md5);
+                try {
+                    String url = ossManager.completePartUploadFile(content.getFileKey(), ossSlicesId, new ArrayList<>(partETags.values()));
+                    uploadBO.setSuccess(true);
+                    uploadBO.setFilePath(url);
+                    uploadBO.setTotalSize(upFileDTO.getTotalSize());
+                    uploadBO.setFileName(file.getOriginalFilename());
+                    uploadBO.setParentId(upFileDTO.getParentId());
+                    uploadBO.setIdentifier(md5);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    uploadBO.setSuccess(false);
+                } finally {
+                    /**
+                     * 如果是最后一个该文件的上传请求就清空缓存
+                     */
+                    if (content.getParentIds().size() == 1) {
+                        UploadContext.removeCache(ossSlicesId);
+                        UploadContext.removeId(md5);
+                    } else {
+                        content.getParentIds().remove(upFileDTO.getParentId());
+                    }
+                }
             } else {
                 content.setPartETags(partETags);
-                UploadContext.set(ossSlicesId, content);
+                UploadContext.setCache(ossSlicesId, content);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -100,24 +119,11 @@ public class AliOssFileService extends AbstractFileService {
     @Transactional(rollbackFor = Exception.class)
     protected UploadBO easyUpload(UpFileDTO upFileDTO) {
         UploadBO uploadBO = new UploadBO();
-        uploadBO.setSuccess(true);
         AssertUtil.isFalse(ObjectUtil.isNull(upFileDTO.getFile()), "file is empty");
         MultipartFile file = upFileDTO.getFile();
-        try {
-            String md5 = MD5Util.fileToMD5(upFileDTO.getFile().getBytes());
-            uploadBO.setIdentifier(md5);
-            FileInfoDO fileInfoDO = fileInfoDao.selectByMd5(md5);
-            if (ObjectUtil.isNotNull(fileInfoDO)) {
-                FileFolderDO existFileFolder = fileFolderDao.selectByFileIdParentId(fileInfoDO.getFileId(), upFileDTO.getParentId());
-                AssertUtil.isFalse(ObjectUtil.isNotNull(existFileFolder), ResponseCode.FILE_EXIST);
-                uploadBO.setNoNewFile(true);
-                uploadBO.setFileId(fileInfoDO.getFileId());
-                return uploadBO;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        /**
+         * 日期文件前缀 yyyy-MM-dd
+         */
         if (upFileDTO.isHasDate()) {
             FileFolderDO fileFolderDO = fileFolderDao.selectByNameAndParentId(DateUtil.today() + "/", upFileDTO.getParentId());
             if (ObjectUtil.isNull(fileFolderDO)) {
@@ -129,22 +135,32 @@ public class AliOssFileService extends AbstractFileService {
             }
             upFileDTO.setParentId(fileFolderDO.getFolderId());
         }
-        FileFolderDO fileFolderDO = fileFolderDao.selectById(upFileDTO.getParentId());
-        String prefix = this.dfsGenerateFolderPrefix(fileFolderDO);
+
         try {
-            String url = ossManager.uploadFile(prefix + file.getOriginalFilename(), file.getInputStream());
-            uploadBO.setFileName(file.getOriginalFilename());
-            uploadBO.setFilePath(url);
-            uploadBO.setTotalSize(file.getSize());
-        } catch (Exception e) {
+            String md5 = MD5Util.fileToMD5(upFileDTO.getFile().getBytes());
+            uploadBO.setIdentifier(md5);
+            FileInfoDO repeatFile = fileHelpService.repeatFile(md5, upFileDTO.getParentId());
+            if (ObjectUtil.isNull(repeatFile)) {
+                FileFolderDO fileFolderDO = fileFolderDao.selectById(upFileDTO.getParentId());
+                String prefix = fileHelpService.dfsGenerateFolderPrefix(fileFolderDO);
+                String url = ossManager.uploadFile(prefix + file.getOriginalFilename(), file.getInputStream());
+                uploadBO.setFileName(file.getOriginalFilename());
+                uploadBO.setFilePath(url);
+                uploadBO.setTotalSize(file.getSize());
+                uploadBO.setSuccess(true);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
             uploadBO.setSuccess(false);
         }
+
+        uploadBO.setParentId(upFileDTO.getParentId());
         return uploadBO;
     }
 
     @Override
     protected DownloadFileVO downFile(FileFolderDO fileFolderDO) {
-        String prefix = this.dfsGenerateFolderPrefix(fileFolderDO);
+        String prefix = fileHelpService.dfsGenerateFolderPrefix(fileFolderDO);
         FileInfoDO fileInfo = fileInfoDao.selectById(fileFolderDO.getFileId());
         DownloadFileVO downloadFileVO = new DownloadFileVO();
         /**
@@ -154,6 +170,8 @@ public class AliOssFileService extends AbstractFileService {
         switch (FileTypeEnum.load(fileInfo.getFileType())) {
             case FILE_IMG:
                 break;
+            default:
+                ;
         }
         downloadFileVO.setFilePath(ossManager.getFileUrl(prefix + fileInfo.getFileName(), time));
         downloadFileVO.setFileName(fileInfo.getFileName());
@@ -180,7 +198,7 @@ public class AliOssFileService extends AbstractFileService {
         List<String> deleteFileIds = new ArrayList<>();
         fileGroup.entrySet().forEach(ety -> {
             if (ety.getValue().size() == 1) {
-                String prefix = this.dfsGenerateFolderPrefix(ety.getValue().get(0));
+                String prefix = fileHelpService.dfsGenerateFolderPrefix(ety.getValue().get(0));
                 ossManager.deleteFile(prefix + fileMap.get(ety.getKey()).getFileName());
                 deleteFileIds.add(ety.getKey());
             }
@@ -192,28 +210,6 @@ public class AliOssFileService extends AbstractFileService {
         return true;
     }
 
-    private String dfsGenerateFolderPrefix(FileFolderDO fileFolderDO) {
-        Stack<FileFolderDO> stack = new Stack<>();
-        stack.add(fileFolderDO);
-        while (true) {
-            FileFolderDO poll = stack.peek();
-            if (ObjectUtil.isNotNull(poll)) {
-                if (ObjectUtil.isNotNull(poll.getParentId())) {
-                    FileFolderDO parentFolder = fileFolderDao.selectById(poll.getParentId());
-                    stack.add(parentFolder);
-                } else {
-                    break;
-                }
-            }
-            break;
-        }
-        String perfix = "";
-        if (CollectionUtil.isNotEmpty(stack)) {
-            perfix = CollectionUtil.join(stack.stream().filter(f -> ObjectUtil.isNotNull(f) && StringUtils.isNotBlank(f.getFolderName())).map(FileFolderDO::getFolderName).collect(Collectors.toList()), "");
-        }
-        return perfix;
-    }
-
     /**
      * 请求oss分片上传id
      *
@@ -222,21 +218,29 @@ public class AliOssFileService extends AbstractFileService {
      */
     @Override
     public String requestUpload(RequestUploadDTO requestUpload) {
-        Integer folderId = requestUpload.getFolderId();
-        String prefix = "";
-        if (ObjectUtil.isNotNull(folderId)) {
-            //拼接前缀
-            FileFolderDO fileFolderDO = fileFolderDao.selectById(folderId);
-            if (ObjectUtil.isNotNull(fileFolderDO)) {
-                prefix = fileFolderDO.getFolderName();
+        String uploadId = UploadContext.getId(requestUpload.getUniqueIdentifier());
+        if (StringUtils.isNotBlank(uploadId)) {
+            //该文件已经在上传流程中
+            UploadContext.Content upload = UploadContext.getUpload(uploadId);
+            if (ObjectUtil.isNotNull(upload)) {
+                upload.getParentIds().add(requestUpload.getFolderId());
             }
+        } else {
+            String prefix = "";
+            if (ObjectUtil.isNotNull(requestUpload.getFolderId())) {
+                //拼接前缀
+                FileFolderDO fileFolderDO = fileFolderDao.selectById(requestUpload.getFolderId());
+                prefix = fileHelpService.dfsGenerateFolderPrefix(fileFolderDO);
+            }
+            String fileName = prefix + requestUpload.getFileName();
+            uploadId = ossManager.getUploadId(fileName);
+            UploadContext.Content content = new UploadContext.Content();
+            content.setPartETags(new HashMap<>());
+            content.setFileKey(fileName);
+            content.getParentIds().add(requestUpload.getFolderId());
+            UploadContext.setCache(uploadId, content);
+            UploadContext.setId(requestUpload.getUniqueIdentifier(), uploadId);
         }
-        String fileName = prefix + requestUpload.getFileName();
-        String uploadId = ossManager.getUploadId(fileName);
-        UploadContext.Content content = new UploadContext.Content();
-        content.setPartETags(new HashMap<>());
-        content.setFileKey(fileName);
-        UploadContext.set(uploadId, content);
         return uploadId;
     }
 }

@@ -8,7 +8,7 @@
         LEFT JOIN file_info f ON ff.file_id = f.file_id
         WHERE 1 = 1
         <if test="con.fileFolderId==null">
-            AND ff.parent_id is NULL
+            AND ff.parent_id = -1
         </if>
         <if test="con.fileFolderId!=null">
             AND ff.parent_id = #{con.fileFolderId}
