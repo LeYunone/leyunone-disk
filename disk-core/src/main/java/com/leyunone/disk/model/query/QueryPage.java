@@ -1,6 +1,5 @@
 package com.leyunone.disk.model.query;
 
-import com.sun.istack.internal.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

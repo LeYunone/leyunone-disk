@@ -17,6 +17,8 @@ import com.leyunone.disk.service.FileService;
 import com.leyunone.disk.service.FolderService;
 import com.leyunone.disk.service.UploadPreService;
 import com.leyunone.disk.service.front.UploadPreServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/file")
 public class FileController {
 
+    private final Logger logger = LoggerFactory.getLogger(FileController.class);
     @Autowired
     private FileQueryService fileQueryService;
     @Resource
@@ -59,7 +62,8 @@ public class FileController {
      */
     @PostMapping("/upload")
     public DataResponse<String> uploadFile(UpFileDTO upFileDTO) {
-        if(ObjectUtil.isNull(upFileDTO.getParentId())) {
+        logger.info("start upload file:{}", upFileDTO.getIdentifier());
+        if (ObjectUtil.isNull(upFileDTO.getParentId())) {
             upFileDTO.setParentId(-1);
         }
         UploadBO upload = fileService.upload(upFileDTO);

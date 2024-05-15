@@ -96,7 +96,7 @@ public class FileQueryServiceImpl implements FileQueryService {
         // 遍历节点，将节点放入父节点的children列表中
         for (FileFolderDO fileFolder : fileFolders) {
             SelectTreeVO node = nodeMap.get(fileFolder.getFolderId());
-            if (fileFolder.getParentId() == null) {
+            if (fileFolder.getParentId() == null || fileFolder.getParentId() == -1) {
                 // 根节点
                 tree.add(node);
             } else {
@@ -115,7 +115,7 @@ public class FileQueryServiceImpl implements FileQueryService {
             return new ArrayList<>();
         }
         FileFolderDO fileFolderDO = fileFolderDao.selectById(folderId);
-        if(ObjectUtil.isNull(fileFolderDO)) {
+        if (ObjectUtil.isNull(fileFolderDO)) {
             //首页
             return new ArrayList<>();
         }
@@ -125,7 +125,7 @@ public class FileQueryServiceImpl implements FileQueryService {
             FileFolderDO peek = stack.peek();
             if (ObjectUtil.isNotNull(peek.getParentId())) {
                 FileFolderDO parentFolderDO = fileFolderDao.selectById(peek.getParentId());
-                if(ObjectUtil.isNull(parentFolderDO)) break;
+                if (ObjectUtil.isNull(parentFolderDO)) break;
                 stack.add(parentFolderDO);
                 fileFolderDO = parentFolderDO;
             }
