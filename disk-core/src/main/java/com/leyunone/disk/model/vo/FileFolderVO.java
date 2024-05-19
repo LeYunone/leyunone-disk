@@ -36,4 +36,6 @@ public class FileFolderVO {
     private String fileSize;
 
     private String filePath;
+
+    private String diskEnv;
 }

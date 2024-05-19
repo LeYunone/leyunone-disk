@@ -51,6 +51,8 @@ public class UploadContext {
     public static class Content {
 
         private Map<Integer, PartETag> partETags = new ConcurrentHashMap<>();
+        
+        private Set<Integer> parts = new HashSet<>();
 
         /**
          * 文件标识 oss为文件名

@@ -17,9 +17,11 @@ import com.leyunone.disk.service.FileService;
 import com.leyunone.disk.service.FolderService;
 import com.leyunone.disk.service.UploadPreService;
 import com.leyunone.disk.service.front.UploadPreServiceImpl;
+import com.leyunone.disk.util.AssertUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -45,6 +47,7 @@ public class FileController {
     private UploadPreService uploadPreService;
     @Autowired
     private FolderService folderService;
+
 
     /**
      * 查询服务器内文件[条件-分页]
@@ -108,10 +111,21 @@ public class FileController {
      * @param
      * @return
      */
-    @PostMapping("/download")
-    public DataResponse<DownloadFileVO> downloadFile(@RequestBody FileDTO fileDTO) {
+    @PostMapping("/downloadHttp")
+    public DataResponse<DownloadFileVO> downloadFileHttp(@RequestBody FileDTO fileDTO) {
         DownloadFileVO down = fileService.down(fileDTO.getFolderId());
         return DataResponse.of(down);
+    }
+
+    /**
+     * 下载文件
+     *
+     * @param
+     * @return
+     */
+    @PostMapping("/downloadStream")
+    public void downloadFileStream(@RequestBody FileDTO fileDTO) {
+        fileService.down(fileDTO.getFolderId());
     }
 
     /**

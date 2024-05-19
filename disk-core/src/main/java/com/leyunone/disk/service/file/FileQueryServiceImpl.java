@@ -13,6 +13,7 @@ import com.leyunone.disk.model.vo.UserFileInfoVO;
 import com.leyunone.disk.service.FileQueryService;
 import com.leyunone.disk.util.FileUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -30,6 +31,8 @@ import java.util.stream.Collectors;
 public class FileQueryServiceImpl implements FileQueryService {
 
     private final FileFolderDao fileFolderDao;
+    @Value("${disk.env:oss}")
+    private String diskEnv;
 
     /**
      * 分页查询文件
@@ -51,6 +54,7 @@ public class FileQueryServiceImpl implements FileQueryService {
                 if (StringUtils.isNotBlank(fileFolderVO.getFileSize())) {
                     fileFolderVO.setFileSize(FileUtil.sizeText(Long.parseLong(fileFolderVO.getFileSize())));
                 }
+                fileFolderVO.setDiskEnv(diskEnv);
             });
         }
         if (ObjectUtil.isNotNull(query.getFileFolderId())) {

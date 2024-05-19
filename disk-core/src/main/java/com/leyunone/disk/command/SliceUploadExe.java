@@ -8,7 +8,6 @@
 //import com.leyunone.disk.domain.domain.FileUserE;
 //import com.leyunone.disk.model.DataResponse;
 //import com.leyunone.disk.model.co.FileUpLogCO;
-//import com.leyunone.disk.common.constant.ServerCode;
 //import com.leyunone.disk.model.dto.UpFileDTO;
 //import com.leyunone.disk.common.enums.FileTypeEnum;
 //import com.leyunone.disk.util.AssertUtil;
@@ -131,6 +130,22 @@
 //        }
 //        //上传成功，返回临时目录位置 等待删除
 //        return DataResponse.of(tempPath);
+//    }
+//
+//    /**
+//     * 处理出临时目录
+//     *
+//     * @param fileMD5Value
+//     * @return
+//     */
+//    public static String resoleFileTempPath(String fileMD5Value) {
+//        String tempPath = ServerCode.TEMP_PATH + fileMD5Value + "/";
+//        File tempFile = new File(tempPath);
+//        if (tempFile.exists()) {
+//            return tempPath;
+//        }
+//        boolean mkdirs = tempFile.mkdirs();
+//        return mkdirs ? tempPath : null;
 //    }
 //
 //    /**

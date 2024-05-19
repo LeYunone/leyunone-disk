@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class FileServiceLoadConfig {
 
-    @Value("${disk.type:oss}")
+    @Value("${disk.env:oss}")
     private String type;
 
     @Bean
