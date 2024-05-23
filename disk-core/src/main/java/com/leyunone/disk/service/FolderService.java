@@ -5,7 +5,7 @@ import com.leyunone.disk.model.dto.FileFolderDTO;
 /**
  * :)
  *
- * @Author pengli
+ * @Author LeYunnoe
  * @Date 2024/5/13 15:37
  */
 public interface FolderService {

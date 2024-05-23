@@ -13,13 +13,14 @@ import com.leyunone.disk.util.AssertUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 /**
  * :)
  *
- * @Author pengli
+ * @Author LeYunnoe
  * @Date 2024/5/13 14:20
  */
 @Service
@@ -67,18 +68,26 @@ public class FileHelpServiceImpl implements FileHelpService {
         while (true) {
             FileFolderDO poll = stack.peek();
             if (ObjectUtil.isNotNull(poll)) {
-                if (ObjectUtil.isNotNull(poll.getParentId())) {
+                if (ObjectUtil.isNotNull(poll.getParentId()) && !poll.getParentId().equals(-1)) {
                     FileFolderDO parentFolder = fileFolderDao.selectById(poll.getParentId());
                     stack.add(parentFolder);
                 } else {
                     break;
                 }
+            } else {
+                break;
             }
-            break;
+        }
+        List<String> sb = new ArrayList<>();
+        while (!stack.isEmpty()) {
+            FileFolderDO pop = stack.pop();
+            if (ObjectUtil.isNotNull(pop)) {
+                sb.add(pop.getFolderName());
+            }
         }
         String perfix = "";
-        if (CollectionUtil.isNotEmpty(stack)) {
-            perfix = CollectionUtil.join(stack.stream().filter(f -> ObjectUtil.isNotNull(f) && StringUtils.isNotBlank(f.getFolderName())).map(FileFolderDO::getFolderName).collect(Collectors.toList()), "");
+        if (CollectionUtil.isNotEmpty(sb)) {
+            perfix = CollectionUtil.join(sb, "");
         }
         return perfix;
     }

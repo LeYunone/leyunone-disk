@@ -103,7 +103,7 @@ public class LocalFileServiceImpl extends AbstractFileService {
             if (currentChunkNo == totalChunks) {
                 //合并文件
                 try {
-                    String url = this.mergeSliceFile(tempPath, file.getOriginalFilename());
+                    String url = this.mergeSliceFile(tempPath, content.getFileKey(), file.getOriginalFilename());
                     uploadBO.setSuccess(true);
                     uploadBO.setFilePath(url);
                     uploadBO.setTotalSize(upFileDTO.getTotalSize());
@@ -177,11 +177,16 @@ public class LocalFileServiceImpl extends AbstractFileService {
      * @param tempPath
      * @param fileName
      */
-    private String mergeSliceFile(String tempPath, String fileName) {
+    private String mergeSliceFile(String tempPath, String folderName, String fileName) {
         //分片文件的临时目录
         File sliceFile = new File(tempPath);
         //本次文件的保存位置
-        String savePath = fileAddress + "/" + fileName;
+        folderName = fileAddress + "/" + folderName;
+        File folder = new File(folderName);
+        if (!folder.exists()) {
+            folder.mkdirs();
+        }
+        String savePath = folderName + fileName;
         File thisFile = new File(savePath);
         //所有分片
         File[] files = sliceFile.listFiles();
@@ -402,11 +407,11 @@ public class LocalFileServiceImpl extends AbstractFileService {
                 FileFolderDO fileFolderDO = fileFolderDao.selectById(requestUpload.getFolderId());
                 prefix = fileHelpService.dfsGenerateFolderPrefix(fileFolderDO);
             }
-            String fileName = prefix + requestUpload.getFileName();
+//            String fileName = prefix + requestUpload.getFileName();
             uploadId = UUID.randomUUID().toString();
             UploadContext.Content content = new UploadContext.Content();
             content.setPartETags(new HashMap<>());
-            content.setFileKey(fileName);
+            content.setFileKey(prefix);
             content.getParentIds().add(requestUpload.getFolderId());
             UploadContext.setCache(uploadId, content);
             UploadContext.setId(requestUpload.getUniqueIdentifier(), uploadId);

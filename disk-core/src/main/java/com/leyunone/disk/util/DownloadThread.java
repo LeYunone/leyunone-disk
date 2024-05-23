@@ -8,7 +8,7 @@ import java.io.RandomAccessFile;
 /**
  * :)
  *
- * @Author pengli
+ * @Author LeYunnoe
  * @Date 2024/5/16 16:24
  */
 public class DownloadThread implements Runnable {

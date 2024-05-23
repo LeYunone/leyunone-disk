@@ -6,7 +6,7 @@ import com.leyunone.disk.dao.entry.FileInfoDO;
 /**
  * :)
  *
- * @Author pengli
+ * @Author LeYunnoe
  * @Date 2024/5/13 14:20
  */
 public interface FileHelpService {
