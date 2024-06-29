@@ -7,12 +7,19 @@
         FROM file_folder ff
         LEFT JOIN file_info f ON ff.file_id = f.file_id
         WHERE 1 = 1
-        <if test="con.fileFolderId==null">
-            AND ff.parent_id = -1
-        </if>
-        <if test="con.fileFolderId!=null">
-            AND ff.parent_id = #{con.fileFolderId}
-        </if>
+        <choose>
+            <when test="con.nameCondition!=null and con.nameCondition!=''">
+                AND (ff.folder_name LIKE CONCAT(#{con.nameCondition},'%') OR f.file_name LIKE CONCAT(#{con.nameCondition},'%'))
+            </when>
+            <otherwise>
+                <if test="con.fileFolderId==null">
+                    AND ff.parent_id = -1
+                </if>
+                <if test="con.fileFolderId!=null">
+                    AND ff.parent_id = #{con.fileFolderId}
+                </if>
+            </otherwise>
+        </choose>
         ORDER BY ff.is_folder DESC
     </select>
 </mapper>

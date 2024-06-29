@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.leyunone.disk.common.enums.FileTypeEnum;
 import com.leyunone.disk.dao.entry.FileFolderDO;
 import com.leyunone.disk.dao.repository.FileFolderDao;
 import com.leyunone.disk.model.query.FileQuery;
@@ -43,20 +44,7 @@ public class FileQueryServiceImpl implements FileQueryService {
     @Override
     public UserFileInfoVO getFiles(FileQuery query) {
         UserFileInfoVO userFileInfVO = new UserFileInfoVO();
-        Page<FileFolderVO> fileFolderVOPage = new Page<>();
-        if (StringUtils.isNotBlank(query.getNameCondition())) {
-            //文件/文件夹名模糊搜索
-
-        } else {
-            fileFolderVOPage = fileFolderDao.selectPage(query);
-
-            fileFolderVOPage.getRecords().forEach(fileFolderVO -> {
-                if (StringUtils.isNotBlank(fileFolderVO.getFileSize())) {
-                    fileFolderVO.setFileSize(FileUtil.sizeText(Long.parseLong(fileFolderVO.getFileSize())));
-                }
-                fileFolderVO.setDiskEnv(diskEnv);
-            });
-        }
+        Page<FileFolderVO> fileFolderVOPage = fileFolderDao.selectPage(query);
         if (ObjectUtil.isNotNull(query.getFileFolderId())) {
             /**
              * 返回上一级
@@ -75,6 +63,16 @@ public class FileQueryServiceImpl implements FileQueryService {
                 }
             }
         }
+
+        fileFolderVOPage.getRecords().forEach(fileFolderVO -> {
+            if (StringUtils.isNotBlank(fileFolderVO.getFileSize())) {
+                fileFolderVO.setFileSize(FileUtil.sizeText(Long.parseLong(fileFolderVO.getFileSize())));
+            }
+            if (ObjectUtil.isNotNull(fileFolderVO.getFileType())) {
+                fileFolderVO.setFileTypeText(FileTypeEnum.load(fileFolderVO.getFileType()).getName());
+            }
+            fileFolderVO.setDiskEnv(diskEnv);
+        });
         userFileInfVO.setInfos(fileFolderVOPage);
         return userFileInfVO;
     }

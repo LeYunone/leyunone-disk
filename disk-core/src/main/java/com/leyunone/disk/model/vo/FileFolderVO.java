@@ -31,6 +31,8 @@ public class FileFolderVO {
     
     private Integer fileType;
 
+    private String fileTypeText;
+
     private Integer folderId;
     
     private String fileSize;
