@@ -35,4 +35,8 @@ public class UploadBO {
      * 目标目录
      */
     private Integer parentId;
+
+    private String fileId;
+
+    private String fileText;
 }

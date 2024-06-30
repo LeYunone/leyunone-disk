@@ -36,14 +36,14 @@ public enum FileTypeEnum {
         return this.fileType;
     }
 
-    public static Integer loadType(String type) {
+    public static FileTypeEnum loadType(String type) {
         FileTypeEnum[] values = values();
         for (FileTypeEnum enums : values) {
             if (enums.getFileType().contains(type.toUpperCase())) {
-                return enums.getValue();
+                return enums;
             }
         }
-        return FileTypeEnum.FILE_OTHER.getValue();
+        return FileTypeEnum.FILE_OTHER;
     }
 
     public static FileTypeEnum load(Integer value) {

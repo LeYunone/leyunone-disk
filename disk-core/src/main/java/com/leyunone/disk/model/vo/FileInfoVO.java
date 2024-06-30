@@ -47,4 +47,6 @@ public class FileInfoVO {
      * 文件路径
      */
     private String filePath;
+
+    private String fileContentText;
 }

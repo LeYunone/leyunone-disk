@@ -1,5 +1,8 @@
 package com.leyunone.disk.util;
 
+import cn.hutool.http.HttpUtil;
+import cn.hutool.http.Method;
+
 import java.io.*;
 
 /**
@@ -49,5 +52,9 @@ public class FileUtil {
             e.printStackTrace();
         }
         return buffer;
+    }
+
+    public static String getTxtFile(String filePath) {
+        return HttpUtil.createRequest(Method.GET,filePath).execute().body();
     }
 }

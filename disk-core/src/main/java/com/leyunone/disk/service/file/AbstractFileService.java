@@ -6,6 +6,7 @@ import com.leyunone.disk.common.UploadContext;
 import com.leyunone.disk.common.enums.FileTypeEnum;
 import com.leyunone.disk.dao.entry.FileFolderDO;
 import com.leyunone.disk.dao.entry.FileInfoDO;
+import com.leyunone.disk.dao.repository.FileExtendContentDao;
 import com.leyunone.disk.dao.repository.FileFolderDao;
 import com.leyunone.disk.dao.repository.FileInfoDao;
 import com.leyunone.disk.model.ResponseCode;
@@ -14,6 +15,7 @@ import com.leyunone.disk.model.dto.FileDTO;
 import com.leyunone.disk.model.dto.FileFolderDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.vo.DownloadFileVO;
+import com.leyunone.disk.service.FileContentService;
 import com.leyunone.disk.service.FileService;
 import com.leyunone.disk.util.AssertUtil;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +54,7 @@ public abstract class AbstractFileService implements FileService {
             fileInfoDO.setFileId(UUID.randomUUID().toString());
             fileInfoDO.setFileName(uploadBO.getFileName());
             fileInfoDO.setFileSize(uploadBO.getTotalSize());
-            fileInfoDO.setFileType(FileTypeEnum.loadType(upFileDTO.getFileType()));
+            fileInfoDO.setFileType(FileTypeEnum.loadType(upFileDTO.getFileType()).getValue());
             fileInfoDO.setFilePath(uploadBO.getFilePath());
             fileInfoDO.setFileMd5(uploadBO.getIdentifier());
             fileInfoDao.save(fileInfoDO);
@@ -61,6 +63,8 @@ public abstract class AbstractFileService implements FileService {
             fileFolderDO.setParentId(uploadBO.getParentId());
             fileFolderDO.setFileId(fileInfoDO.getFileId());
             fileFolderDao.save(fileFolderDO);
+            uploadBO.setFileId(fileInfoDO.getFileId());
+//            fileContentService.saveFileContent(uploadBO);
         }
         return uploadBO;
     }

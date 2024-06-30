@@ -11,11 +11,9 @@ import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.query.FileQuery;
 import com.leyunone.disk.model.vo.CheckFileVO;
 import com.leyunone.disk.model.vo.DownloadFileVO;
+import com.leyunone.disk.model.vo.FileInfoVO;
 import com.leyunone.disk.model.vo.UserFileInfoVO;
-import com.leyunone.disk.service.FileQueryService;
-import com.leyunone.disk.service.FileService;
-import com.leyunone.disk.service.FolderService;
-import com.leyunone.disk.service.UploadPreService;
+import com.leyunone.disk.service.*;
 import com.leyunone.disk.service.front.UploadPreServiceImpl;
 import com.leyunone.disk.util.AssertUtil;
 import org.slf4j.Logger;
@@ -47,6 +45,8 @@ public class FileController {
     private UploadPreService uploadPreService;
     @Autowired
     private FolderService folderService;
+    @Autowired
+    private FileContentService fileContentService;
 
 
     /**
@@ -58,6 +58,17 @@ public class FileController {
     public DataResponse<UserFileInfoVO> getFiles(FileQuery query) {
         UserFileInfoVO files = fileQueryService.getFiles(query);
         return DataResponse.of(files);
+    }
+
+    /**
+     * 查询详情
+     * @param fileId
+     * @return
+     */
+    @GetMapping("/detail")
+    public DataResponse<FileInfoVO> detail(String fileId) {
+        FileInfoVO fileInfoVO = fileContentService.fileDetail(fileId);
+        return DataResponse.of(fileInfoVO);
     }
 
     /**
