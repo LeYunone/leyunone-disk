@@ -1,7 +1,9 @@
 package com.leyunone.disk.util;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 
@@ -54,7 +56,30 @@ public class FileUtil {
         return buffer;
     }
 
+    public static String getFileType(MultipartFile file) {
+        if (ObjectUtil.isNull(file)) {
+            return null;
+        }
+        String originalFilename = file.getOriginalFilename();
+        return originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
+    }
+
     public static String getTxtFile(String filePath) {
-        return HttpUtil.createRequest(Method.GET,filePath).execute().body();
+//        return HttpUtil.createRequest(Method.GET,filePath).execute().body();
+        File file = new File(filePath);
+        if (file.exists()) {
+            StringBuilder content = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new FileReader(filePath), 8192)) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    content.append(line);
+                    content.append("\n");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return content.toString();
+        }
+        return null;
     }
 }

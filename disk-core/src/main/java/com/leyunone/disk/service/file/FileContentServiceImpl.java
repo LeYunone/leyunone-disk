@@ -13,6 +13,7 @@ import com.leyunone.disk.model.vo.FileInfoVO;
 import com.leyunone.disk.service.FileContentService;
 import com.leyunone.disk.util.AssertUtil;
 import com.leyunone.disk.util.FileUtil;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ public class FileContentServiceImpl implements FileContentService {
 
     private final FileExtendContentDao fileExtendContentDao;
     private final FileInfoDao fileInfoDao;
+    @Value("${disk.env:oss}")
+    private String env;
 
     public FileContentServiceImpl(FileExtendContentDao fileExtendContentDao, FileInfoDao fileInfoDao) {
         this.fileExtendContentDao = fileExtendContentDao;
@@ -68,12 +71,16 @@ public class FileContentServiceImpl implements FileContentService {
         //判断文件大小进行截取内容依据
         long fileSize = fileInfoDO.getFileSize();
         FileTypeEnum fileType = FileTypeEnum.load(fileInfoDO.getFileType());
-        switch (fileType) {
-            case FILE_WORD:
-                //文本内容
-                String txtFile = FileUtil.getTxtFile(fileInfoDO.getFilePath());
-                fileInfoVO.setFileContentText(txtFile);
-            default:
+        fileInfoVO.setFileTypeText(fileType.getName());
+        fileInfoVO.setFileSize(FileUtil.sizeText(fileSize));
+        if(fileSize <= 10240000) {
+            switch (fileType) {
+                case FILE_WORD:
+                    //文本内容
+                    String txtFile = FileUtil.getTxtFile(fileInfoDO.getFilePath());
+                    fileInfoVO.setFileContentText(txtFile);
+                default:
+            }
         }
         return fileInfoVO;
     }

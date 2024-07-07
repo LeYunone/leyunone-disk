@@ -90,47 +90,57 @@ public class LocalFileServiceImpl extends AbstractFileService {
         String ossSlicesId = upFileDTO.getUploadId();
         //字节流转换
         Set<Integer> parts = content.getParts();
+        boolean merge = false;
         //分片上传
-        try {
-            if (!parts.contains(currentChunkNo)) {
-                //上传分片
-                boolean success = this.uploadSlice(upFileDTO, tempPath);
-                if (success) {
-                    parts.add(currentChunkNo);
+        //非已上传的分片
+        if (!parts.contains(currentChunkNo)) {
+            //上传分片
+            boolean success = this.uploadSlice(upFileDTO, tempPath);
+            if (success) {
+                parts.add(currentChunkNo);
+                //如果是最后一个子分片，将合并线程放开
+                if (currentChunkNo != totalChunks && parts.size() == totalChunks) {
+                    merge = true;
                 }
             }
-            //分片编号等于总片数的时候合并文件,如果符合条件则合并文件，否则继续等待
-            if (currentChunkNo == totalChunks) {
-                //合并文件
-                try {
-                    String url = this.mergeSliceFile(tempPath, content.getFileKey(), file.getOriginalFilename());
-                    uploadBO.setSuccess(true);
-                    uploadBO.setFilePath(url);
-                    uploadBO.setTotalSize(upFileDTO.getTotalSize());
-                    uploadBO.setFileName(file.getOriginalFilename());
-                    uploadBO.setParentId(upFileDTO.getParentId());
-                    uploadBO.setIdentifier(md5);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    uploadBO.setSuccess(false);
-                } finally {
-                    /**
-                     * 如果是最后一个该文件的上传请求就清空缓存
-                     */
-                    if (content.getParentIds().size() == 1) {
-                        UploadContext.removeCache(ossSlicesId);
-                        UploadContext.removeId(md5);
-                    } else {
-                        content.getParentIds().remove(upFileDTO.getParentId());
-                    }
-                    this.deleteSliceTemp(tempPath);
-                }
+        }
+        //分片编号等于总片数的时候合并文件,如果符合条件则合并文件，否则继续等待
+        if (currentChunkNo == totalChunks) {
+            //合并文件
+            if (parts.size() != totalChunks) {
+                //挂起 等待小分片上传完毕
             } else {
-                content.setParts(parts);
-                UploadContext.setCache(ossSlicesId, content);
+                merge = true;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        }
+        content.setParts(parts);
+        UploadContext.setCache(ossSlicesId, content);
+        if (merge) {
+            //最后一个分支上传完成
+            try {
+                String url = this.mergeSliceFile(tempPath, content.getFileKey(), file.getOriginalFilename());
+                uploadBO.setSuccess(true);
+                uploadBO.setFilePath(url);
+                uploadBO.setTotalSize(upFileDTO.getTotalSize());
+                uploadBO.setFileName(file.getOriginalFilename());
+                uploadBO.setParentId(upFileDTO.getParentId());
+                uploadBO.setIdentifier(md5);
+            } catch (Exception e) {
+                e.printStackTrace();
+                uploadBO.setSuccess(false);
+            } finally {
+                /**
+                 * 如果是最后一个该文件的上传请求就清空缓存
+                 */
+                if (content.getParentIds().size() == 1) {
+                    UploadContext.removeCache(ossSlicesId);
+                    UploadContext.removeId(md5);
+                } else {
+                    content.getParentIds().remove(upFileDTO.getParentId());
+                }
+//                this.deleteSliceTemp(tempPath);
+            }
         }
         return uploadBO;
     }
@@ -191,7 +201,7 @@ public class LocalFileServiceImpl extends AbstractFileService {
         //所有分片
         File[] files = sliceFile.listFiles();
         //按照1 2 3 4 排序，有序写入
-        Arrays.stream(files).sorted(Comparator.comparing(o -> Integer.valueOf(o.getName())));
+        Arrays.sort(files, Comparator.comparing(o -> Integer.parseInt(o.getName())));
         RandomAccessFile randomAccessFile = null;
         try {
             //使用RandomAccessFile 达到追加插入， 也可以使用Inputstream的Skip方法跳过已读过的
@@ -270,8 +280,9 @@ public class LocalFileServiceImpl extends AbstractFileService {
             os = httpServletResponse.getOutputStream();
             bis = new BufferedInputStream(new ByteArrayInputStream(bytes));
             //写入文件
-            while (bis.read(buffer) != -1) {
-                os.write(buffer);
+            int bytesRead;
+            while ((bytesRead = bis.read(buffer)) != -1) {
+                os.write(buffer, 0, bytesRead);
             }
         } catch (Exception e) {
             e.printStackTrace();

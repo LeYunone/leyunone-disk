@@ -54,7 +54,7 @@ public abstract class AbstractFileService implements FileService {
             fileInfoDO.setFileId(UUID.randomUUID().toString());
             fileInfoDO.setFileName(uploadBO.getFileName());
             fileInfoDO.setFileSize(uploadBO.getTotalSize());
-            fileInfoDO.setFileType(FileTypeEnum.loadType(upFileDTO.getFileType()).getValue());
+            fileInfoDO.setFileType(FileTypeEnum.loadType(upFileDTO.getFileType().toUpperCase()).getValue());
             fileInfoDO.setFilePath(uploadBO.getFilePath());
             fileInfoDO.setFileMd5(uploadBO.getIdentifier());
             fileInfoDao.save(fileInfoDO);

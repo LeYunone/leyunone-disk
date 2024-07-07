@@ -66,45 +66,58 @@ public class AliOssFileServiceImpl extends AbstractFileService {
         String ossSlicesId = upFileDTO.getUploadId();
         //字节流转换
         Map<Integer, PartETag> partETags = content.getPartETags();
+        boolean merge = false;
         //分片上传
-        try {
-            if (!partETags.containsKey(currentChunkNo)) {
-                //每次上传分片之后，OSS的返回结果会包含一个PartETag
-                PartETag partETag = ossManager.partUploadFile(content.getFileKey(), file.getInputStream(), ossSlicesId,
+        if (!partETags.containsKey(currentChunkNo)) {
+            //每次上传分片之后，OSS的返回结果会包含一个PartETag
+            PartETag partETag = null;
+            try {
+                partETag = ossManager.partUploadFile(content.getFileKey(), file.getInputStream(), ossSlicesId,
                         upFileDTO.getIdentifier(), currentChunkNo, file.getSize());
-                partETags.put(currentChunkNo, partETag);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            //分片编号等于总片数的时候合并文件,如果符合条件则合并文件，否则继续等待
-            if (currentChunkNo == totalChunks) {
-                //合并文件，注意：partETags必须是所有分片的所以必须存入redis，然后取出放入集合
-                try {
-                    String url = ossManager.completePartUploadFile(content.getFileKey(), ossSlicesId, new ArrayList<>(partETags.values()));
-                    uploadBO.setSuccess(true);
-                    uploadBO.setFilePath(url);
-                    uploadBO.setTotalSize(upFileDTO.getTotalSize());
-                    uploadBO.setFileName(file.getOriginalFilename());
-                    uploadBO.setParentId(upFileDTO.getParentId());
-                    uploadBO.setIdentifier(md5);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    uploadBO.setSuccess(false);
-                } finally {
-                    /**
-                     * 如果是最后一个该文件的上传请求就清空缓存
-                     */
-                    if (content.getParentIds().size() == 1) {
-                        UploadContext.removeCache(ossSlicesId);
-                        UploadContext.removeId(md5);
-                    } else {
-                        content.getParentIds().remove(upFileDTO.getParentId());
-                    }
-                }
+            partETags.put(currentChunkNo, partETag);
+            //如果是最后一个子分片，将合并线程放开
+            if (currentChunkNo != totalChunks && partETags.size() == totalChunks) {
+                merge = true;
+            }
+        }
+        //分片编号等于总片数的时候合并文件,如果符合条件则合并文件，否则继续等待
+        if (currentChunkNo == totalChunks) {
+            //合并文件
+            if (partETags.size() != totalChunks) {
+                //挂起 等待小分片上传完毕
             } else {
-                content.setPartETags(partETags);
-                UploadContext.setCache(ossSlicesId, content);
+                merge = true;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }
+        content.setPartETags(partETags);
+        UploadContext.setCache(ossSlicesId, content);
+        if (merge) {
+            //合并文件，注意：partETags必须是所有分片的所以必须存入redis，然后取出放入集合
+            try {
+                String url = ossManager.completePartUploadFile(content.getFileKey(), ossSlicesId, new ArrayList<>(partETags.values()));
+                uploadBO.setSuccess(true);
+                uploadBO.setFilePath(url);
+                uploadBO.setTotalSize(upFileDTO.getTotalSize());
+                uploadBO.setFileName(file.getOriginalFilename());
+                uploadBO.setParentId(upFileDTO.getParentId());
+                uploadBO.setIdentifier(md5);
+            } catch (Exception e) {
+                e.printStackTrace();
+                uploadBO.setSuccess(false);
+            } finally {
+                /**
+                 * 如果是最后一个该文件的上传请求就清空缓存
+                 */
+                if (content.getParentIds().size() == 1) {
+                    UploadContext.removeCache(ossSlicesId);
+                    UploadContext.removeId(md5);
+                } else {
+                    content.getParentIds().remove(upFileDTO.getParentId());
+                }
+            }
         }
         return uploadBO;
     }

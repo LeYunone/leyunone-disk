@@ -33,7 +33,9 @@ public class FileInfoVO {
     /**
      * 文件类型
      */
-    private String fileType;
+    private Integer fileType;
+
+    private String fileTypeText;
 
     private LocalDateTime updateDt;
 

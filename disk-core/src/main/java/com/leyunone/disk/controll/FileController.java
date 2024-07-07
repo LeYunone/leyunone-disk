@@ -16,6 +16,7 @@ import com.leyunone.disk.model.vo.UserFileInfoVO;
 import com.leyunone.disk.service.*;
 import com.leyunone.disk.service.front.UploadPreServiceImpl;
 import com.leyunone.disk.util.AssertUtil;
+import com.leyunone.disk.util.FileUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +81,7 @@ public class FileController {
         if (ObjectUtil.isNull(upFileDTO.getParentId())) {
             upFileDTO.setParentId(-1);
         }
+        upFileDTO.setFileType(FileUtil.getFileType(upFileDTO.getFile()));
         UploadBO upload = fileService.upload(upFileDTO);
         return DataResponse.of(upload.getFilePath());
     }
