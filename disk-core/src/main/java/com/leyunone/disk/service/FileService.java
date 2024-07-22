@@ -26,4 +26,6 @@ public interface FileService {
     String requestUpload(RequestUploadDTO requestUpload);
     
     void cancelUpload(UpFileDTO upFileDTO);
+
+    String accessFile(String fileId);
 }

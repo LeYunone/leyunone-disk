@@ -11,6 +11,7 @@ import com.leyunone.disk.model.ResponseCode;
 import com.leyunone.disk.model.bo.UploadBO;
 import com.leyunone.disk.model.vo.FileInfoVO;
 import com.leyunone.disk.service.FileContentService;
+import com.leyunone.disk.service.FileService;
 import com.leyunone.disk.util.AssertUtil;
 import com.leyunone.disk.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,12 +32,14 @@ public class FileContentServiceImpl implements FileContentService {
 
     private final FileExtendContentDao fileExtendContentDao;
     private final FileInfoDao fileInfoDao;
+    private final FileService fileService;
     @Value("${disk.env:oss}")
     private String env;
 
-    public FileContentServiceImpl(FileExtendContentDao fileExtendContentDao, FileInfoDao fileInfoDao) {
+    public FileContentServiceImpl(FileExtendContentDao fileExtendContentDao, FileInfoDao fileInfoDao, FileService fileService) {
         this.fileExtendContentDao = fileExtendContentDao;
         this.fileInfoDao = fileInfoDao;
+        this.fileService = fileService;
     }
 
     @Override
@@ -77,7 +80,7 @@ public class FileContentServiceImpl implements FileContentService {
             switch (fileType) {
                 case FILE_WORD:
                     //文本内容
-                    String txtFile = FileUtil.getTxtFile(fileInfoDO.getFilePath());
+                    String txtFile = fileService.accessFile(fileId);
                     fileInfoVO.setFileContentText(txtFile);
                 default:
             }

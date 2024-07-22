@@ -109,7 +109,7 @@ public abstract class AbstractFileService implements FileService {
             if (upload.getParentIds().size() == 1) {
                 //删除
                 UploadContext.removeCache(uploadId);
-                UploadContext.removeId(upFileDTO.getIdentifier());
+                UploadContext.removeId(upFileDTO.getUniqueIdentifier());
             }
         }
     }

@@ -74,4 +74,6 @@ public class UpFileDTO implements Serializable {
     private Integer parentId;
 
     private boolean hasDate;
+
+    private String uniqueIdentifier;
 }

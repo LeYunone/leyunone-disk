@@ -429,4 +429,26 @@ public class LocalFileServiceImpl extends AbstractFileService {
         }
         return uploadId;
     }
+
+    @Override
+    public String accessFile(String fileId) {
+//        return HttpUtil.createRequest(Method.GET,filePath).execute().body();
+        FileInfoDO fileInfoDO = fileInfoDao.selectById(fileId);
+        AssertUtil.isFalse(ObjectUtil.isNull(fileInfoDO), ResponseCode.FILE_NOT_EXIST);
+        File file = new File(fileInfoDO.getFilePath());
+        if (file.exists()) {
+            StringBuilder content = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new FileReader(fileInfoDO.getFilePath()), 8192)) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    content.append(line);
+                    content.append("\n");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return content.toString();
+        }
+        return null;
+    }
 }

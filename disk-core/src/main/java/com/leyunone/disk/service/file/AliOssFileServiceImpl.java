@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.http.HttpUtil;
+import cn.hutool.http.Method;
 import com.aliyun.oss.model.PartETag;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.leyunone.disk.common.UploadContext;
@@ -26,6 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -255,5 +260,14 @@ public class AliOssFileServiceImpl extends AbstractFileService {
             UploadContext.setId(requestUpload.getUniqueIdentifier(), uploadId);
         }
         return uploadId;
+    }
+
+    @Override
+    public String accessFile(String fileId) {
+        FileInfoDO fileInfoDO = fileInfoDao.selectById(fileId);
+        AssertUtil.isFalse(ObjectUtil.isNull(fileInfoDO), ResponseCode.FILE_NOT_EXIST);
+        //http请求拿到文件字符内容
+        String body = HttpUtil.createRequest(Method.GET, fileInfoDO.getFilePath()).execute().body();
+        return body;
     }
 }
