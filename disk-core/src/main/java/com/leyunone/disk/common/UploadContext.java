@@ -59,6 +59,8 @@ public class UploadContext {
          */
         private String fileKey;
 
+        private String uploadId;
+
         /**
          * 待上传的路径
          */

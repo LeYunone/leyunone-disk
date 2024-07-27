@@ -2,6 +2,7 @@ package com.leyunone.disk.service.file;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.leyunone.disk.common.UploadContext;
 import com.leyunone.disk.common.enums.FileTypeEnum;
 import com.leyunone.disk.dao.entry.FileFolderDO;
@@ -13,6 +14,7 @@ import com.leyunone.disk.model.ResponseCode;
 import com.leyunone.disk.model.bo.UploadBO;
 import com.leyunone.disk.model.dto.FileDTO;
 import com.leyunone.disk.model.dto.FileFolderDTO;
+import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.vo.DownloadFileVO;
 import com.leyunone.disk.service.FileContentService;
@@ -20,6 +22,7 @@ import com.leyunone.disk.service.FileService;
 import com.leyunone.disk.util.AssertUtil;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -90,6 +93,26 @@ public abstract class AbstractFileService implements FileService {
             this.deleteFile(files.stream().map(FileDTO::getFolderId).collect(Collectors.toList()));
         }
     }
+
+    @Override
+    public String requestUpload(RequestUploadDTO requestUpload) {
+        String uploadId = UploadContext.getId(requestUpload.getUniqueIdentifier());
+        if (StringUtils.isNotBlank(uploadId)) {
+            //该文件已经在上传流程中
+            UploadContext.Content upload = UploadContext.getUpload(uploadId);
+            if (ObjectUtil.isNotNull(upload)) {
+                upload.getParentIds().add(requestUpload.getFolderId());
+            }
+        } else {
+            UploadContext.Content content = this.requestUploadId(requestUpload);
+            uploadId = content.getUploadId();
+            //埋点记录文件
+
+        }
+        return uploadId;
+    }
+
+    protected abstract UploadContext.Content requestUploadId(RequestUploadDTO requestUpload);
 
     protected abstract boolean deleteFile(List<Integer> folderIds);
 

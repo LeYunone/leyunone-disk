@@ -403,31 +403,23 @@ public class LocalFileServiceImpl extends AbstractFileService {
      * @return
      */
     @Override
-    public String requestUpload(RequestUploadDTO requestUpload) {
-        String uploadId = UploadContext.getId(requestUpload.getUniqueIdentifier());
-        if (StringUtils.isNotBlank(uploadId)) {
-            //该文件已经在上传流程中
-            UploadContext.Content upload = UploadContext.getUpload(uploadId);
-            if (ObjectUtil.isNotNull(upload)) {
-                upload.getParentIds().add(requestUpload.getFolderId());
-            }
-        } else {
-            String prefix = "";
-            if (ObjectUtil.isNotNull(requestUpload.getFolderId())) {
-                //拼接前缀
-                FileFolderDO fileFolderDO = fileFolderDao.selectById(requestUpload.getFolderId());
-                prefix = fileHelpService.dfsGenerateFolderPrefix(fileFolderDO);
-            }
-//            String fileName = prefix + requestUpload.getFileName();
-            uploadId = UUID.randomUUID().toString();
-            UploadContext.Content content = new UploadContext.Content();
-            content.setPartETags(new HashMap<>());
-            content.setFileKey(prefix);
-            content.getParentIds().add(requestUpload.getFolderId());
-            UploadContext.setCache(uploadId, content);
-            UploadContext.setId(requestUpload.getUniqueIdentifier(), uploadId);
+    public UploadContext.Content requestUploadId(RequestUploadDTO requestUpload) {
+        String prefix = "";
+        if (ObjectUtil.isNotNull(requestUpload.getFolderId())) {
+            //拼接前缀
+            FileFolderDO fileFolderDO = fileFolderDao.selectById(requestUpload.getFolderId());
+            prefix = fileHelpService.dfsGenerateFolderPrefix(fileFolderDO);
         }
-        return uploadId;
+//            String fileName = prefix + requestUpload.getFileName();
+        String uploadId = UUID.randomUUID().toString();
+        UploadContext.Content content = new UploadContext.Content();
+        content.setPartETags(new HashMap<>());
+        content.setFileKey(prefix);
+        content.getParentIds().add(requestUpload.getFolderId());
+        content.setUploadId(uploadId);
+        UploadContext.setCache(uploadId, content);
+        UploadContext.setId(requestUpload.getUniqueIdentifier(), uploadId);
+        return content;
     }
 
     @Override
