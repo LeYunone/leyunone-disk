@@ -16,6 +16,8 @@ import java.util.Set;
 @Setter
 public class UploadBO {
     
+    private String uploadId;
+    
     private boolean success;
     
     private String filePath;
@@ -39,4 +41,6 @@ public class UploadBO {
     private String fileId;
 
     private String fileText;
+
+    private Integer chunkNumber;
 }

@@ -7,7 +7,6 @@ import lombok.Setter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 /**
  * :)
@@ -18,9 +17,14 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 public class UploadContext {
 
-    private final static Map<String, Content> updateCache = new ConcurrentHashMap<>();
+    private final static Map<String, Content> uploadCache = new ConcurrentHashMap<>();
 
     private final static Map<String, String> uploadId = new ConcurrentHashMap<>();
+
+    public static void cleanCache(String id, String md5) {
+        uploadCache.remove(id);
+        uploadId.remove(md5);
+    }
 
     public static void setId(String md5, String id) {
         uploadId.put(md5, id);
@@ -35,15 +39,15 @@ public class UploadContext {
     }
 
     public static void setCache(String key, Content value) {
-        updateCache.put(key, value);
+        uploadCache.put(key, value);
     }
 
     public static void removeCache(String key) {
-        updateCache.remove(key);
+        uploadCache.remove(key);
     }
 
     public static Content getUpload(String key) {
-        return updateCache.get(key);
+        return uploadCache.get(key);
     }
 
     @Getter
@@ -51,11 +55,11 @@ public class UploadContext {
     public static class Content {
 
         private Map<Integer, PartETag> partETags = new ConcurrentHashMap<>();
-        
+
         private Set<Integer> parts = new HashSet<>();
 
         /**
-         * 文件标识 oss为文件名
+         * 文件标识 oss为文件名 local为文件存储目录
          */
         private String fileKey;
 

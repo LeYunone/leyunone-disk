@@ -24,5 +24,7 @@ public interface OssManager {
     void deleteFile(String fileName);
     
     String uploadFile(String name, InputStream stream);
-    
+
+    void cancelFile(String fileName,String uploadId);
+
 }

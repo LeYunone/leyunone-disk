@@ -3,24 +3,20 @@ package com.leyunone.disk.service.file;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.leyunone.disk.common.UploadContext;
 import com.leyunone.disk.dao.entry.FileFolderDO;
 import com.leyunone.disk.dao.entry.FileInfoDO;
 import com.leyunone.disk.dao.repository.FileFolderDao;
 import com.leyunone.disk.dao.repository.FileInfoDao;
-import com.leyunone.disk.manager.OssManager;
 import com.leyunone.disk.model.ResponseCode;
 import com.leyunone.disk.model.bo.UploadBO;
-import com.leyunone.disk.model.co.FileInfoCO;
 import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.vo.DownloadFileVO;
 import com.leyunone.disk.service.FileHelpService;
-import com.leyunone.disk.service.FileService;
+import com.leyunone.disk.service.FileHistoryService;
 import com.leyunone.disk.util.AssertUtil;
 import com.leyunone.disk.util.CollectionFunctionUtils;
-import com.leyunone.disk.util.DownloadThread;
 import com.leyunone.disk.util.FileUtil;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,8 +47,8 @@ public class LocalFileServiceImpl extends AbstractFileService {
     @Value("${disk.download.count:4}")
     private Integer threadCount;
 
-    public LocalFileServiceImpl(FileInfoDao fileInfoDao, FileFolderDao fileFolderDao) {
-        super(fileInfoDao, fileFolderDao);
+    public LocalFileServiceImpl(FileInfoDao fileInfoDao, FileFolderDao fileFolderDao, FileHistoryService fileHistoryService) {
+        super(fileInfoDao, fileFolderDao, fileHistoryService);
     }
 
     /**

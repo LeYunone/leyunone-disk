@@ -133,6 +133,17 @@ public class OssManagerImpl implements OssManager {
         return getDownloadUrl(name);
     }
 
+    @Override
+    public void cancelFile(String fileName, String uploadId) {
+        // 创建OSSClient实例。
+        OSS ossClient = new OSSClientBuilder().build(endpoint, accessKeyId, accessKeySecret);
+        // 取消分片上传。
+        AbortMultipartUploadRequest abortMultipartUploadRequest =
+                new AbortMultipartUploadRequest(bucketName, fileName, uploadId);
+        ossClient.abortMultipartUpload(abortMultipartUploadRequest);
+        ossClient.shutdown();
+    }
+
     /**
      * 获取bucket文件的下载链接
      */

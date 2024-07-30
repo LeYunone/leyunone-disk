@@ -31,10 +31,10 @@ public class FileUserDO implements Serializable {
     @TableField(value = "deleted", fill = FieldFill.INSERT)
     private Integer deleted;
 
-    @TableField(value = "create_Dt", fill = FieldFill.INSERT)
+    @TableField(value = "create_dt", fill = FieldFill.INSERT)
     private LocalDateTime createDt;
 
-    @TableField(value = "update_Dt", fill = FieldFill.INSERT)
+    @TableField(value = "update_dt", fill = FieldFill.INSERT)
     private LocalDateTime updateDt;
 
 }

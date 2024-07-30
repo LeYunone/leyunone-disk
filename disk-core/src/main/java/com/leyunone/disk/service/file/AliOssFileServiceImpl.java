@@ -7,12 +7,12 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.http.Method;
 import com.aliyun.oss.model.PartETag;
-import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.leyunone.disk.common.UploadContext;
 import com.leyunone.disk.common.enums.FileTypeEnum;
 import com.leyunone.disk.dao.entry.FileFolderDO;
 import com.leyunone.disk.dao.entry.FileInfoDO;
 import com.leyunone.disk.dao.repository.FileFolderDao;
+import com.leyunone.disk.dao.repository.FileHistoryDao;
 import com.leyunone.disk.dao.repository.FileInfoDao;
 import com.leyunone.disk.manager.OssManager;
 import com.leyunone.disk.model.ResponseCode;
@@ -21,6 +21,7 @@ import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.vo.DownloadFileVO;
 import com.leyunone.disk.service.FileHelpService;
+import com.leyunone.disk.service.FileHistoryService;
 import com.leyunone.disk.util.AssertUtil;
 import com.leyunone.disk.util.CollectionFunctionUtils;
 import com.leyunone.disk.util.MD5Util;
@@ -28,9 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -49,8 +47,8 @@ public class AliOssFileServiceImpl extends AbstractFileService {
     @Autowired
     private FileHelpService fileHelpService;
 
-    public AliOssFileServiceImpl(FileInfoDao fileInfoDao, FileFolderDao fileFolderDao) {
-        super(fileInfoDao, fileFolderDao);
+    public AliOssFileServiceImpl(FileInfoDao fileInfoDao, FileFolderDao fileFolderDao, FileHistoryService fileHistoryService) {
+        super(fileInfoDao, fileFolderDao, fileHistoryService);
     }
 
     @Override

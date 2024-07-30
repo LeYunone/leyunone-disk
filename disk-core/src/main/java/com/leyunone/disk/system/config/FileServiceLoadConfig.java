@@ -2,6 +2,7 @@ package com.leyunone.disk.system.config;
 
 import com.leyunone.disk.dao.repository.FileFolderDao;
 import com.leyunone.disk.dao.repository.FileInfoDao;
+import com.leyunone.disk.service.FileHistoryService;
 import com.leyunone.disk.service.FileService;
 import com.leyunone.disk.service.file.AliOssFileServiceImpl;
 import com.leyunone.disk.service.file.LocalFileServiceImpl;
@@ -22,13 +23,14 @@ public class FileServiceLoadConfig {
     private String type;
 
     @Bean
-    public FileService fileService(FileInfoDao fileInfoDao, FileFolderDao fileFolderDao) {
+    public FileService fileService(FileInfoDao fileInfoDao, FileFolderDao fileFolderDao, FileHistoryService fileHistoryService) {
         switch (type) {
             case "oss":
-                return new AliOssFileServiceImpl(fileInfoDao, fileFolderDao);
+                return new AliOssFileServiceImpl(fileInfoDao, fileFolderDao, fileHistoryService);
             case "local":
-                return new LocalFileServiceImpl(fileInfoDao, fileFolderDao);
+                return new LocalFileServiceImpl(fileInfoDao, fileFolderDao, fileHistoryService);
+            default:
+                return new AliOssFileServiceImpl(fileInfoDao, fileFolderDao, fileHistoryService);
         }
-        return new AliOssFileServiceImpl(fileInfoDao, fileFolderDao);
     }
 }

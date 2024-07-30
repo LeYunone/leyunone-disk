@@ -28,10 +28,10 @@ public class FileUpLogDO implements Serializable {
 
     private Long upFileTotalSize;
 
-    @TableField(value = "update_Dt", fill = FieldFill.INSERT)
+    @TableField(value = "update_dt", fill = FieldFill.INSERT)
     private LocalDateTime updateDt;
 
-    @TableField(value = "create_Dt", fill = FieldFill.INSERT)
+    @TableField(value = "create_dt", fill = FieldFill.INSERT)
     private LocalDateTime createDt;
 
 }

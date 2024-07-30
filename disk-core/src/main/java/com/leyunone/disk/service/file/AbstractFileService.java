@@ -7,22 +7,19 @@ import com.leyunone.disk.common.UploadContext;
 import com.leyunone.disk.common.enums.FileTypeEnum;
 import com.leyunone.disk.dao.entry.FileFolderDO;
 import com.leyunone.disk.dao.entry.FileInfoDO;
-import com.leyunone.disk.dao.repository.FileExtendContentDao;
 import com.leyunone.disk.dao.repository.FileFolderDao;
 import com.leyunone.disk.dao.repository.FileInfoDao;
 import com.leyunone.disk.model.ResponseCode;
 import com.leyunone.disk.model.bo.UploadBO;
 import com.leyunone.disk.model.dto.FileDTO;
-import com.leyunone.disk.model.dto.FileFolderDTO;
 import com.leyunone.disk.model.dto.RequestUploadDTO;
 import com.leyunone.disk.model.dto.UpFileDTO;
 import com.leyunone.disk.model.vo.DownloadFileVO;
-import com.leyunone.disk.service.FileContentService;
+import com.leyunone.disk.service.FileHistoryService;
 import com.leyunone.disk.service.FileService;
 import com.leyunone.disk.util.AssertUtil;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -35,39 +32,48 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractFileService implements FileService {
 
-    protected FileInfoDao fileInfoDao;
-    protected FileFolderDao fileFolderDao;
+    protected final FileInfoDao fileInfoDao;
+    protected final FileFolderDao fileFolderDao;
+    private final FileHistoryService fileHistoryService;
 
-    public AbstractFileService(FileInfoDao fileInfoDao, FileFolderDao fileFolderDao) {
+    public AbstractFileService(FileInfoDao fileInfoDao, FileFolderDao fileFolderDao, FileHistoryService fileHistoryService) {
         this.fileInfoDao = fileInfoDao;
         this.fileFolderDao = fileFolderDao;
+        this.fileHistoryService = fileHistoryService;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public UploadBO upload(UpFileDTO upFileDTO) {
         UploadBO uploadBO = null;
-        if (upFileDTO.isEasyUpload()) {
-            uploadBO = this.easyUpload(upFileDTO);
-        } else {
-            uploadBO = this.shardUpload(upFileDTO);
-        }
-        if (uploadBO.isSuccess()) {
-            FileInfoDO fileInfoDO = new FileInfoDO();
-            fileInfoDO.setFileId(UUID.randomUUID().toString());
-            fileInfoDO.setFileName(uploadBO.getFileName());
-            fileInfoDO.setFileSize(uploadBO.getTotalSize());
-            fileInfoDO.setFileType(FileTypeEnum.loadType(upFileDTO.getFileType().toUpperCase()).getValue());
-            fileInfoDO.setFilePath(uploadBO.getFilePath());
-            fileInfoDO.setFileMd5(uploadBO.getIdentifier());
-            fileInfoDao.save(fileInfoDO);
-            FileFolderDO fileFolderDO = new FileFolderDO();
-            fileFolderDO.setFolder(false);
-            fileFolderDO.setParentId(uploadBO.getParentId());
-            fileFolderDO.setFileId(fileInfoDO.getFileId());
-            fileFolderDao.save(fileFolderDO);
-            uploadBO.setFileId(fileInfoDO.getFileId());
+        try {
+            if (upFileDTO.isEasyUpload()) {
+                uploadBO = this.easyUpload(upFileDTO);
+            } else {
+                uploadBO = this.shardUpload(upFileDTO);
+            }
+            if (uploadBO.isSuccess()) {
+                FileInfoDO fileInfoDO = new FileInfoDO();
+                fileInfoDO.setFileId(UUID.randomUUID().toString());
+                fileInfoDO.setFileName(uploadBO.getFileName());
+                fileInfoDO.setFileSize(uploadBO.getTotalSize());
+                fileInfoDO.setFileType(FileTypeEnum.loadType(upFileDTO.getFileType().toUpperCase()).getValue());
+                fileInfoDO.setFilePath(uploadBO.getFilePath());
+                fileInfoDO.setFileMd5(uploadBO.getIdentifier());
+                fileInfoDao.save(fileInfoDO);
+                FileFolderDO fileFolderDO = new FileFolderDO();
+                fileFolderDO.setFolder(false);
+                fileFolderDO.setParentId(uploadBO.getParentId());
+                fileFolderDO.setFileId(fileInfoDO.getFileId());
+                fileFolderDao.save(fileFolderDO);
+                uploadBO.setFileId(fileInfoDO.getFileId());
 //            fileContentService.saveFileContent(uploadBO);
+            }
+        } finally {
+            //为空时上传失败
+            if (ObjectUtil.isNotNull(uploadBO)) {
+                fileHistoryService.uploadRecord(uploadBO);
+            }
         }
         return uploadBO;
     }
@@ -97,17 +103,30 @@ public abstract class AbstractFileService implements FileService {
     @Override
     public String requestUpload(RequestUploadDTO requestUpload) {
         String uploadId = UploadContext.getId(requestUpload.getUniqueIdentifier());
+        String fileKey = "";
         if (StringUtils.isNotBlank(uploadId)) {
             //该文件已经在上传流程中
             UploadContext.Content upload = UploadContext.getUpload(uploadId);
             if (ObjectUtil.isNotNull(upload)) {
                 upload.getParentIds().add(requestUpload.getFolderId());
+                fileKey = upload.getFileKey();
+            } else {
+                //两个缓存有延时问题，删除缓存
+                UploadContext.removeId(requestUpload.getUniqueIdentifier());
+                /**
+                 * 迭代判断
+                 */
+                return this.requestUpload(requestUpload);
             }
         } else {
-            UploadContext.Content content = this.requestUploadId(requestUpload);
-            uploadId = content.getUploadId();
-            //埋点记录文件
-
+            try {
+                UploadContext.Content content = this.requestUploadId(requestUpload);
+                uploadId = content.getUploadId();
+                fileKey = content.getFileKey();
+            } finally {
+                //埋点记录文件
+                fileHistoryService.burialPoint(uploadId, fileKey, requestUpload.getUniqueIdentifier());
+            }
         }
         return uploadId;
     }
