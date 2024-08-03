@@ -55,6 +55,8 @@ public class AliOssFileServiceImpl extends AbstractFileService {
     @Transactional(rollbackFor = Exception.class)
     public UploadBO shardUpload(UpFileDTO upFileDTO) {
         UploadBO uploadBO = new UploadBO();
+        uploadBO.setChunkNumber(upFileDTO.getChunkNumber());
+        uploadBO.setUploadId(upFileDTO.getUploadId());
         uploadBO.setSuccess(false);
         //本次文件的MD5码
         String md5 = upFileDTO.getIdentifier();

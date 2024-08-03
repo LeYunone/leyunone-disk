@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@TableName("file_folder")
+@TableName("file_history")
 @ToString
 @EqualsAndHashCode
 public class FileHistoryDO {
